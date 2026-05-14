@@ -15,9 +15,9 @@ export const invitationsApi = {
   send: (data: SendInvitationPayload) =>
     apiClient.post<BackendResponse<Invitation>>('/invitations/send', data).then(unwrap),
 
-  // POST /api/invitations/validate
+  // GET /api/invitations/validate?token=...
   validate: (token: string) =>
-    apiClient.post<BackendResponse<ValidatedInvitation>>('/invitations/validate', { token }).then(unwrap),
+    apiClient.get<BackendResponse<ValidatedInvitation>>('/invitations/validate', { params: { token } }).then(unwrap),
 
   // POST /api/invitations/join
   join: (data: JoinPayload) =>

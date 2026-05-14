@@ -3,11 +3,12 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { CheckCircle, XCircle, Loader2, Zap } from 'lucide-react'
 import { Button } from '@components/common/Button'
-import { authApi } from '@features/auth/api/authApi'
+import { useAuth } from '@hooks/useAuth'
 
 type State = 'loading' | 'success' | 'error'
 
 export default function VerifyEmailPage() {
+  const { verifyEmail, resendVerification } = useAuth()
   const [searchParams] = useSearchParams()
   const navigate        = useNavigate()
   const token           = searchParams.get('token') ?? ''
@@ -16,7 +17,7 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     if (!token) { setState('error'); return }
-    authApi.verifyEmail(token)
+    verifyEmail(token)
       .then(() => setState('success'))
       .catch(() => setState('error'))
   }, [token])
@@ -24,7 +25,7 @@ export default function VerifyEmailPage() {
   const resend = async () => {
     try {
       setResending(true)
-      await authApi.resendVerification(searchParams.get('email') || '')
+      await resendVerification(searchParams.get('email') || '')
     } finally {
       setResending(false)
     }

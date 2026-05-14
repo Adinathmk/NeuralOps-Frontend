@@ -1,12 +1,11 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
 import { User, Lock, Monitor, Bell, Link as LinkIcon, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useAppSelector, useAppDispatch } from '@store/index'
-import { updateUser } from '@store/slices/authSlice'
+import { useAppSelector } from '@store/index'
 import { authApi } from '@features/auth/api/authApi'
 import { Card, CardContent, CardHeader, CardTitle } from '@components/common/Card'
 import { Button } from '@components/common/Button'
@@ -36,7 +35,6 @@ const SETTING_LINKS = [
 export default function SettingsPage() {
   const user    = useAppSelector(s => s.auth.user)
   const tenant  = useAppSelector(s => s.auth.tenant)
-  const dispatch = useAppDispatch()
   const { toast } = useToast()
   const [pwLoading, setPwLoading] = useState(false)
 

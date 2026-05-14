@@ -9,10 +9,7 @@ import { Button } from '@components/common/Button'
 import { Input } from '@components/common/Input'
 import { Badge } from '@components/common/Badge'
 import { invitationsApi } from '@features/invitations/api/invitationsApi'
-import { authApi } from '@features/auth/api/authApi'
-import { useAppDispatch } from '@store/index'
-import { setAuthFromOAuth } from '@store/slices/authSlice'
-import { tokenStorage, userStorage } from '@utils/token'
+import { useAuth } from '@hooks/useAuth'
 import type { ValidatedInvitation, JoinPayload } from '@/types'
 
 const schema = z.object({
@@ -29,7 +26,7 @@ type PageState = 'loading' | 'valid' | 'invalid' | 'joined'
 export default function AcceptInvitePage() {
   const [searchParams]  = useSearchParams()
   const navigate        = useNavigate()
-  const dispatch        = useAppDispatch()
+  const { joinInvitation } = useAuth()
   const token           = searchParams.get('token') ?? ''
   const [pageState, setPageState]           = useState<PageState>('loading')
   const [invitation, setInvitation]         = useState<ValidatedInvitation | null>(null)
@@ -54,26 +51,19 @@ export default function AcceptInvitePage() {
     if (!invitation) return
     setJoining(true); setError(null)
     try {
-      const res = await invitationsApi.join({
-        invite_token:    token,
-        first_name:      data.first_name,
-        last_name:       data.last_name,
-        password:        data.password,
+      const result = await joinInvitation({
+        invite_token:     token,
+        first_name:       data.first_name,
+        last_name:        data.last_name,
+        password:         data.password,
         password_confirm: data.password_confirm,
       })
-      // If the backend returns tokens on join, log in immediately
-      if (res.access_token && res.refresh_token && res.data) {
-        const tokens = { access_token: res.access_token, refresh_token: res.refresh_token, token_type: 'bearer' as const }
-        tokenStorage.setTokens(tokens)
-        setPageState('joined')
-        setTimeout(() => navigate('/dashboard'), 2000)
-      } else {
-        setPageState('joined')
-        setTimeout(() => navigate('/login'), 2500)
-      }
+      setPageState('joined')
+      // If backend auto-logged them in via joinInvitationThunk, go to dashboard
+      // Otherwise redirect to login
+      setTimeout(() => navigate(result.autoLogin ? '/dashboard' : '/login'), 2000)
     } catch (err: unknown) {
-      const e = err as { response?: { data?: { message?: string } } }
-      setError(e.response?.data?.message ?? 'Failed to join. Please try again.')
+      setError(typeof err === 'string' ? err : 'Failed to join. Please try again.')
     } finally { setJoining(false) }
   }
 

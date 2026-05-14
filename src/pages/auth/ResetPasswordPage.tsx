@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Button } from '@components/common/Button'
 import { Input } from '@components/common/Input'
-import { authApi } from '@features/auth/api/authApi'
+import { useAuth } from '@hooks/useAuth'
 import type { ResetPasswordFormData } from '@/types'
 
 const schema = z.object({
@@ -25,6 +25,7 @@ const schema = z.object({
 type FormData = Omit<ResetPasswordFormData, 'token'>
 
 export default function ResetPasswordPage() {
+  const { resetPassword } = useAuth()
   const [searchParams] = useSearchParams()
   const navigate        = useNavigate()
   const token           = searchParams.get('token') ?? ''
@@ -40,7 +41,7 @@ export default function ResetPasswordPage() {
     if (!token) { setError('Invalid or missing reset token.'); return }
     try {
       setLoading(true); setError(null)
-      await authApi.resetPassword({ token, ...data })
+      await resetPassword({ token, ...data })
       setDone(true)
     } catch {
       setError('Reset link is invalid or has expired.')

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import type { Incident, IncidentStatus } from '@/types'
-import api from '@lib/axios'
+import { incidentsApi } from '@features/dashboard/api/incidentsApi'
 
 interface IncidentsState {
   items:    Incident[]
@@ -34,7 +34,7 @@ export const fetchIncidentsThunk = createAsyncThunk(
   'incidents/fetchAll',
   async (params: Record<string, unknown> = {}, { rejectWithValue }) => {
     try {
-      const res = await api.get<{ results: Incident[]; count: number }>('/v1/incidents', { params })
+      const res = await incidentsApi.list(params)
       return res.data
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } }
@@ -47,7 +47,7 @@ export const fetchIncidentThunk = createAsyncThunk(
   'incidents/fetchOne',
   async (id: string, { rejectWithValue }) => {
     try {
-      const res = await api.get<Incident>(`/v1/incidents/${id}`)
+      const res = await incidentsApi.getById(id)
       return res.data
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } }

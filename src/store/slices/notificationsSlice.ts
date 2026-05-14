@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import type { Notification } from '@/types'
-import api from '@lib/axios'
+import { notificationsApi } from '@features/dashboard/api/notificationsApi'
 
 interface NotificationsState {
   items:      Notification[]
@@ -17,7 +17,7 @@ const initialState: NotificationsState = {
 export const fetchNotificationsThunk = createAsyncThunk(
   'notifications/fetchAll',
   async (userId: string) => {
-    const res = await api.get<Notification[]>(`/users/${userId}/notifications`)
+    const res = await notificationsApi.listByUser(userId)
     return res.data
   }
 )
@@ -25,7 +25,7 @@ export const fetchNotificationsThunk = createAsyncThunk(
 export const markReadThunk = createAsyncThunk(
   'notifications/markRead',
   async (notificationId: string) => {
-    await api.patch(`/notifications/${notificationId}/read`)
+    await notificationsApi.markRead(notificationId)
     return notificationId
   }
 )

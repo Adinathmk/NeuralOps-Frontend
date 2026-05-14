@@ -11,6 +11,7 @@ import RegisterPage       from '@pages/auth/RegisterPage'
 import ForgotPasswordPage from '@pages/auth/ForgotPasswordPage'
 import ResetPasswordPage  from '@pages/auth/ResetPasswordPage'
 import VerifyEmailPage    from '@pages/auth/VerifyEmailPage'
+import OAuthCallbackPage  from '@pages/auth/OAuthCallbackPage'
 
 // Dashboard pages
 import DashboardPage      from '@pages/dashboard/DashboardPage'
@@ -32,7 +33,7 @@ import AcceptInvitePage   from '@pages/invitations/AcceptInvitePage'
 // Misc
 import NotFoundPage       from '@pages/NotFoundPage'
 
-// â”€â”€ Private route wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Private route wrappers ────────────────────────────────────────────────────
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAppSelector(s => s.auth.isAuthenticated)
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
@@ -47,10 +48,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* â”€â”€ Root redirect â”€â”€ */}
+        {/* ── Root redirect ── */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* â”€â”€ Auth routes (guest only) â”€â”€ */}
+        {/* ── Auth routes (guest only) ── */}
         <Route element={<RequireGuest><AuthLayout /></RequireGuest>}>
           <Route path="/login"           element={<LoginPage />} />
           <Route path="/register"        element={<RegisterPage />} />
@@ -59,26 +60,29 @@ export default function App() {
           <Route path="/verify-email"    element={<VerifyEmailPage />} />
         </Route>
 
-        {/* â”€â”€ Public invitation accept (no auth required) â”€â”€ */}
-        <Route path="/invitations/accept" element={<AcceptInvitePage />} />
+        {/* ── OAuth Callback routes (public — no auth guard, provider comes from URL) ── */}
+        <Route path="/auth/:provider/callback" element={<OAuthCallbackPage />} />
 
-        {/* â”€â”€ Protected dashboard routes â”€â”€ */}
+        {/* ── Public invitation accept (no auth required) ── */}
+        <Route path="/join" element={<AcceptInvitePage />} />
+
+        {/* ── Protected dashboard routes ── */}
         <Route element={<RequireAuth><DashboardLayout /></RequireAuth>}>
-          <Route path="/dashboard"                         element={<DashboardPage />} />
-          <Route path="/dashboard/incidents"               element={<IncidentsPage />} />
-          <Route path="/dashboard/incidents/:id"           element={<IncidentDetailPage />} />
-          <Route path="/dashboard/analytics"               element={<AnalyticsPage />} />
-          <Route path="/dashboard/notifications"           element={<NotificationsPage />} />
-          <Route path="/dashboard/sessions"                element={<SessionsPage />} />
+          <Route path="/dashboard"                          element={<DashboardPage />} />
+          <Route path="/dashboard/incidents"                element={<IncidentsPage />} />
+          <Route path="/dashboard/incidents/:id"            element={<IncidentDetailPage />} />
+          <Route path="/dashboard/analytics"                element={<AnalyticsPage />} />
+          <Route path="/dashboard/notifications"            element={<NotificationsPage />} />
+          <Route path="/dashboard/sessions"                 element={<SessionsPage />} />
 
           {/* Settings sub-routes */}
-          { <Route path="/dashboard/settings"                element={<SettingsPage />} />}
-          <Route path="/dashboard/settings/alert-rules"   element={<AlertRulesPage />} />
-          <Route path="/dashboard/settings/playbooks"      element={<PlaybooksPage />} />
-          <Route path="/dashboard/settings/team"           element={<TeamPage />} /> 
+          <Route path="/dashboard/settings"                 element={<SettingsPage />} />
+          <Route path="/dashboard/settings/alert-rules"     element={<AlertRulesPage />} />
+          <Route path="/dashboard/settings/playbooks"       element={<PlaybooksPage />} />
+          <Route path="/dashboard/settings/team"            element={<TeamPage />} />
         </Route>
 
-        {/* â”€â”€ 404 â”€â”€ */}
+        {/* ── 404 ── */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

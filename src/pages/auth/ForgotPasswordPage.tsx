@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Button } from '@components/common/Button'
 import { Input } from '@components/common/Input'
-import { authApi } from '@features/auth/api/authApi'
+import { useAuth } from '@hooks/useAuth'
 import type { ForgotPasswordFormData } from '@/types'
 
 const schema = z.object({
@@ -15,6 +15,7 @@ const schema = z.object({
 })
 
 export default function ForgotPasswordPage() {
+  const { forgotPassword } = useAuth()
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -27,7 +28,7 @@ export default function ForgotPasswordPage() {
     try {
       setLoading(true)
       setError(null)
-      await authApi.forgotPassword(data)
+      await forgotPassword(data)
       setSent(true)
     } catch {
       setError('Something went wrong. Please try again.')

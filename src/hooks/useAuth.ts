@@ -1,8 +1,9 @@
-﻿import { useCallback } from 'react'
+import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@store/index'
-import { loginThunk, registerThunk, logoutThunk, fetchMeThunk, clearError } from '@store/slices/authSlice'
-import type { LoginFormData, RegisterFormData } from '@/types'
+import { loginThunk, registerThunk, logoutThunk, fetchMeThunk, clearError, googleOAuthThunk, githubOAuthThunk, joinInvitationThunk } from '@store/slices/authSlice'
+import { authApi } from '@features/auth/api/authApi'
+import type { LoginFormData, RegisterFormData, ForgotPasswordFormData, ResetPasswordFormData, ChangePasswordFormData, JoinPayload } from '@/types'
 
 export function useAuth() {
   const dispatch = useAppDispatch()
@@ -30,6 +31,34 @@ export function useAuth() {
     return result
   }, [dispatch, navigate])
 
+  const googleOAuth = useCallback(async (code: string, inviteToken?: string) => {
+    return dispatch(googleOAuthThunk({ code, inviteToken })).unwrap()
+  }, [dispatch])
+
+  const githubOAuth = useCallback(async (code: string, inviteToken?: string) => {
+    return dispatch(githubOAuthThunk({ code, inviteToken })).unwrap()
+  }, [dispatch])
+
+  const joinInvitation = useCallback(async (payload: JoinPayload) => {
+    return dispatch(joinInvitationThunk(payload)).unwrap()
+  }, [dispatch])
+
+  const forgotPassword = useCallback(async (data: ForgotPasswordFormData) => {
+    return authApi.forgotPassword(data)
+  }, [])
+
+  const resetPassword = useCallback(async (data: ResetPasswordFormData) => {
+    return authApi.resetPassword(data)
+  }, [])
+
+  const verifyEmail = useCallback(async (token: string) => {
+    return authApi.verifyEmail(token)
+  }, [])
+
+  const resendVerification = useCallback(async (email: string) => {
+    return authApi.resendVerification(email)
+  }, [])
+
   const logout = useCallback(async () => {
     await dispatch(logoutThunk())
     navigate('/login', { replace: true })
@@ -55,6 +84,13 @@ export function useAuth() {
 
     login,
     register,
+    googleOAuth,
+    githubOAuth,
+    joinInvitation,
+    forgotPassword,
+    resetPassword,
+    verifyEmail,
+    resendVerification,
     logout,
     refreshUser,
     dismissError,
