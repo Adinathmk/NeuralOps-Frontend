@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 4%;
+    --foreground: 210 40% 92%;
+    --card: 222 47% 7%;
+    --card-foreground: 210 40% 92%;
+    --popover: 222 47% 7%;
+    --popover-foreground: 210 40% 92%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 47% 12%;
+    --secondary-foreground: 210 40% 92%;
+    --muted: 222 47% 12%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 222 47% 12%;
+    --accent-foreground: 210 40% 92%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 47% 13%;
+    --input: 222 47% 10%;
+    --ring: 142 76% 36%;
+    --radius: 0.5rem;
+  }
+
+ * {
+  border-color: hsl(var(--border));
+  box-sizing: border-box;
+}
+
+  html {
+    @apply antialiased;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-surface-0 text-foreground font-sans;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+  /* Code blocks */
+  code, pre { font-family: 'Geist Mono', 'Fira Code', monospace; }
+}
+
+@layer utilities {
+  .bg-surface-0 { background-color: #0a0c0f; }
+  .bg-surface-1 { background-color: #0f1117; }
+  .bg-surface-2 { background-color: #151821; }
+  .bg-surface-3 { background-color: #1c2030; }
+  .bg-surface-4 { background-color: #232840; }
+
+  .border-white\/8 { border-color: rgba(255,255,255,0.08); }
+
+  .glow-neural {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-neural-400 to-neural-300 bg-clip-text text-transparent;
+  }
+}
