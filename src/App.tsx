@@ -13,7 +13,8 @@ import ForgotPasswordPage from '@pages/auth/ForgotPasswordPage'
 import ResetPasswordPage  from '@pages/auth/ResetPasswordPage'
 import VerifyEmailPage    from '@pages/auth/VerifyEmailPage'
 import OAuthCallbackPage  from '@pages/auth/OAuthCallbackPage'
-import MFAVerifyPage      from '@pages/auth/MFAVerifyPage'   // ← NEW
+import MFAVerifyPage      from '@/pages/auth/MFAVerifyPage'   // ← NEW
+import RegisterSuccessPage from '@pages/auth/RegisterSuccessPage'
 
 // Dashboard pages
 import DashboardPage      from '@pages/dashboard/DashboardPage'
@@ -69,6 +70,8 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password"  element={<ResetPasswordPage />} />
           <Route path="/verify-email"    element={<VerifyEmailPage />} />
+          <Route path="/register-success" element={<RegisterSuccessPage />} />
+
         </Route>
 
         {/* ── MFA challenge — public but only reachable if mfa_token exists ── */}
@@ -85,7 +88,7 @@ export default function App() {
         <Route path="/auth/:provider/callback" element={<OAuthCallbackPage />} />
 
         {/* ── Invitation accept ── */}
-        <Route path="/invitations/accept" element={<AcceptInvitePage />} />
+        <Route path="/join" element={<AcceptInvitePage />} />
 
         {/* ── Protected dashboard ── */}
         <Route element={<RequireAuth><DashboardLayout /></RequireAuth>}>

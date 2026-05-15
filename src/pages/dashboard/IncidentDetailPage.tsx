@@ -43,13 +43,13 @@ amount = transaction['amount']`,
 const mockMessages: ThreadMessage[] = [
   {
     id: 'm1', thread_id: 'th1',
-    author: { id: 'u2', email: 'alice@co.com', first_name: 'Alice', last_name: 'Chen', full_name: 'Alice Chen', role: 'engineer', is_superadmin: false, is_email_verified: true, email_verified: true, created_at: '' },
+    author: { id: 'u2', email: 'alice@co.com', first_name: 'Alice', last_name: 'Chen', full_name: 'Alice Chen', role: 'engineer', is_email_verified: true, email_verified: true, created_at: '' },
     content: 'I can reproduce this in staging. The webhook fires before the DB commit because of async timing.',
     mentions: [], created_at: new Date(Date.now() - 18 * 60000).toISOString(), updated_at: '',
   },
   {
     id: 'm2', thread_id: 'th1',
-    author: { id: 'u3', email: 'bob@co.com', first_name: 'Bob', last_name: 'Torres', full_name: 'Bob Torres', role: 'admin', is_superadmin: false, is_email_verified: true, email_verified: true, created_at: '' },
+    author: { id: 'u3', email: 'bob@co.com', first_name: 'Bob', last_name: 'Torres', full_name: 'Bob Torres', role: 'admin', is_email_verified: true, email_verified: true, created_at: '' },
     content: "The AI fix looks right. I'll add a retry with backoff on the webhook handler side too. @Alice can you verify the fix in staging?",
     mentions: [], created_at: new Date(Date.now() - 10 * 60000).toISOString(), updated_at: '',
   },

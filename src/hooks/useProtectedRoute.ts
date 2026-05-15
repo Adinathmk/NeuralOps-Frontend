@@ -45,11 +45,9 @@ export function useToast() {
 // ── Role guard ────────────────────────────────────────────────────────────────
 export function useRole() {
   const role   = useAppSelector(s => s.auth.user?.role)
-  const isSuper = useAppSelector(s => s.auth.user?.is_superadmin ?? false)
-
   const canManage  = role === 'owner' || role === 'admin'
   const canInteract = canManage || role === 'engineer'
   const isOwner    = role === 'owner'
 
-  return { role, isSuper, canManage, canInteract, isOwner }
+  return { role,canManage, canInteract, isOwner }
 }

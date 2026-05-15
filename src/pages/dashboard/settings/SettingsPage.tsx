@@ -190,4 +190,4 @@ export default function SettingsPage() {
       </motion.div>
     </div>
   )
-  }
+}

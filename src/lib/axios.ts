@@ -27,7 +27,16 @@ apiClient.interceptors.response.use(
   r => r,
   async (error: AxiosError) => {
     const orig = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
-    if (error.response?.status === 401 && !orig._retry) {
+    const url = orig.url ?? ''
+
+    const isAuthEndpoint =
+      url.includes('/auth/login') ||
+      url.includes('/auth/register') ||
+      url.includes('/auth/forgot-password') ||
+      url.includes('/auth/reset-password') ||
+      url.includes('/auth/mfa')
+  
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       orig._retry = true
 
       if (isRefreshing) {

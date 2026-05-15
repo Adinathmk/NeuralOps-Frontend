@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Zap, CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { Zap, CheckCircle, XCircle, Loader2, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@hooks/useAuth'
 import { Button } from '@components/common/Button'
 
-type State = 'loading' | 'success' | 'error'
+type State = 'loading' | 'success' | 'mfa' | 'error'
 
 export default function OAuthCallbackPage() {
   const [searchParams] = useSearchParams()
@@ -17,8 +17,8 @@ export default function OAuthCallbackPage() {
   const [errMsg, setErrMsg] = useState<string>('')
 
   useEffect(() => {
-    const code         = searchParams.get('code')
-    const inviteToken  = sessionStorage.getItem('invite_token') ?? undefined
+    const code        = searchParams.get('code')
+    const inviteToken = sessionStorage.getItem('invite_token') ?? undefined
 
     if (!code || !provider) {
       setState('error')
@@ -28,17 +28,23 @@ export default function OAuthCallbackPage() {
 
     ;(async () => {
       try {
-        if (provider === 'google') {
-          await googleOAuth(code, inviteToken)
-        } else if (provider === 'github') {
-          await githubOAuth(code, inviteToken)
-        } else {
-          throw new Error('Unknown provider')
-        }
+        const result = provider === 'google'
+          ? await googleOAuth(code, inviteToken)
+          : provider === 'github'
+            ? await githubOAuth(code, inviteToken)
+            : (() => { throw new Error('Unknown provider') })()
 
         sessionStorage.removeItem('invite_token')
-        setState('success')
-        setTimeout(() => navigate('/dashboard', { replace: true }), 1500)
+
+        if (result.requiresMfa) {
+          // MFA required — show shield UI, then redirect to MFA page
+          setState('mfa')
+          setTimeout(() => navigate('/mfa-verify', { replace: true }), 1200)
+        } else {
+          // Normal success — redirect to dashboard
+          setState('success')
+          setTimeout(() => navigate('/dashboard', { replace: true }), 1500)
+        }
       } catch (err: unknown) {
         sessionStorage.removeItem('invite_token')
         setErrMsg(typeof err === 'string' ? err : 'Authentication failed. Please try again.')
@@ -87,6 +93,23 @@ export default function OAuthCallbackPage() {
             <div>
               <p className="text-lg font-bold text-white">Signed in!</p>
               <p className="text-sm text-white/40 mt-1">Redirecting to your dashboard…</p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* MFA redirect */}
+        {state === 'mfa' && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            <div className="h-14 w-14 rounded-full bg-neural-500/10 border border-neural-500/20 flex items-center justify-center mx-auto">
+              <ShieldCheck size={28} className="text-neural-400" />
+            </div>
+            <div>
+              <p className="text-lg font-bold text-white">Two-factor required</p>
+              <p className="text-sm text-white/40 mt-1">Redirecting to verification…</p>
             </div>
           </motion.div>
         )}

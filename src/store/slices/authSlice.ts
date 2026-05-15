@@ -98,12 +98,8 @@ export const mfaVerifyThunk = createAsyncThunk(
         return rejectWithValue(res.message ?? 'MFA verification failed')
       }
 
-      // After MFA verify, fetch the full user profile
-      const meRes = await authApi.me()
-      if (!meRes.data) return rejectWithValue('Failed to fetch user')
-
       return {
-        user:          normaliseUser(meRes.data as User),
+        user: normaliseUser(res.data as User),
         access_token:  res.access_token,
         refresh_token: res.refresh_token,
       }
@@ -170,10 +166,17 @@ export const googleOAuthThunk = createAsyncThunk(
   async ({ code, inviteToken }: { code: string; inviteToken?: string }, { rejectWithValue }) => {
     try {
       const res = await authApi.googleCallback(code, inviteToken)
+
+      // MFA required — backend returns mfa_token instead of access_token
+      if (res.requires_mfa && res.mfa_token) {
+        return { requiresMfa: true, mfaToken: res.mfa_token }
+      }
+
       if (!res.data || !res.access_token || !res.refresh_token) {
-        throw new Error(res.message ?? 'Authentication failed')
+        return rejectWithValue(res.message ?? 'Google OAuth failed')
       }
       return {
+        requiresMfa:   false,
         user:          normaliseUser(res.data),
         access_token:  res.access_token,
         refresh_token: res.refresh_token,
@@ -190,10 +193,17 @@ export const githubOAuthThunk = createAsyncThunk(
   async ({ code, inviteToken }: { code: string; inviteToken?: string }, { rejectWithValue }) => {
     try {
       const res = await authApi.githubCallback(code, inviteToken)
+
+      // MFA required — backend returns mfa_token instead of access_token
+      if (res.requires_mfa && res.mfa_token) {
+        return { requiresMfa: true, mfaToken: res.mfa_token }
+      }
+
       if (!res.data || !res.access_token || !res.refresh_token) {
-        throw new Error(res.message ?? 'Authentication failed')
+        return rejectWithValue(res.message ?? 'GitHub OAuth failed')
       }
       return {
+        requiresMfa:   false,
         user:          normaliseUser(res.data),
         access_token:  res.access_token,
         refresh_token: res.refresh_token,
@@ -285,15 +295,31 @@ const authSlice = createSlice({
 
     // ── google OAuth ──
     builder
-      .addCase(googleOAuthThunk.pending,   state => { state.isLoading = true; state.error = null })
-      .addCase(googleOAuthThunk.fulfilled, (state, { payload }) => applyAuthSuccess(state, payload))
-      .addCase(googleOAuthThunk.rejected,  (state, { payload }) => { state.isLoading = false; state.error = payload as string })
+      .addCase(googleOAuthThunk.pending, state => { state.isLoading = true; state.error = null; state.mfaRequired = false; state.mfaToken = null })
+      .addCase(googleOAuthThunk.fulfilled, (state, { payload }) => {
+        state.isLoading = false
+        if (payload.requiresMfa) {
+          state.mfaRequired = true
+          state.mfaToken    = payload.mfaToken ?? null
+        } else if (payload.user && payload.access_token && payload.refresh_token) {
+          applyAuthSuccess(state, { user: payload.user, access_token: payload.access_token, refresh_token: payload.refresh_token })
+        }
+      })
+      .addCase(googleOAuthThunk.rejected, (state, { payload }) => { state.isLoading = false; state.error = payload as string })
 
     // ── github OAuth ──
     builder
-      .addCase(githubOAuthThunk.pending,   state => { state.isLoading = true; state.error = null })
-      .addCase(githubOAuthThunk.fulfilled, (state, { payload }) => applyAuthSuccess(state, payload))
-      .addCase(githubOAuthThunk.rejected,  (state, { payload }) => { state.isLoading = false; state.error = payload as string })
+      .addCase(githubOAuthThunk.pending, state => { state.isLoading = true; state.error = null; state.mfaRequired = false; state.mfaToken = null })
+      .addCase(githubOAuthThunk.fulfilled, (state, { payload }) => {
+        state.isLoading = false
+        if (payload.requiresMfa) {
+          state.mfaRequired = true
+          state.mfaToken    = payload.mfaToken ?? null
+        } else if (payload.user && payload.access_token && payload.refresh_token) {
+          applyAuthSuccess(state, { user: payload.user, access_token: payload.access_token, refresh_token: payload.refresh_token })
+        }
+      })
+      .addCase(githubOAuthThunk.rejected, (state, { payload }) => { state.isLoading = false; state.error = payload as string })
 
     // ── register ──
     builder
