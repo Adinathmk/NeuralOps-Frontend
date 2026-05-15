@@ -1,9 +1,10 @@
+// src/pages/dashboard/settings/SettingsPage.tsx
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
-import { User, Lock, Monitor, Bell, Link as LinkIcon, ChevronRight } from 'lucide-react'
+import { User, Lock, Monitor, Bell, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAppSelector } from '@store/index'
 import { authApi } from '@features/auth/api/authApi'
@@ -11,30 +12,33 @@ import { Card, CardContent, CardHeader, CardTitle } from '@components/common/Car
 import { Button } from '@components/common/Button'
 import { Input } from '@components/common/Input'
 import { Badge } from '@components/common/Badge'
+import { MFASection } from '@features/settings/components/MFASection'
 import { useToast } from '@hooks/useProtectedRoute'
 import { getInitials } from '@utils/cn'
 import type { ChangePasswordFormData } from '@/types'
 
 const passwordSchema = z.object({
-  current_password:  z.string().min(1, 'Required'),
-  new_password:      z.string().min(8, 'At least 8 characters').regex(/[A-Z]/, 'Uppercase required').regex(/[0-9]/, 'Number required'),
+  current_password:     z.string().min(1, 'Required'),
+  new_password:         z.string().min(8, 'At least 8 characters')
+    .regex(/[A-Z]/, 'Uppercase required')
+    .regex(/[0-9]/, 'Number required'),
   new_password_confirm: z.string(),
 }).refine(d => d.new_password === d.new_password_confirm, {
-  message: 'Passwords do not match', path: ['new_password_confirm'],
+  message: 'Passwords do not match',
+  path: ['new_password_confirm'],
 })
 
-// Map frontend form fields -> backend field names
 type PwFormData = ChangePasswordFormData & { new_password_confirm: string }
 
 const SETTING_LINKS = [
-  { to: '/dashboard/sessions',            icon: Monitor, label: 'Active Sessions',   desc: 'View and revoke sessions on other devices' },
-  { to: '/dashboard/settings/team',       icon: User,    label: 'Team Members',      desc: 'Manage your workspace users and roles' },
-  { to: '/dashboard/settings/alert-rules', icon: Bell,   label: 'Alert Rules',       desc: 'Configure incident notification thresholds' },
+  { to: '/dashboard/sessions',              icon: Monitor, label: 'Active Sessions',  desc: 'View and revoke sessions on other devices' },
+  { to: '/dashboard/settings/team',         icon: User,    label: 'Team Members',     desc: 'Manage your workspace users and roles' },
+  { to: '/dashboard/settings/alert-rules',  icon: Bell,    label: 'Alert Rules',      desc: 'Configure incident notification thresholds' },
 ]
 
 export default function SettingsPage() {
-  const user    = useAppSelector(s => s.auth.user)
-  const tenant  = useAppSelector(s => s.auth.tenant)
+  const user   = useAppSelector(s => s.auth.user)
+  const tenant = useAppSelector(s => s.auth.tenant)
   const { toast } = useToast()
   const [pwLoading, setPwLoading] = useState(false)
 
@@ -46,8 +50,8 @@ export default function SettingsPage() {
     setPwLoading(true)
     try {
       await authApi.changePassword({
-        current_password:    data.current_password,
-        new_password:        data.new_password,
+        current_password:     data.current_password,
+        new_password:         data.new_password,
         new_password_confirm: data.new_password_confirm,
       })
       toast({ type: 'success', title: 'Password changed', description: 'Please log in again on other devices.' })
@@ -55,7 +59,9 @@ export default function SettingsPage() {
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } }
       toast({ type: 'error', title: e.response?.data?.message ?? 'Failed to change password' })
-    } finally { setPwLoading(false) }
+    } finally {
+      setPwLoading(false)
+    }
   }
 
   return (
@@ -97,10 +103,10 @@ export default function SettingsPage() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { label: 'Workspace',  value: tenant?.name ?? 'â€”' },
-                { label: 'Plan',       value: tenant?.plan_tier?.toUpperCase() ?? 'â€”' },
-                { label: 'Slug',       value: tenant?.slug ?? 'â€”' },
-                { label: 'Status',     value: tenant?.status ?? 'â€”' },
+                { label: 'Workspace', value: tenant?.name       ?? '—' },
+                { label: 'Plan',      value: tenant?.plan_tier?.toUpperCase() ?? '—' },
+                { label: 'Slug',      value: tenant?.slug       ?? '—' },
+                { label: 'Status',    value: tenant?.status     ?? '—' },
               ].map(({ label, value }) => (
                 <div key={label}>
                   <p className="text-xs text-white/30 mb-0.5">{label}</p>
@@ -126,14 +132,14 @@ export default function SettingsPage() {
               <Input
                 label="Current Password"
                 type="password"
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
                 error={errors.current_password?.message}
                 {...register('current_password')}
               />
               <Input
                 label="New Password"
                 type="password"
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
                 hint="Min 8 chars, one uppercase, one number"
                 error={errors.new_password?.message}
                 {...register('new_password')}
@@ -141,7 +147,7 @@ export default function SettingsPage() {
               <Input
                 label="Confirm New Password"
                 type="password"
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
                 error={errors.new_password_confirm?.message}
                 {...register('new_password_confirm')}
               />
@@ -153,8 +159,13 @@ export default function SettingsPage() {
         </Card>
       </motion.div>
 
-      {/* Quick links */}
+      {/* ── MFA Section ── dropped in here */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        <MFASection />
+      </motion.div>
+
+      {/* Quick links */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <Card>
           <CardHeader><CardTitle>More Settings</CardTitle></CardHeader>
           <CardContent className="space-y-1 pt-0">
@@ -179,4 +190,4 @@ export default function SettingsPage() {
       </motion.div>
     </div>
   )
-}
+  }

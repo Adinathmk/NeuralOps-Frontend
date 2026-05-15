@@ -1,4 +1,6 @@
-// ─── Auth & User ────────────────────────────────────────────────────────────
+// src/types/index.ts
+
+// ─── Auth & User ─────────────────────────────────────────────────────────────
 
 export type UserRole = 'owner' | 'admin' | 'engineer' | 'viewer'
 
@@ -12,6 +14,7 @@ export interface User {
   is_superadmin: boolean
   is_email_verified: boolean
   email_verified: boolean
+  mfa_enabled?: boolean          // ← NEW
   avatar_url?: string
   tenant?: Tenant
   created_at: string
@@ -34,25 +37,31 @@ export interface AuthTokens {
 
 // Actual backend response shape
 export interface BackendResponse<T = unknown> {
-  success: boolean
-  message: string
-  data?: T
+  success:       boolean
+  message:       string
+  data?:         T
   access_token?: string
   refresh_token?: string
+  // ── MFA-specific fields from login response ──
+  mfa_token?:    string          // ← NEW — returned when MFA is required
+  requires_mfa?: boolean         // ← NEW — flag that MFA step is needed
   code?: string
   errors?: Record<string, string[]>
 }
 
 export interface AuthState {
-  user: User | null
-  tenant: Tenant | null
-  tokens: AuthTokens | null
+  user:            User | null
+  tenant:          Tenant | null
+  tokens:          AuthTokens | null
   isAuthenticated: boolean
-  isLoading: boolean
-  error: string | null
+  isLoading:       boolean
+  error:           string | null
+  // ── MFA challenge state ──
+  mfaRequired:     boolean       // ← NEW — show MFA page after login
+  mfaToken:        string | null // ← NEW — temporary token to exchange
 }
 
-// ─── Session ─────────────────────────────────────────────────────────────────
+// ─── Session ──────────────────────────────────────────────────────────────────
 
 export interface Session {
   id: string
@@ -63,7 +72,7 @@ export interface Session {
   expires_at: string
 }
 
-// ─── Invitation ──────────────────────────────────────────────────────────────
+// ─── Invitation ───────────────────────────────────────────────────────────────
 
 export type InvitationStatus = 'pending' | 'accepted' | 'cancelled' | 'expired'
 
@@ -100,7 +109,7 @@ export interface JoinPayload {
   password_confirm: string
 }
 
-// ─── Incidents ───────────────────────────────────────────────────────────────
+// ─── Incidents ────────────────────────────────────────────────────────────────
 
 export type IncidentStatus   = 'open' | 'investigating' | 'resolved' | 'closed'
 export type IncidentSeverity = 'critical' | 'warning' | 'info'
@@ -152,7 +161,7 @@ export interface Notification {
   created_at: string
 }
 
-// ─── Analytics ───────────────────────────────────────────────────────────────
+// ─── Analytics ────────────────────────────────────────────────────────────────
 
 export interface AnalyticsDashboard {
   total_incidents: number
@@ -165,7 +174,7 @@ export interface AnalyticsDashboard {
   top_error_types: Array<{ error_type: string; count: number }>
 }
 
-// ─── Alert Rules ─────────────────────────────────────────────────────────────
+// ─── Alert Rules ──────────────────────────────────────────────────────────────
 
 export interface AlertRule {
   id: string
@@ -178,7 +187,7 @@ export interface AlertRule {
   created_at: string
 }
 
-// ─── Playbooks ───────────────────────────────────────────────────────────────
+// ─── Playbooks ────────────────────────────────────────────────────────────────
 
 export interface Playbook {
   id: string
@@ -190,7 +199,7 @@ export interface Playbook {
   created_at: string
 }
 
-// ─── UI State ────────────────────────────────────────────────────────────────
+// ─── UI State ─────────────────────────────────────────────────────────────────
 
 export interface UIState {
   sidebarCollapsed: boolean
@@ -206,7 +215,7 @@ export interface Toast {
   description?: string
 }
 
-// ─── Form types ──────────────────────────────────────────────────────────────
+// ─── Form types ───────────────────────────────────────────────────────────────
 
 export interface LoginFormData {
   email: string
