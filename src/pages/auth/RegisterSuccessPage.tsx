@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Zap, Mail, RefreshCw, ArrowLeft, CheckCircle } from 'lucide-react'
+import { Zap, Mail, RefreshCw, ArrowLeft, CheckCircle, ShieldAlert } from 'lucide-react'
 import { Button } from '@components/common/Button'
 import { authApi } from '@features/auth/api/authApi'
 
@@ -10,13 +10,13 @@ export default function RegisterSuccessPage() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  // RegisterPage should pass the email via navigation state:
-  // navigate('/register-success', { state: { email: data.email } })
-  const email = (location.state as { email?: string })?.email ?? ''
+  const state     = location.state as { email?: string; fromLogin?: boolean } | null
+  const email     = state?.email ?? ''
+  const fromLogin = state?.fromLogin === true   // ← came from login, email not verified
 
-  const [resending, setResending]   = useState(false)
-  const [resent, setResent]         = useState(false)
-  const [error, setError]           = useState<string | null>(null)
+  const [resending, setResending] = useState(false)
+  const [resent, setResent]       = useState(false)
+  const [error, setError]         = useState<string | null>(null)
 
   const handleResend = async () => {
     if (!email) return
@@ -32,6 +32,23 @@ export default function RegisterSuccessPage() {
       setResending(false)
     }
   }
+
+  // ── copy variants ──────────────────────────────────────────────────────────
+  const heading = fromLogin ? 'Email not verified yet' : 'Check your inbox'
+  const subtext = fromLogin
+    ? 'You need to verify your email before signing in. We can resend the link to'
+    : 'We sent a verification link to'
+  const steps = fromLogin
+    ? [
+        { step: '1', text: 'Check your inbox (and spam folder)' },
+        { step: '2', text: 'Click the "Verify email" link in the email' },
+        { step: '3', text: 'Come back here and sign in' },
+      ]
+    : [
+        { step: '1', text: 'Open the email from NeuralOps' },
+        { step: '2', text: 'Click the "Verify email" button' },
+        { step: '3', text: "You'll be redirected to sign in" },
+      ]
 
   return (
     <div className="min-h-screen bg-surface-0 flex items-center justify-center p-6">
@@ -55,37 +72,41 @@ export default function RegisterSuccessPage() {
           {/* Icon */}
           <div className="flex justify-center">
             <div className="relative">
-              <div className="h-20 w-20 rounded-full bg-neural-500/10 border border-neural-500/20 flex items-center justify-center">
-                <Mail size={34} className="text-neural-400" />
+              <div className={`h-20 w-20 rounded-full flex items-center justify-center ${
+                fromLogin
+                  ? 'bg-amber-500/10 border border-amber-500/20'
+                  : 'bg-neural-500/10 border border-neural-500/20'
+              }`}>
+                {fromLogin
+                  ? <ShieldAlert size={34} className="text-amber-400" />
+                  : <Mail      size={34} className="text-neural-400" />
+                }
               </div>
               {/* Pulse ring */}
-              <div className="absolute inset-0 rounded-full border border-neural-500/20 animate-ping opacity-30" />
+              <div className={`absolute inset-0 rounded-full border animate-ping opacity-30 ${
+                fromLogin ? 'border-amber-500/20' : 'border-neural-500/20'
+              }`} />
             </div>
           </div>
 
           {/* Text */}
           <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold text-white">Check your inbox</h1>
-            <p className="text-sm text-white/50 leading-relaxed">
-              We sent a verification link to
-            </p>
+            <h1 className="text-2xl font-bold text-white">{heading}</h1>
+            <p className="text-sm text-white/50 leading-relaxed">{subtext}</p>
             {email && (
-              <p className="text-sm font-semibold text-neural-400 break-all">
-                {email}
+              <p className="text-sm font-semibold text-neural-400 break-all">{email}</p>
+            )}
+            {!fromLogin && (
+              <p className="text-sm text-white/40 leading-relaxed pt-1">
+                Click the link in that email to activate your account. The link expires in{' '}
+                <span className="text-white/60 font-medium">24 hours</span>.
               </p>
             )}
-            <p className="text-sm text-white/40 leading-relaxed pt-1">
-              Click the link in that email to activate your account. The link expires in <span className="text-white/60 font-medium">24 hours</span>.
-            </p>
           </div>
 
           {/* Steps */}
           <div className="rounded-xl border border-white/8 bg-surface-2 p-4 space-y-3">
-            {[
-              { step: '1', text: 'Open the email from NeuralOps' },
-              { step: '2', text: 'Click the "Verify email" button' },
-              { step: '3', text: 'You\'ll be redirected to sign in' },
-            ].map(({ step, text }) => (
+            {steps.map(({ step, text }) => (
               <div key={step} className="flex items-center gap-3">
                 <div className="h-6 w-6 rounded-full bg-neural-500/15 border border-neural-500/20 flex items-center justify-center shrink-0">
                   <span className="text-[11px] font-bold text-neural-400">{step}</span>

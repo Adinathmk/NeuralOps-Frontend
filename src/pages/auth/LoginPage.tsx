@@ -55,6 +55,16 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     const result = await dispatch(loginThunk(data))
+
+    if (loginThunk.rejected.match(result)) {
+      const msg = (result.payload as string) ?? ''
+      // Email not verified → show the "check your inbox" page
+      if (msg.toLowerCase().includes('verify your email') || msg.toLowerCase().includes('verify')) {
+        navigate('/register-success', { state: { email: data.email, fromLogin: true }, replace: true })
+      }
+      return
+    }
+
     // If no MFA required, loginThunk.fulfilled already set isAuthenticated
     // → RequireGuest will redirect to /dashboard automatically
     // If MFA required, the useEffect above handles navigation
