@@ -60,7 +60,7 @@ export default function VerifyEmailPage() {
               <p className="text-lg font-bold text-white">Email verified!</p>
               <p className="text-sm text-white/40 mt-1">Your account is ready. Let's get started.</p>
             </div>
-            <Button className="w-full" onClick={() => navigate('/dashboard')}>Go to dashboard</Button>
+            <Button className="w-full" onClick={() => navigate('/dashboard')}>Go to login</Button>
           </div>
         )}
 
