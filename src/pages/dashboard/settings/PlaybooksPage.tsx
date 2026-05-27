@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Plus, BookOpen, Trash2, Edit2, Code2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
