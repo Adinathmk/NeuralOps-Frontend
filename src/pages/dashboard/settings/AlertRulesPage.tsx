@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Plus,
@@ -8,6 +8,7 @@ import {
   ToggleRight,
   Edit2,
   Users,
+  Loader2,
 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -22,51 +23,25 @@ import { Button } from '@components/common/Button'
 import { Input } from '@components/common/Input'
 import { Badge } from '@components/common/Badge'
 import { Modal } from '@components/common/Modal'
+import { Skeleton } from '@components/common/Skeleton'
 
 import { useToast } from '@hooks/useProtectedRoute'
 import { cn } from '@utils/cn'
+
+import { useAppDispatch, useAppSelector } from '@store/index'
+import {
+  fetchAlertRules,
+  createAlertRule,
+  updateAlertRule,
+  deleteAlertRule,
+} from '@store/slices/alertRulesSlice'
 
 import type {
   AlertRule,
   IncidentSeverity,
 } from '@/types'
 
-const MOCK_RULES: AlertRule[] = [
-  {
-    id: '1',
-    tenant_id: 't1',
-    name: 'Critical Incidents',
-    confidence_threshold: 0.85,
-    severity_filter: ['critical'],
-    recipients: ['team@co.com', 'oncall@co.com'],
-    is_enabled: true,
-    created_at: '',
-  },
-  {
-    id: '2',
-    tenant_id: 't1',
-    name: 'All High Severity',
-    confidence_threshold: 0.75,
-    severity_filter: ['critical', 'warning'],
-    recipients: ['eng@co.com'],
-    is_enabled: true,
-    created_at: '',
-  },
-  {
-    id: '3',
-    tenant_id: 't1',
-    name: 'Low Confidence Draft',
-    confidence_threshold: 0.5,
-    severity_filter: ['info'],
-    recipients: ['alice@co.com'],
-    is_enabled: false,
-    created_at: '',
-  },
-]
-
 const ruleSchema = z.object({
-  name: z.string().min(2, 'Name required'),
-
   confidence_threshold: z
     .number()
     .min(0, 'Minimum is 0')
@@ -74,7 +49,7 @@ const ruleSchema = z.object({
 
   recipients_raw: z.string().min(
     1,
-    'At least one recipient email'
+    'At least one recipient ID'
   ),
 })
 
@@ -82,18 +57,14 @@ type RuleForm = z.infer<typeof ruleSchema>
 
 export default function AlertRulesPage() {
   const { toast } = useToast()
+  const dispatch = useAppDispatch()
 
-  const [rules, setRules] =
-    useState<AlertRule[]>(MOCK_RULES)
+  const { items: rules, isLoading } = useAppSelector(s => s.alertRules)
 
-  const [modalOpen, setModalOpen] =
-    useState(false)
-
-  const [editRule, setEditRule] =
-    useState<AlertRule | null>(null)
-
-  const [severities, setSeverities] =
-    useState<IncidentSeverity[]>(['critical'])
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editRule, setEditRule] = useState<AlertRule | null>(null)
+  const [severities, setSeverities] = useState<IncidentSeverity[]>(['critical'])
+  const [submitting, setSubmitting] = useState(false)
 
   const {
     register,
@@ -105,126 +76,121 @@ export default function AlertRulesPage() {
     resolver: zodResolver(ruleSchema),
     defaultValues: {
       confidence_threshold: 0.8,
-      name: '',
       recipients_raw: '',
     },
   })
 
+  // ── Fetch on mount ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    dispatch(fetchAlertRules())
+  }, [dispatch])
+
+  // ── Modal openers ───────────────────────────────────────────────────────────
   const openCreate = () => {
     setEditRule(null)
-
     setSeverities(['critical'])
-
     reset({
       confidence_threshold: 0.8,
-      name: '',
       recipients_raw: '',
     })
-
     setModalOpen(true)
   }
 
   const openEdit = (rule: AlertRule) => {
     setEditRule(rule)
-
     setSeverities(rule.severity_filter)
-
-    setValue('name', rule.name)
-
-    setValue(
-      'confidence_threshold',
-      rule.confidence_threshold
-    )
-
-    setValue(
-      'recipients_raw',
-      rule.recipients.join(', ')
-    )
-
+    setValue('confidence_threshold', rule.confidence_threshold)
+    setValue('recipients_raw', rule.recipient_ids.join(', '))
     setModalOpen(true)
   }
 
-  const onSubmit = (data: RuleForm) => {
-    const recipients = data.recipients_raw
+  // ── Form submit ─────────────────────────────────────────────────────────────
+  const onSubmit = async (data: RuleForm) => {
+    const recipient_ids = data.recipients_raw
       .split(',')
       .map(s => s.trim())
       .filter(Boolean)
 
-    if (editRule) {
-      setRules(prev =>
-        prev.map(r =>
-          r.id === editRule.id
-            ? {
-                ...r,
-                ...data,
-                severity_filter: severities,
-                recipients,
-              }
-            : r
-        )
-      )
+    setSubmitting(true)
 
-      toast({
-        type: 'success',
-        title: 'Rule updated',
-      })
-    } else {
-      const newRule: AlertRule = {
-        id: crypto.randomUUID(),
-        tenant_id: 't1',
-        name: data.name,
-        confidence_threshold:
-          data.confidence_threshold,
-        severity_filter: severities,
-        recipients,
-        is_enabled: true,
-        created_at: new Date().toISOString(),
+    try {
+      if (editRule) {
+        await dispatch(updateAlertRule({
+          id: editRule.id,
+          confidence_threshold: data.confidence_threshold,
+          severity_filter: severities,
+          recipient_ids,
+        })).unwrap()
+
+        toast({ type: 'success', title: 'Rule updated' })
+      } else {
+        await dispatch(createAlertRule({
+          confidence_threshold: data.confidence_threshold,
+          severity_filter: severities,
+          recipient_ids,
+          enabled: true,
+        })).unwrap()
+
+        toast({ type: 'success', title: 'Rule created' })
       }
 
-      setRules(prev => [newRule, ...prev])
-
-      toast({
-        type: 'success',
-        title: 'Rule created',
-      })
+      setModalOpen(false)
+      reset()
+    } catch (err) {
+      toast({ type: 'error', title: (err as string) || 'Something went wrong' })
+    } finally {
+      setSubmitting(false)
     }
-
-    setModalOpen(false)
-
-    reset()
   }
 
-  const toggleRule = (id: string) => {
-    setRules(prev =>
-      prev.map(r =>
-        r.id === id
-          ? {
-              ...r,
-              is_enabled: !r.is_enabled,
-            }
-          : r
-      )
-    )
+  // ── Toggle enabled ──────────────────────────────────────────────────────────
+  const toggleRule = async (rule: AlertRule) => {
+    try {
+      await dispatch(updateAlertRule({
+        id: rule.id,
+        enabled: !rule.enabled,
+      })).unwrap()
+    } catch (err) {
+      toast({ type: 'error', title: (err as string) || 'Failed to toggle rule' })
+    }
   }
 
-  const deleteRule = (id: string) => {
-    setRules(prev =>
-      prev.filter(r => r.id !== id)
-    )
-
-    toast({
-      type: 'success',
-      title: 'Rule deleted',
-    })
+  // ── Delete ──────────────────────────────────────────────────────────────────
+  const handleDelete = async (id: string) => {
+    try {
+      await dispatch(deleteAlertRule(id)).unwrap()
+      toast({ type: 'success', title: 'Rule deleted' })
+    } catch (err) {
+      toast({ type: 'error', title: (err as string) || 'Failed to delete rule' })
+    }
   }
 
-  const toggleSeverity = (
-    s: IncidentSeverity
-  ) => {
+  // ── Severity toggle ─────────────────────────────────────────────────────────
+  const toggleSeverity = (s: IncidentSeverity) => {
     setSeverities(prev =>
       prev.includes(s)
         ? prev.filter(x => x !== s)
         : [...prev, s]
+    )
+  }
+
+  // ── Loading skeleton ────────────────────────────────────────────────────────
+  if (isLoading && rules.length === 0) {
+    return (
+      <div className="max-w-3xl space-y-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-7 w-32" />
+            <Skeleton className="h-4 w-64 mt-1" />
+          </div>
+          <Skeleton className="h-8 w-24 rounded-md" />
+        </div>
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <Skeleton key={i} className="h-24 rounded-xl" />
+          ))}
+        </div>
+      </div>
     )
   }
 
@@ -235,7 +201,6 @@ export default function AlertRulesPage() {
           <h1 className="text-xl font-bold text-white">
             Alert Rules
           </h1>
-
           <p className="text-sm text-white/40 mt-0.5">
             Control when and who gets notified
             about incidents.
@@ -252,6 +217,17 @@ export default function AlertRulesPage() {
         </Button>
       </div>
 
+      {/* Empty state */}
+      {rules.length === 0 && !isLoading && (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <Shield size={32} className="mx-auto text-white/15 mb-3" />
+            <p className="text-sm text-white/40">No alert rules configured yet.</p>
+            <p className="text-xs text-white/25 mt-1">Create your first rule to get notified about incidents.</p>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="space-y-3">
         {rules.map((rule, i) => (
           <motion.div
@@ -262,7 +238,7 @@ export default function AlertRulesPage() {
           >
             <Card
               className={cn(
-                !rule.is_enabled && 'opacity-60'
+                !rule.enabled && 'opacity-60'
               )}
             >
               <CardContent className="p-4">
@@ -270,7 +246,7 @@ export default function AlertRulesPage() {
                   <div
                     className={cn(
                       'h-9 w-9 rounded-lg flex items-center justify-center shrink-0',
-                      rule.is_enabled
+                      rule.enabled
                         ? 'bg-neural-500/10'
                         : 'bg-white/5'
                     )}
@@ -278,7 +254,7 @@ export default function AlertRulesPage() {
                     <Shield
                       size={15}
                       className={
-                        rule.is_enabled
+                        rule.enabled
                           ? 'text-neural-400'
                           : 'text-white/30'
                       }
@@ -288,10 +264,10 @@ export default function AlertRulesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <p className="text-sm font-semibold text-white/90">
-                        {rule.name}
+                        {rule.severity_filter.join(', ')} alerts
                       </p>
 
-                      {!rule.is_enabled && (
+                      {!rule.enabled && (
                         <Badge variant="neutral">
                           Disabled
                         </Badge>
@@ -300,7 +276,7 @@ export default function AlertRulesPage() {
 
                     <div className="flex items-center gap-3 flex-wrap text-xs text-white/40">
                       <span>
-                        Confidence â‰¥{' '}
+                        Confidence ≥{' '}
                         {Math.round(
                           rule.confidence_threshold *
                             100
@@ -333,7 +309,7 @@ export default function AlertRulesPage() {
                       />
 
                       <p className="text-xs text-white/35 truncate">
-                        {rule.recipients.join(', ')}
+                        {rule.recipient_ids.length} recipient(s)
                       </p>
                     </div>
                   </div>
@@ -341,11 +317,11 @@ export default function AlertRulesPage() {
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() =>
-                        toggleRule(rule.id)
+                        toggleRule(rule)
                       }
                       className="text-white/30 hover:text-white/70 transition-colors p-1.5"
                     >
-                      {rule.is_enabled ? (
+                      {rule.enabled ? (
                         <ToggleRight
                           size={18}
                           className="text-neural-400"
@@ -371,7 +347,7 @@ export default function AlertRulesPage() {
                       size="icon"
                       className="h-7 w-7 text-red-400/50 hover:text-red-400"
                       onClick={() =>
-                        deleteRule(rule.id)
+                        handleDelete(rule.id)
                       }
                     >
                       <Trash2 size={12} />
@@ -401,13 +377,6 @@ export default function AlertRulesPage() {
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-4 mt-4"
         >
-          <Input
-            label="Rule Name"
-            placeholder="e.g. Critical Incidents"
-            error={errors.name?.message}
-            {...register('name')}
-          />
-
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-white/60 uppercase tracking-wide">
               Severity Filter
@@ -447,7 +416,7 @@ export default function AlertRulesPage() {
           </div>
 
           <Input
-            label="Confidence Threshold (0â€“1)"
+            label="Confidence Threshold (0–1)"
             type="number"
             step="0.05"
             min="0"
@@ -467,9 +436,9 @@ export default function AlertRulesPage() {
           />
 
           <Input
-            label="Recipient Emails"
-            placeholder="oncall@co.com, team@co.com"
-            hint="Comma-separated email addresses"
+            label="Recipient IDs"
+            placeholder="uuid-1, uuid-2"
+            hint="Comma-separated user UUIDs"
             error={
               errors.recipients_raw?.message
             }
@@ -480,6 +449,7 @@ export default function AlertRulesPage() {
             <Button
               type="submit"
               className="flex-1"
+              isLoading={submitting}
             >
               {editRule
                 ? 'Save changes'

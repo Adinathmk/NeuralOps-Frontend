@@ -1,4 +1,4 @@
-﻿// src/App.tsx
+// src/App.tsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAppSelector } from '@store/index'
 

@@ -178,25 +178,26 @@ export interface AnalyticsDashboard {
 
 export interface AlertRule {
   id: string
-  tenant_id: string
-  name: string
+  tenant: string
   confidence_threshold: number
   severity_filter: IncidentSeverity[]
-  recipients: string[]
-  is_enabled: boolean
+  recipient_ids: string[]
+  enabled: boolean
+  source_version: number
   created_at: string
+  updated_at: string
 }
 
 // ─── Playbooks ────────────────────────────────────────────────────────────────
 
 export interface Playbook {
   id: string
-  tenant_id: string
-  name: string
-  description: string
-  pattern_regex: string
+  tenant: string
+  error_pattern: string
   instructions: string
+  source_version: number
   created_at: string
+  updated_at: string
 }
 
 // ─── UI State ─────────────────────────────────────────────────────────────────
