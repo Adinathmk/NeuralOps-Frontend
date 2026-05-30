@@ -38,45 +38,47 @@ export function Modal({
               />
             </Dialog.Overlay>
             <Dialog.Content asChild>
-              <motion.div
-                className={cn(
-                  'fixed left-1/2 top-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 p-4',
-                  sizeMap[size]
-                )}
-                initial={{ opacity: 0, scale: 0.95, y: -8 }}
-                animate={{ opacity: 1, scale: 1,    y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-              >
-                <div className={cn(
-                  'relative rounded-xl border border-white/10 bg-surface-1 shadow-2xl shadow-black/60 p-6',
-                  className
-                )}>
-                  <button
-                    onClick={onClose}
-                    className="absolute right-4 top-4 text-white/40 hover:text-white/80 transition-colors"
-                  >
-                    <X size={16} />
-                  </button>
-
-                  {(title || description) && (
-                    <div className="mb-5">
-                      {title && (
-                        <Dialog.Title className="text-base font-semibold text-white">
-                          {title}
-                        </Dialog.Title>
-                      )}
-                      {description && (
-                        <Dialog.Description className="mt-1 text-sm text-white/50">
-                          {description}
-                        </Dialog.Description>
-                      )}
-                    </div>
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <motion.div
+                  className={cn(
+                    'w-full',
+                    sizeMap[size]
                   )}
+                  initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                  animate={{ opacity: 1, scale: 1,    y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                >
+                  <div className={cn(
+                    'relative rounded-xl border border-white/10 bg-surface-1 shadow-2xl shadow-black/60 p-6',
+                    className
+                  )}>
+                    <button
+                      onClick={onClose}
+                      className="absolute right-4 top-4 text-white/40 hover:text-white/80 transition-colors"
+                    >
+                      <X size={16} />
+                    </button>
 
-                  {children}
-                </div>
-              </motion.div>
+                    {(title || description) && (
+                      <div className="mb-5">
+                        {title && (
+                          <Dialog.Title className="text-base font-semibold text-white">
+                            {title}
+                          </Dialog.Title>
+                        )}
+                        {description && (
+                          <Dialog.Description className="mt-1 text-sm text-white/50">
+                            {description}
+                          </Dialog.Description>
+                        )}
+                      </div>
+                    )}
+
+                    {children}
+                  </div>
+                </motion.div>
+              </div>
             </Dialog.Content>
           </Dialog.Portal>
         )}

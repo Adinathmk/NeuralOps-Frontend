@@ -177,7 +177,7 @@ export default function TeamPage() {
                         <div className="flex items-center gap-2 mt-0.5">
                           <StatusIcon size={10} className={statusColor} />
                           <span className={cn('text-xs', statusColor)}>{inv.status}</span>
-                          <span className="text-xs text-white/25">Â·</span>
+                          <span className="text-xs text-white/25">•</span>
                           <span className="text-xs text-white/30">expires {formatRelative(inv.expires_at)}</span>
                         </div>
                       </div>
@@ -215,11 +215,11 @@ export default function TeamPage() {
             <label className="text-xs font-medium text-white/60 uppercase tracking-wide">Role</label>
             <select
               {...register('role')}
-              className="h-9 rounded-md border border-white/10 bg-surface-2 px-3 text-sm text-white focus:outline-none focus:border-neural-500 transition-colors"
+              className="w-full h-9 rounded-md border border-white/10 bg-surface-2 px-3 text-sm text-white focus:outline-none focus:border-neural-500 transition-colors"
             >
-              <option value="engineer">Engineer â€” Can view and interact with incidents</option>
-              <option value="admin">Admin â€” All permissions except billing</option>
-              <option value="viewer">Viewer â€” Read-only access</option>
+              <option value="engineer">Engineer - Can view and interact with incidents</option>
+              <option value="admin">Admin - All permissions except billing</option>
+              <option value="viewer">Viewer - Read-only access</option>
             </select>
           </div>
           <div className="flex gap-2 pt-1">

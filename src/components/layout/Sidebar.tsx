@@ -45,24 +45,45 @@ export function Sidebar() {
       transition={{ duration: 0.25, ease: 'easeInOut' }}
       className="relative flex flex-col h-screen bg-surface-1 border-r border-white/8 shrink-0 overflow-hidden z-20"
     >
-      {/* Logo */}
-      <div className="flex items-center gap-3 h-14 px-4 border-b border-white/8 shrink-0">
-        <div className="h-7 w-7 rounded-lg bg-neural-500 flex items-center justify-center shrink-0 shadow-lg shadow-neural-500/30">
-          <Zap size={14} className="text-white" />
-        </div>
-        <AnimatePresence>
+      {/* Logo / Interactive Toggle Header */}
+      <div
+        onClick={() => collapsed && dispatch(toggleSidebar())}
+        className={cn(
+          "flex items-center justify-between h-14 pl-4 pr-3 border-b border-white/8 shrink-0 select-none",
+          collapsed && "cursor-pointer hover:bg-white/4 justify-center px-0 relative group"
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "h-7 w-7 rounded-lg bg-neural-500 flex items-center justify-center shrink-0 shadow-lg shadow-neural-500/30 transition-all duration-300",
+            collapsed && "group-hover:scale-0 opacity-100 group-hover:opacity-0"
+          )}>
+            <Zap size={14} className="text-white" />
+          </div>
           {!collapsed && (
-            <motion.span
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.15 }}
-              className="text-sm font-bold text-white tracking-tight whitespace-nowrap"
-            >
+            <span className="text-sm font-bold text-white tracking-tight whitespace-nowrap">
               NeuralOps
-            </motion.span>
+            </span>
           )}
-        </AnimatePresence>
+        </div>
+
+        {/* Toggle Button for Expanded State */}
+        {!collapsed && (
+          <button
+            onClick={(e) => { e.stopPropagation(); dispatch(toggleSidebar()) }}
+            className="h-7 w-7 rounded-lg bg-surface-2 border border-white/8 hover:bg-surface-3 flex items-center justify-center text-white/50 hover:text-white/90 transition-all shadow-sm shadow-black/10"
+            title="Collapse Sidebar"
+          >
+            <ChevronLeft size={13} />
+          </button>
+        )}
+
+        {/* Expand Indicator for Collapsed State on Hover */}
+        {collapsed && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <ChevronRight size={16} className="text-neural-400" />
+          </div>
+        )}
       </div>
 
       {/* Tenant badge */}
@@ -138,14 +159,6 @@ export function Sidebar() {
           </AnimatePresence>
         </div>
       </div>
-
-      {/* Collapse toggle */}
-      <button
-        onClick={() => dispatch(toggleSidebar())}
-        className="absolute top-4 -right-3 h-6 w-6 rounded-full bg-surface-3 border border-white/10 flex items-center justify-center text-white/50 hover:text-white/90 hover:bg-surface-4 transition-all z-30"
-      >
-        {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
-      </button>
     </motion.aside>
   )
 }
