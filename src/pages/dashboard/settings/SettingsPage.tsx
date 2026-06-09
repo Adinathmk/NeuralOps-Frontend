@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
-import { User, Lock, Monitor, Bell, ChevronRight } from 'lucide-react'
+import { User, Lock, Monitor, Bell, ChevronRight, GitBranch } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAppSelector } from '@store/index'
 import { authApi } from '@features/auth/api/authApi'
@@ -34,6 +34,7 @@ const SETTING_LINKS = [
   { to: '/dashboard/sessions',              icon: Monitor, label: 'Active Sessions',  desc: 'View and revoke sessions on other devices' },
   { to: '/dashboard/settings/team',         icon: User,    label: 'Team Members',     desc: 'Manage your workspace users and roles' },
   { to: '/dashboard/settings/alert-rules',  icon: Bell,    label: 'Alert Rules',      desc: 'Configure incident notification thresholds' },
+  { to: '/dashboard/settings/github',       icon: GitBranch,  label: 'GitHub Integration', desc: 'Connect repo for AST-driven code retrieval' },
 ]
 
 export default function SettingsPage() {

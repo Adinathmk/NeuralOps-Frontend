@@ -29,6 +29,7 @@ import SettingsPage       from '@pages/dashboard/settings/SettingsPage'
 import AlertRulesPage     from '@pages/dashboard/settings/AlertRulesPage'
 import PlaybooksPage      from '@pages/dashboard/settings/PlaybooksPage'
 import TeamPage           from '@pages/dashboard/settings/TeamPage'
+import GitHubIntegrationPage from '@pages/dashboard/settings/GitHubIntegrationPage'
 
 // Invitation pages
 import AcceptInvitePage   from '@pages/invitations/AcceptInvitePage'
@@ -102,6 +103,7 @@ export default function App() {
           <Route path="/dashboard/settings/alert-rules"    element={<AlertRulesPage />} />
           <Route path="/dashboard/settings/playbooks"      element={<PlaybooksPage />} />
           <Route path="/dashboard/settings/team"           element={<TeamPage />} />
+          <Route path="/dashboard/settings/github"         element={<GitHubIntegrationPage />} />
         </Route>
 
         {/* ── 404 ── */}

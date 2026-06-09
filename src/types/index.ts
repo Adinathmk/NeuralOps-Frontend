@@ -247,3 +247,21 @@ export interface ChangePasswordFormData {
   new_password: string
   new_password_confirm: string
 }
+
+// ─── GitHub Integration ───────────────────────────────────────────────────────
+
+export interface GitHubIntegrationStatus {
+  repo_url: string
+  repo_owner: string
+  repo_name: string
+  indexing_status: 'pending' | 'indexing' | 'completed' | 'failed'
+  last_indexed_commit?: string
+}
+
+export interface GitHubIntegrationFormData {
+  repo_url: string
+  repo_owner: string
+  repo_name: string
+  pat?: string
+  webhook_secret?: string
+}

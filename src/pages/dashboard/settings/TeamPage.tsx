@@ -11,24 +11,17 @@ import { Badge } from '@components/common/Badge'
 import { Modal } from '@components/common/Modal'
 import { Skeleton } from '@components/common/Skeleton'
 import { invitationsApi } from '@features/invitations/api/invitationsApi'
+import { teamApi } from '@features/team/api/teamApi'
 import { useToast } from '@hooks/useProtectedRoute'
 import { useRole } from '@hooks/useProtectedRoute'
 import { getInitials, formatDate, formatRelative, cn } from '@utils/cn'
-import type { Invitation, InvitationStatus, UserRole } from '@/types'
+import type { Invitation, InvitationStatus, UserRole, User } from '@/types'
 
 const inviteSchema = z.object({
   email: z.string().email('Invalid email'),
   role:  z.enum(['engineer', 'admin', 'viewer'] as const),
 })
 type InviteForm = { email: string; role: 'engineer' | 'admin' | 'viewer' }
-
-// Mock current team members
-const MOCK_MEMBERS = [
-  { id: 'u1', full_name: 'Jane Smith',  email: 'jane@co.com',  role: 'owner'    as UserRole, is_email_verified: true,  created_at: '' },
-  { id: 'u2', full_name: 'Alice Chen',  email: 'alice@co.com', role: 'engineer' as UserRole, is_email_verified: true,  created_at: '' },
-  { id: 'u3', full_name: 'Bob Torres',  email: 'bob@co.com',   role: 'admin'    as UserRole, is_email_verified: true,  created_at: '' },
-  { id: 'u4', full_name: 'Carol Singh', email: 'carol@co.com', role: 'viewer'   as UserRole, is_email_verified: false, created_at: '' },
-]
 
 const STATUS_ICON: Record<InvitationStatus, React.ElementType> = {
   pending:   Clock,
@@ -46,6 +39,10 @@ const STATUS_COLOR: Record<InvitationStatus, string> = {
 export default function TeamPage() {
   const { canManage } = useRole()
   const { toast } = useToast()
+  
+  const [members, setMembers]         = useState<User[]>([])
+  const [loadingMembers, setLoadingMembers] = useState(true)
+  
   const [invitations, setInvitations] = useState<Invitation[]>([])
   const [loadingInv, setLoadingInv]   = useState(false)
   const [inviteOpen, setInviteOpen]   = useState(false)
@@ -65,7 +62,18 @@ export default function TeamPage() {
       .finally(() => setLoadingInv(false))
   }
 
-  useEffect(() => { loadInvitations() }, [])
+  const loadMembers = () => {
+    setLoadingMembers(true)
+    teamApi.listMembers()
+      .then(res => { if (res.data) setMembers(res.data) })
+      .catch(() => toast({ type: 'error', title: 'Failed to load team members' }))
+      .finally(() => setLoadingMembers(false))
+  }
+
+  useEffect(() => { 
+    loadInvitations()
+    loadMembers()
+  }, [])
 
   const onInvite = async (data: InviteForm) => {
     setSending(true)
@@ -106,7 +114,7 @@ export default function TeamPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Team</h1>
-          <p className="text-sm text-white/40 mt-0.5">{MOCK_MEMBERS.length} members in this workspace</p>
+          <p className="text-sm text-white/40 mt-0.5">{members.length} member{members.length !== 1 && 's'} in this workspace</p>
         </div>
         {canManage && (
           <Button size="sm" className="gap-2" onClick={() => setInviteOpen(true)}>
@@ -119,27 +127,31 @@ export default function TeamPage() {
       <Card>
         <CardHeader><CardTitle>Members</CardTitle></CardHeader>
         <CardContent className="space-y-1 pt-0">
-          {MOCK_MEMBERS.map((member, i) => (
-            <motion.div
-              key={member.id}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/4 transition-colors"
-            >
-              <div className="h-8 w-8 rounded-full bg-neural-500/15 border border-neural-500/20 flex items-center justify-center text-xs font-semibold text-neural-400 shrink-0">
-                {getInitials(member.full_name)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white/85">{member.full_name}</p>
-                <p className="text-xs text-white/40">{member.email}</p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                {!member.is_email_verified && <Badge variant="warning" dot>Unverified</Badge>}
-                <Badge variant={roleVariant(member.role) as 'warning' | 'info' | 'success' | 'neutral'}>{member.role}</Badge>
-              </div>
-            </motion.div>
-          ))}
+          {loadingMembers ? (
+            <div className="space-y-2">{[1,2,3].map(i=><Skeleton key={i} className="h-14 rounded-lg"/>)}</div>
+          ) : (
+            members.map((member, i) => (
+              <motion.div
+                key={member.id}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/4 transition-colors"
+              >
+                <div className="h-8 w-8 rounded-full bg-neural-500/15 border border-neural-500/20 flex items-center justify-center text-xs font-semibold text-neural-400 shrink-0">
+                  {getInitials(member.full_name || member.email)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white/85">{member.full_name || 'No Name'}</p>
+                  <p className="text-xs text-white/40">{member.email}</p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {!member.email_verified && !member.is_email_verified && <Badge variant="warning" dot>Unverified</Badge>}
+                  <Badge variant={roleVariant(member.role) as 'warning' | 'info' | 'success' | 'neutral'}>{member.role}</Badge>
+                </div>
+              </motion.div>
+            ))
+          )}
         </CardContent>
       </Card>
 

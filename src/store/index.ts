@@ -6,6 +6,7 @@ import incidentsReducer     from './slices/incidentsSlice'
 import notificationsReducer from './slices/notificationsSlice'
 import alertRulesReducer    from './slices/alertRulesSlice'
 import playbooksReducer     from './slices/playbooksSlice'
+import integrationsReducer  from './slices/integrationsSlice'
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     notifications: notificationsReducer,
     alertRules:    alertRulesReducer,
     playbooks:     playbooksReducer,
+    integrations:  integrationsReducer,
   },
   middleware: getDefault =>
     getDefault({ serializableCheck: { ignoredActionPaths: ['payload.created_at'] } }),

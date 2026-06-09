@@ -11,23 +11,6 @@ import { Skeleton } from '@components/common/Skeleton'
 import { formatRelative, cn } from '@utils/cn'
 import type { Incident, IncidentSeverity, IncidentStatus } from '@/types'
 
-// Use mock data since we don't have a real backend connected
-const mockIncidents: Incident[] = Array.from({ length: 12 }, (_, i) => ({
-  id: String(i + 1),
-  tenant_id: 't1',
-  error_type: ['NullPointerException', 'ConnectionTimeout', 'OutOfMemoryError', 'KeyError', 'TypeError'][i % 5],
-  file_path: ['services/payment/processor.py', 'lib/db/pool.ts', 'workers/job_queue.go', 'api/routes/users.py', 'core/cache.ts'][i % 5],
-  line_number: 100 + i * 17,
-  service_name: ['payment-service', 'api-gateway', 'worker', 'user-service', 'cache-service'][i % 5],
-  environment: 'production',
-  status: (['open', 'investigating', 'resolved', 'closed'] as IncidentStatus[])[i % 4],
-  severity: (['critical', 'warning', 'info'] as IncidentSeverity[])[i % 3],
-  root_cause: i % 2 === 0 ? 'Unhandled exception in async context' : undefined,
-  confidence_score: 0.7 + (i % 3) * 0.1,
-  created_at: new Date(Date.now() - i * 3600000).toISOString(),
-  updated_at: new Date().toISOString(),
-}))
-
 const SEVERITY_FILTERS: Array<{ label: string; value: string }> = [
   { label: 'All',      value: 'all' },
   { label: 'Critical', value: 'critical' },
@@ -45,26 +28,37 @@ const STATUS_FILTERS: Array<{ label: string; value: string }> = [
 
 export default function IncidentsPage() {
   const dispatch = useAppDispatch()
-  const { filters } = useAppSelector(s => s.incidents)
+  const { items, filters, isLoading, error } = useAppSelector(s => s.incidents)
   const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(false)
 
-  const filtered = mockIncidents.filter(i => {
-    if (filters.severity !== 'all' && i.severity !== filters.severity) return false
-    if (filters.status   !== 'all' && i.status   !== filters.status)   return false
-    if (search && !i.error_type.toLowerCase().includes(search.toLowerCase()) &&
-        !i.file_path.toLowerCase().includes(search.toLowerCase())) return false
-    return true
-  })
+  useEffect(() => {
+    dispatch(fetchIncidentsThunk({
+      status: filters.status !== 'all' ? filters.status : undefined,
+      severity: filters.severity !== 'all' ? filters.severity : undefined,
+      search: filters.search || undefined,
+      page: filters.page,
+    }))
+  }, [dispatch, filters.status, filters.severity, filters.search, filters.page])
+
+  // Debounced search
+  useEffect(() => {
+    const t = setTimeout(() => dispatch(setFilter({ search })), 300)
+    return () => clearTimeout(t)
+  }, [search, dispatch])
 
   return (
     <div className="space-y-5 max-w-6xl">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Incidents</h1>
-          <p className="text-sm text-white/40 mt-0.5">{filtered.length} incidents found</p>
+          <p className="text-sm text-white/40 mt-0.5">{items.length} incidents found</p>
         </div>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2" onClick={() => dispatch(fetchIncidentsThunk({
+          status: filters.status !== 'all' ? filters.status : undefined,
+          severity: filters.severity !== 'all' ? filters.severity : undefined,
+          search: filters.search || undefined,
+          page: filters.page,
+        }))} isLoading={isLoading}>
           <RefreshCw size={13} /> Refresh
         </Button>
       </div>
@@ -100,20 +94,32 @@ export default function IncidentsPage() {
 
       {/* List */}
       <div className="space-y-2">
-        {filtered.map((incident, idx) => (
-          <motion.div
-            key={incident.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.04, duration: 0.25 }}
-          >
-            <Link to={`/dashboard/incidents/${incident.id}`}>
-              <IncidentCard incident={incident} />
-            </Link>
-          </motion.div>
-        ))}
+        {error && (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
 
-        {filtered.length === 0 && (
+        {isLoading && items.length === 0 ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-xl" />
+          ))
+        ) : (
+          items.map((incident, idx) => (
+            <motion.div
+              key={incident.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.04, duration: 0.25 }}
+            >
+              <Link to={`/dashboard/incidents/${incident.id}`}>
+                <IncidentCard incident={incident} />
+              </Link>
+            </motion.div>
+          ))
+        )}
+
+        {!isLoading && items.length === 0 && !error && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <AlertTriangle size={32} className="text-white/20 mb-3" />
             <p className="text-sm text-white/40">No incidents match your filters</p>
