@@ -23,6 +23,7 @@ const settingsItems = [
   { to: '/dashboard/settings/alert-rules', icon: Shield,   label: 'Alert Rules' },
   { to: '/dashboard/settings/playbooks',   icon: BookOpen, label: 'Playbooks' },
   { to: '/dashboard/settings/team',        icon: Users,    label: 'Team' },
+  { to: '/dashboard/settings/demo',        icon: Zap,      label: 'SDK Demo' },
   { to: '/dashboard/settings',             icon: Settings, label: 'Settings' },
 ]
 
