@@ -156,7 +156,7 @@ function IncidentCard({ incident }: { incident: Incident }) {
           <Badge variant={statusVariant}>{incident.status}</Badge>
         </div>
         <p className="text-xs text-white/40 truncate font-mono">
-          {incident.file_path}:{incident.line_number}
+          {incident.crash_file}:{incident.crash_line}
         </p>
         {incident.root_cause && (
           <p className="text-xs text-white/50 truncate mt-1">{incident.root_cause}</p>

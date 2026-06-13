@@ -8,7 +8,7 @@ import { cn } from '@/utils/cn'
 export default function DemoIngestPage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
-  const [incidentId, setIncidentId] = useState(crypto.randomUUID())
+  const [incidentId, setIncidentId] = useState<string>(crypto.randomUUID())
   const [serviceName, setServiceName] = useState('payment-service')
   const [environment, setEnvironment] = useState('production')
   const [logs, setLogs] = useState(

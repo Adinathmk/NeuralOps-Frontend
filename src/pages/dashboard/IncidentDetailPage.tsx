@@ -12,33 +12,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@components/common/Car
 import { Skeleton } from '@components/common/Skeleton'
 import { formatDate, formatRelative, cn } from '@utils/cn'
 import type { Incident, ThreadMessage } from '@/types'
-import { useAppSelector } from '@store/index'
+import { useAppSelector, useAppDispatch } from '@store/index'
+import { fetchIncidentThunk } from '@store/slices/incidentsSlice'
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
-const mockIncident: Incident = {
-  id: '1', tenant_id: 't1',
-  error_type: 'NullPointerException',
-  file_path: 'services/payment/processor.py',
-  line_number: 142,
-  service_name: 'payment-service',
-  environment: 'production',
-  status: 'investigating',
-  severity: 'critical',
-  root_cause: 'The `transaction` dict returned from `get_transaction()` can return `None` when the transaction ID does not exist in the database, but line 142 dereferences it without a null check. This happens when payment webhooks arrive before the transaction is committed.',
-  suggested_fix: `# Before (line 142)
-amount = transaction['amount']
-
-# After — add null guard
-transaction = get_transaction(tx_id)
-if transaction is None:
-    logger.warning("Transaction %s not found, skipping", tx_id)
-    return
-
-amount = transaction['amount']`,
-  confidence_score: 0.91,
-  created_at: new Date(Date.now() - 25 * 60000).toISOString(),
-  updated_at: new Date(Date.now() - 5 * 60000).toISOString(),
-}
 
 const mockMessages: ThreadMessage[] = [
   {
@@ -60,18 +37,21 @@ const statusFlow: Array<Incident['status']> = ['open', 'investigating', 'resolve
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function IncidentDetailPage() {
   const { id } = useParams<{ id: string }>()
-  const [incident, setIncident] = useState<Incident | null>(null)
-  const [loading, setLoading]   = useState(true)
+  const dispatch = useAppDispatch()
+  
+  const incident = useAppSelector(s => s.incidents.selected)
+  const loading = useAppSelector(s => s.incidents.isLoading)
+  
   const [messages, setMessages] = useState<ThreadMessage[]>(mockMessages)
   const [message, setMessage]   = useState('')
   const [copied, setCopied]     = useState(false)
   const user = useAppSelector(s => s.auth.user)
 
   useEffect(() => {
-    // Simulate fetch
-    const t = setTimeout(() => { setIncident(mockIncident); setLoading(false) }, 600)
-    return () => clearTimeout(t)
-  }, [id])
+    if (id) {
+      dispatch(fetchIncidentThunk(id))
+    }
+  }, [id, dispatch])
 
   const handleCopy = () => {
     if (incident?.suggested_fix) {
@@ -94,7 +74,7 @@ export default function IncidentDetailPage() {
     setMessage('')
   }
 
-  if (loading) return <DetailSkeleton />
+  if (loading && !incident) return <DetailSkeleton />
   if (!incident) return <div className="text-white/40 text-sm p-6">Incident not found.</div>
 
   const severityVariant = { critical: 'critical', warning: 'warning', info: 'info' }[incident.severity] as 'critical' | 'warning' | 'info'
@@ -121,7 +101,7 @@ export default function IncidentDetailPage() {
           </div>
           <h1 className="text-xl font-bold text-white">{incident.error_type}</h1>
           <p className="text-sm text-white/40 font-mono">
-            {incident.file_path}:{incident.line_number} · {incident.service_name}
+            {incident.crash_file}:{incident.crash_line} · {incident.service_name}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -222,7 +202,7 @@ export default function IncidentDetailPage() {
                   {[
                     { label: 'Service',     value: incident.service_name },
                     { label: 'Environment', value: incident.environment },
-                    { label: 'File',        value: `${incident.file_path}:${incident.line_number}` },
+                    { label: 'File',        value: `${incident.crash_file}:${incident.crash_line}` },
                     { label: 'Error Type',  value: incident.error_type },
                     { label: 'Created',     value: formatDate(incident.created_at) },
                     { label: 'Updated',     value: formatDate(incident.updated_at) },

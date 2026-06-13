@@ -114,22 +114,51 @@ export interface JoinPayload {
 export type IncidentStatus   = 'open' | 'investigating' | 'resolved' | 'closed'
 export type IncidentSeverity = 'critical' | 'warning' | 'info'
 
+export interface AnalysisDetail {
+  id: string
+  agent_version: string
+  total_tokens_used?: number
+  prompt_tokens?: number
+  completion_tokens?: number
+  total_latency_ms?: number
+  node_results: Record<string, any>
+  matched_playbook_id?: string
+  created_at: string
+}
+
 export interface Incident {
   id: string
   tenant_id: string
-  error_type: string
-  file_path: string
-  line_number: number
-  service_name: string
-  environment: string
+  fingerprint: string
   status: IncidentStatus
   severity: IncidentSeverity
+  error_type: string
+  error_message?: string
+  service_name: string
+  environment: string
+  crash_file?: string
+  crash_line?: number
+  crash_method?: string
+  stack_frames: Array<{
+    file: string
+    line: number
+    method: string
+    module?: string
+  }>
   root_cause?: string
   suggested_fix?: string
   confidence_score?: number
-  assigned_to?: User
+  occurrence_count: number
+  occurrences: string[]
+  is_draft: boolean
+  assigned_user_id?: string
+  source_log_id?: string
+  first_seen_at: string
+  last_seen_at: string
+  resolved_at?: string
   created_at: string
   updated_at: string
+  analysis?: AnalysisDetail | null
 }
 
 // ─── Collaboration ────────────────────────────────────────────────────────────

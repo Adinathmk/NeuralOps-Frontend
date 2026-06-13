@@ -35,10 +35,10 @@ export const fetchIncidentsThunk = createAsyncThunk(
   async (params: Record<string, unknown> = {}, { rejectWithValue }) => {
     try {
       const res = await incidentsApi.list(params)
-      return res.data
+      return res.data // Contains data array and pagination object
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      return rejectWithValue(error.response?.data?.detail ?? 'Failed to fetch incidents')
+      const error = err as { response?: { data?: { message?: string } } }
+      return rejectWithValue(error.response?.data?.message ?? 'Failed to fetch incidents')
     }
   }
 )
@@ -48,10 +48,25 @@ export const fetchIncidentThunk = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const res = await incidentsApi.getById(id)
-      return res.data
+      const { incident, analysis } = res.data.data
+      return { ...incident, analysis } as Incident
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { detail?: string } } }
-      return rejectWithValue(error.response?.data?.detail ?? 'Failed to fetch incident')
+      const error = err as { response?: { data?: { message?: string } } }
+      return rejectWithValue(error.response?.data?.message ?? 'Failed to fetch incident')
+    }
+  }
+)
+
+export const updateIncidentThunk = createAsyncThunk(
+  'incidents/update',
+  async ({ id, ...data }: { id: string, status?: IncidentStatus, assigned_user_id?: string | null }, { rejectWithValue }) => {
+    try {
+      const res = await incidentsApi.update(id, data)
+      // The API returns the updated fields in res.data.data
+      return res.data.data
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } }
+      return rejectWithValue(error.response?.data?.message ?? 'Failed to update incident')
     }
   }
 )
@@ -83,8 +98,8 @@ const incidentsSlice = createSlice({
       })
       .addCase(fetchIncidentsThunk.fulfilled, (state, { payload }) => {
         state.isLoading = false
-        state.items     = payload.results
-        state.total     = payload.count
+        state.items     = payload.data
+        state.total     = payload.pagination.total
       })
       .addCase(fetchIncidentsThunk.rejected, (state, { payload }) => {
         state.isLoading = false
@@ -96,6 +111,15 @@ const incidentsSlice = createSlice({
         state.selected = payload
         const idx = state.items.findIndex(i => i.id === payload.id)
         if (idx >= 0) state.items[idx] = payload
+      })
+      .addCase(updateIncidentThunk.fulfilled, (state, { payload }) => {
+        if (state.selected && state.selected.id === payload.id) {
+          state.selected = { ...state.selected, ...payload }
+        }
+        const idx = state.items.findIndex(i => i.id === payload.id)
+        if (idx >= 0) {
+          state.items[idx] = { ...state.items[idx], ...payload }
+        }
       })
   },
 })

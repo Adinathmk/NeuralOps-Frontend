@@ -16,26 +16,26 @@ const mockStats = [
   { label: 'Agent Accuracy',   value: '94%', delta: '+2%',  icon: TrendingUp,   color: 'text-amber-400',  bg: 'bg-amber-500/10' },
 ]
 
-const mockIncidents: Incident[] = [
+const mockIncidents = [
   {
-    id: '1', tenant_id: 't1', error_type: 'NullPointerException', file_path: 'services/payment/processor.py',
-    line_number: 142, service_name: 'payment-service', environment: 'production',
+    id: '1', tenant_id: 't1', error_type: 'NullPointerException', crash_file: 'services/payment/processor.py',
+    crash_line: 142, service_name: 'payment-service', environment: 'production',
     status: 'open', severity: 'critical', root_cause: 'Unhandled None value in transaction dict',
     confidence_score: 0.91, created_at: new Date(Date.now() - 4 * 60000).toISOString(), updated_at: new Date().toISOString(),
   },
   {
-    id: '2', tenant_id: 't1', error_type: 'ConnectionTimeout', file_path: 'lib/db/pool.ts',
-    line_number: 87, service_name: 'api-gateway', environment: 'production',
+    id: '2', tenant_id: 't1', error_type: 'ConnectionTimeout', crash_file: 'lib/db/pool.ts',
+    crash_line: 87, service_name: 'api-gateway', environment: 'production',
     status: 'investigating', severity: 'warning', confidence_score: 0.76,
     created_at: new Date(Date.now() - 28 * 60000).toISOString(), updated_at: new Date().toISOString(),
   },
   {
-    id: '3', tenant_id: 't1', error_type: 'OutOfMemoryError', file_path: 'workers/job_queue.go',
-    line_number: 312, service_name: 'worker', environment: 'production',
+    id: '3', tenant_id: 't1', error_type: 'OutOfMemoryError', crash_file: 'workers/job_queue.go',
+    crash_line: 312, service_name: 'worker', environment: 'production',
     status: 'resolved', severity: 'critical', root_cause: 'Unclosed file descriptors causing memory leak',
     confidence_score: 0.88, created_at: new Date(Date.now() - 2 * 3600000).toISOString(), updated_at: new Date().toISOString(),
   },
-]
+] as Incident[]
 
 const container = {
   hidden: {},
@@ -190,7 +190,7 @@ function IncidentRow({ incident }: { incident: Incident }) {
       )} />
       <div className="flex-1 min-w-0">
         <p className="text-xs font-medium text-white/80 truncate">{incident.error_type}</p>
-        <p className="text-[11px] text-white/40 truncate mt-0.5">{incident.file_path}:{incident.line_number}</p>
+        <p className="text-[11px] text-white/40 truncate mt-0.5">{incident.crash_file}:{incident.crash_line}</p>
         <div className="flex items-center gap-2 mt-1.5">
           <Badge variant={severityVariant} dot>{incident.severity}</Badge>
           <Badge variant={statusVariant}>{incident.status}</Badge>
