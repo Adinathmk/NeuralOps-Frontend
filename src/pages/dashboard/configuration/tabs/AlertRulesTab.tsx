@@ -55,7 +55,7 @@ const ruleSchema = z.object({
 
 type RuleForm = z.infer<typeof ruleSchema>
 
-export default function AlertRulesPage() {
+export default function AlertRulesTab() {
   const { toast } = useToast()
   const dispatch = useAppDispatch()
 
@@ -196,18 +196,7 @@ export default function AlertRulesPage() {
 
   return (
     <div className="max-w-3xl space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">
-            Alert Rules
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Control when and who gets notified
-            about incidents.
-          </p>
-        </div>
-
-        <Button
+      <div className="flex items-center justify-end">        <Button
           size="sm"
           className="gap-2"
           onClick={openCreate}

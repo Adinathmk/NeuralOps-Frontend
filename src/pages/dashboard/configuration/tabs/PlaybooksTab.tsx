@@ -28,7 +28,7 @@ const schema = z.object({
 })
 type PlaybookForm = z.infer<typeof schema>
 
-export default function PlaybooksPage() {
+export default function PlaybooksTab() {
   const { toast } = useToast()
   const dispatch = useAppDispatch()
 
@@ -115,11 +115,7 @@ export default function PlaybooksPage() {
 
   return (
     <div className="max-w-3xl space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">Playbooks</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Runbooks matched against errors to guide AI agent analysis.</p>
-        </div>
+      <div className="flex items-center justify-end">
         <Button size="sm" className="gap-2" onClick={openCreate}>
           <Plus size={13} /> New playbook
         </Button>

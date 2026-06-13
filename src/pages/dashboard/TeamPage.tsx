@@ -110,7 +110,7 @@ export default function TeamPage() {
     role === 'owner' ? 'warning' : role === 'admin' ? 'info' : role === 'engineer' ? 'success' : 'neutral'
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-900">Team</h1>

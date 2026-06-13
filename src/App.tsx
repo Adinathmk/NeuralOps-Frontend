@@ -23,12 +23,11 @@ import IncidentDetailPage from '@pages/dashboard/IncidentDetailPage'
 import AnalyticsPage      from '@pages/dashboard/AnalyticsPage'
 import NotificationsPage  from '@pages/dashboard/NotificationsPage'
 import SessionsPage       from '@pages/dashboard/SessionsPage'
+import ConfigurationPage  from '@pages/dashboard/configuration/ConfigurationPage'
+import TeamPage           from '@pages/dashboard/TeamPage'
 
 // Settings pages
 import SettingsPage       from '@pages/dashboard/settings/SettingsPage'
-import AlertRulesPage     from '@pages/dashboard/settings/AlertRulesPage'
-import PlaybooksPage      from '@pages/dashboard/settings/PlaybooksPage'
-import TeamPage           from '@pages/dashboard/settings/TeamPage'
 import GitHubIntegrationPage from '@pages/dashboard/settings/GitHubIntegrationPage'
 import DemoIngestPage       from '@pages/dashboard/settings/DemoIngestPage'
 
@@ -100,12 +99,11 @@ export default function App() {
           <Route path="/dashboard/analytics"               element={<AnalyticsPage />} />
           <Route path="/dashboard/notifications"           element={<NotificationsPage />} />
           <Route path="/dashboard/sessions"                element={<SessionsPage />} />
+          <Route path="/dashboard/team"                    element={<TeamPage />} />
+          <Route path="/dashboard/demo"                    element={<DemoIngestPage />} />
+          <Route path="/dashboard/configuration"           element={<ConfigurationPage />} />
           <Route path="/dashboard/settings"                element={<SettingsPage />} />
-          <Route path="/dashboard/settings/alert-rules"    element={<AlertRulesPage />} />
-          <Route path="/dashboard/settings/playbooks"      element={<PlaybooksPage />} />
-          <Route path="/dashboard/settings/team"           element={<TeamPage />} />
           <Route path="/dashboard/settings/github"         element={<GitHubIntegrationPage />} />
-          <Route path="/dashboard/settings/demo"           element={<DemoIngestPage />} />
         </Route>
 
         {/* ── 404 ── */}
