@@ -31,9 +31,9 @@ const STATUS_ICON: Record<InvitationStatus, React.ElementType> = {
 }
 const STATUS_COLOR: Record<InvitationStatus, string> = {
   pending:   'text-amber-400',
-  accepted:  'text-neural-400',
+  accepted:  'text-primary',
   cancelled: 'text-red-400',
-  expired:   'text-white/30',
+  expired:   'text-slate-500',
 }
 
 export default function TeamPage() {
@@ -113,8 +113,8 @@ export default function TeamPage() {
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Team</h1>
-          <p className="text-sm text-white/40 mt-0.5">{members.length} member{members.length !== 1 && 's'} in this workspace</p>
+          <h1 className="text-xl font-bold text-slate-900">Team</h1>
+          <p className="text-sm text-slate-500 mt-0.5">{members.length} member{members.length !== 1 && 's'} in this workspace</p>
         </div>
         {canManage && (
           <Button size="sm" className="gap-2" onClick={() => setInviteOpen(true)}>
@@ -136,14 +136,14 @@ export default function TeamPage() {
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/4 transition-colors"
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-100 transition-colors"
               >
-                <div className="h-8 w-8 rounded-full bg-neural-500/15 border border-neural-500/20 flex items-center justify-center text-xs font-semibold text-neural-400 shrink-0">
+                <div className="h-8 w-8 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center text-xs font-semibold text-primary shrink-0">
                   {getInitials(member.full_name || member.email)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white/85">{member.full_name || 'No Name'}</p>
-                  <p className="text-xs text-white/40">{member.email}</p>
+                  <p className="text-sm font-medium text-slate-900/85">{member.full_name || 'No Name'}</p>
+                  <p className="text-xs text-slate-500">{member.email}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {!member.email_verified && !member.is_email_verified && <Badge variant="warning" dot>Unverified</Badge>}
@@ -171,8 +171,8 @@ export default function TeamPage() {
               <div className="space-y-2">{[1,2].map(i=><Skeleton key={i} className="h-14 rounded-lg"/>)}</div>
             ) : invitations.length === 0 ? (
               <div className="text-center py-8">
-                <Mail size={24} className="mx-auto text-white/15 mb-2" />
-                <p className="text-sm text-white/30">No pending invitations</p>
+                <Mail size={24} className="mx-auto text-slate-900/15 mb-2" />
+                <p className="text-sm text-slate-500">No pending invitations</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -180,23 +180,23 @@ export default function TeamPage() {
                   const StatusIcon  = STATUS_ICON[inv.status]
                   const statusColor = STATUS_COLOR[inv.status]
                   return (
-                    <div key={inv.id} className="flex items-center gap-3 p-3 rounded-lg border border-white/8 bg-surface-2">
-                      <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center text-xs font-semibold text-white/50 shrink-0">
+                    <div key={inv.id} className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50">
+                      <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center text-xs font-semibold text-slate-600 shrink-0">
                         {inv.email[0].toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white/80">{inv.email}</p>
+                        <p className="text-sm text-slate-700">{inv.email}</p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <StatusIcon size={10} className={statusColor} />
                           <span className={cn('text-xs', statusColor)}>{inv.status}</span>
-                          <span className="text-xs text-white/25">•</span>
-                          <span className="text-xs text-white/30">expires {formatRelative(inv.expires_at)}</span>
+                          <span className="text-xs text-slate-400">•</span>
+                          <span className="text-xs text-slate-500">expires {formatRelative(inv.expires_at)}</span>
                         </div>
                       </div>
                       <Badge variant="neutral">{inv.role}</Badge>
                       <div className="flex items-center gap-1 shrink-0">
                         <Button
-                          variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white/70"
+                          variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-700"
                           title="Resend" isLoading={actionId === inv.id}
                           onClick={() => onResend(inv.id)}
                         >
@@ -224,10 +224,10 @@ export default function TeamPage() {
         <form onSubmit={handleSubmit(onInvite)} className="space-y-4 mt-4">
           <Input label="Email address" type="email" placeholder="colleague@company.com" error={errors.email?.message} {...register('email')} />
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-white/60 uppercase tracking-wide">Role</label>
+            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide">Role</label>
             <select
               {...register('role')}
-              className="w-full h-9 rounded-md border border-white/10 bg-surface-2 px-3 text-sm text-white focus:outline-none focus:border-neural-500 transition-colors"
+              className="w-full h-9 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 focus:outline-none focus:border-primary transition-colors"
             >
               <option value="engineer">Engineer - Can view and interact with incidents</option>
               <option value="admin">Admin - All permissions except billing</option>

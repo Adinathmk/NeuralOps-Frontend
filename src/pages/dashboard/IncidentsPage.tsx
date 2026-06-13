@@ -50,8 +50,8 @@ export default function IncidentsPage() {
     <div className="space-y-5 max-w-6xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Incidents</h1>
-          <p className="text-sm text-white/40 mt-0.5">{items.length} incidents found</p>
+          <h1 className="text-xl font-bold text-slate-900">Incidents</h1>
+          <p className="text-sm text-slate-500 mt-0.5">{items.length} incidents found</p>
         </div>
         <Button variant="outline" size="sm" className="gap-2" onClick={() => dispatch(fetchIncidentsThunk({
           status: filters.status !== 'all' ? filters.status : undefined,
@@ -68,12 +68,12 @@ export default function IncidentsPage() {
         <CardContent className="py-4 flex flex-wrap gap-4 items-center">
           {/* Search */}
           <div className="relative flex-1 min-w-48">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by error type or file…"
-              className="w-full h-8 pl-8 pr-3 rounded-md border border-white/10 bg-surface-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-neural-500 transition-colors"
+              className="w-full h-8 pl-8 pr-3 rounded-md border border-slate-200 bg-slate-50 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-primary transition-colors"
             />
           </div>
 
@@ -121,8 +121,8 @@ export default function IncidentsPage() {
 
         {!isLoading && items.length === 0 && !error && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <AlertTriangle size={32} className="text-white/20 mb-3" />
-            <p className="text-sm text-white/40">No incidents match your filters</p>
+            <AlertTriangle size={32} className="text-slate-400 mb-3" />
+            <p className="text-sm text-slate-500">No incidents match your filters</p>
           </div>
         )}
       </div>
@@ -136,10 +136,10 @@ function IncidentCard({ incident }: { incident: Incident }) {
 
   return (
     <div className={cn(
-      'flex items-center gap-4 p-4 rounded-xl border bg-surface-1 hover:bg-surface-2 transition-all cursor-pointer group',
+      'flex items-center gap-4 p-4 rounded-xl border bg-white hover:bg-slate-50 transition-all cursor-pointer group',
       incident.severity === 'critical' ? 'border-red-500/15 hover:border-red-500/25' :
       incident.severity === 'warning'  ? 'border-amber-500/15 hover:border-amber-500/25' :
-                                         'border-white/8 hover:border-white/15'
+                                         'border-slate-200 hover:border-slate-200'
     )}>
       {/* Severity indicator */}
       <div className={cn(
@@ -151,33 +151,33 @@ function IncidentCard({ incident }: { incident: Incident }) {
       {/* Main content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <p className="text-sm font-semibold text-white/90 truncate">{incident.error_type}</p>
+          <p className="text-sm font-semibold text-slate-800 truncate">{incident.error_type}</p>
           <Badge variant={severityVariant} dot>{incident.severity}</Badge>
           <Badge variant={statusVariant}>{incident.status}</Badge>
         </div>
-        <p className="text-xs text-white/40 truncate font-mono">
+        <p className="text-xs text-slate-500 truncate font-mono">
           {incident.crash_file}:{incident.crash_line}
         </p>
         {incident.root_cause && (
-          <p className="text-xs text-white/50 truncate mt-1">{incident.root_cause}</p>
+          <p className="text-xs text-slate-600 truncate mt-1">{incident.root_cause}</p>
         )}
       </div>
 
       {/* Meta */}
       <div className="text-right shrink-0 space-y-1">
-        <p className="text-xs text-white/60 font-medium">{incident.service_name}</p>
+        <p className="text-xs text-slate-600 font-medium">{incident.service_name}</p>
         {incident.confidence_score && (
           <div className="flex items-center justify-end gap-1.5">
             <div className="h-1 w-16 rounded-full bg-white/10 overflow-hidden">
               <div
-                className="h-full rounded-full bg-neural-500"
+                className="h-full rounded-full bg-primary"
                 style={{ width: `${incident.confidence_score * 100}%` }}
               />
             </div>
-            <span className="text-[10px] text-white/30">{Math.round(incident.confidence_score * 100)}%</span>
+            <span className="text-[10px] text-slate-500">{Math.round(incident.confidence_score * 100)}%</span>
           </div>
         )}
-        <p className="text-[11px] text-white/30">{formatRelative(incident.created_at)}</p>
+        <p className="text-[11px] text-slate-500">{formatRelative(incident.created_at)}</p>
       </div>
     </div>
   )
@@ -191,7 +191,7 @@ function FilterGroup({ label, options, active, onChange }: {
 }) {
   return (
     <div className="flex items-center gap-1.5">
-      <span className="text-xs text-white/40 shrink-0">{label}:</span>
+      <span className="text-xs text-slate-500 shrink-0">{label}:</span>
       <div className="flex items-center gap-1">
         {options.map(opt => (
           <button
@@ -200,8 +200,8 @@ function FilterGroup({ label, options, active, onChange }: {
             className={cn(
               'px-2.5 py-1 rounded-md text-xs font-medium transition-all',
               active === opt.value
-                ? 'bg-neural-500/15 text-neural-400 ring-1 ring-neural-500/20'
-                : 'text-white/40 hover:text-white/70 hover:bg-white/5'
+                ? 'bg-primary/15 text-primary ring-1 ring-neural-500/20'
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
             )}
           >
             {opt.label}

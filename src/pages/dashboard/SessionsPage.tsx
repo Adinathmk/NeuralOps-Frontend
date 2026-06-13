@@ -54,8 +54,8 @@ export default function SessionsPage() {
   return (
     <div className="max-w-2xl space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-white">Active Sessions</h1>
-        <p className="text-sm text-white/40 mt-0.5">Manage where you're signed in. Revoke access from devices you don't recognise.</p>
+        <h1 className="text-xl font-bold text-slate-900">Active Sessions</h1>
+        <p className="text-sm text-slate-500 mt-0.5">Manage where you're signed in. Revoke access from devices you don't recognise.</p>
       </div>
 
       {/* Security tip */}
@@ -83,27 +83,27 @@ export default function SessionsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.06 }}
               >
-                <Card className={cn(isCurrent && 'border-neural-500/20 bg-neural-500/5')}>
+                <Card className={cn(isCurrent && 'border-primary/20 bg-primary/5')}>
                   <CardContent className="p-4 flex items-start gap-4">
                     <div className={cn(
                       'h-10 w-10 rounded-lg flex items-center justify-center shrink-0',
-                      isCurrent ? 'bg-neural-500/15' : 'bg-white/5'
+                      isCurrent ? 'bg-primary/15' : 'bg-white/5'
                     )}>
-                      <DeviceIcon size={18} className={isCurrent ? 'text-neural-400' : 'text-white/40'} />
+                      <DeviceIcon size={18} className={isCurrent ? 'text-primary' : 'text-slate-500'} />
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm font-medium text-white/90">{session.device_name}</p>
+                        <p className="text-sm font-medium text-slate-800">{session.device_name}</p>
                         {isCurrent && <Badge variant="success" dot>Current session</Badge>}
                       </div>
                       <div className="flex items-center gap-3 mt-1 flex-wrap">
-                        <span className="flex items-center gap-1 text-xs text-white/40">
+                        <span className="flex items-center gap-1 text-xs text-slate-500">
                           <Globe size={11} /> {session.ip_address}
                         </span>
-                        <span className="text-xs text-white/30">Last active {formatRelative(session.last_activity)}</span>
+                        <span className="text-xs text-slate-500">Last active {formatRelative(session.last_activity)}</span>
                       </div>
-                      <p className="text-[11px] text-white/25 mt-0.5">
+                      <p className="text-[11px] text-slate-400 mt-0.5">
                         Started {formatDate(session.created_at)} · Expires {formatDate(session.expires_at)}
                       </p>
                     </div>

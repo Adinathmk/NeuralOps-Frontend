@@ -198,10 +198,10 @@ export default function AlertRulesPage() {
     <div className="max-w-3xl space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">
+          <h1 className="text-xl font-bold text-slate-900">
             Alert Rules
           </h1>
-          <p className="text-sm text-white/40 mt-0.5">
+          <p className="text-sm text-slate-500 mt-0.5">
             Control when and who gets notified
             about incidents.
           </p>
@@ -221,9 +221,9 @@ export default function AlertRulesPage() {
       {rules.length === 0 && !isLoading && (
         <Card>
           <CardContent className="py-12 text-center">
-            <Shield size={32} className="mx-auto text-white/15 mb-3" />
-            <p className="text-sm text-white/40">No alert rules configured yet.</p>
-            <p className="text-xs text-white/25 mt-1">Create your first rule to get notified about incidents.</p>
+            <Shield size={32} className="mx-auto text-slate-900/15 mb-3" />
+            <p className="text-sm text-slate-500">No alert rules configured yet.</p>
+            <p className="text-xs text-slate-400 mt-1">Create your first rule to get notified about incidents.</p>
           </CardContent>
         </Card>
       )}
@@ -247,7 +247,7 @@ export default function AlertRulesPage() {
                     className={cn(
                       'h-9 w-9 rounded-lg flex items-center justify-center shrink-0',
                       rule.enabled
-                        ? 'bg-neural-500/10'
+                        ? 'bg-primary/10'
                         : 'bg-white/5'
                     )}
                   >
@@ -255,15 +255,15 @@ export default function AlertRulesPage() {
                       size={15}
                       className={
                         rule.enabled
-                          ? 'text-neural-400'
-                          : 'text-white/30'
+                          ? 'text-primary'
+                          : 'text-slate-500'
                       }
                     />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <p className="text-sm font-semibold text-white/90">
+                      <p className="text-sm font-semibold text-slate-800">
                         {rule.severity_filter.join(', ')} alerts
                       </p>
 
@@ -274,7 +274,7 @@ export default function AlertRulesPage() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-3 flex-wrap text-xs text-white/40">
+                    <div className="flex items-center gap-3 flex-wrap text-xs text-slate-500">
                       <span>
                         Confidence ≥{' '}
                         {Math.round(
@@ -305,10 +305,10 @@ export default function AlertRulesPage() {
                     <div className="flex items-center gap-1.5 mt-1.5">
                       <Users
                         size={11}
-                        className="text-white/25"
+                        className="text-slate-400"
                       />
 
-                      <p className="text-xs text-white/35 truncate">
+                      <p className="text-xs text-slate-900/35 truncate">
                         {rule.recipient_ids.length} recipient(s)
                       </p>
                     </div>
@@ -319,12 +319,12 @@ export default function AlertRulesPage() {
                       onClick={() =>
                         toggleRule(rule)
                       }
-                      className="text-white/30 hover:text-white/70 transition-colors p-1.5"
+                      className="text-slate-500 hover:text-slate-700 transition-colors p-1.5"
                     >
                       {rule.enabled ? (
                         <ToggleRight
                           size={18}
-                          className="text-neural-400"
+                          className="text-primary"
                         />
                       ) : (
                         <ToggleLeft size={18} />
@@ -334,7 +334,7 @@ export default function AlertRulesPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-white/40 hover:text-white/70"
+                      className="h-7 w-7 text-slate-500 hover:text-slate-700"
                       onClick={() =>
                         openEdit(rule)
                       }
@@ -378,7 +378,7 @@ export default function AlertRulesPage() {
           className="space-y-4 mt-4"
         >
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-white/60 uppercase tracking-wide">
+            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide">
               Severity Filter
             </label>
 
@@ -405,7 +405,7 @@ export default function AlertRulesPage() {
                         : s === 'warning'
                         ? 'bg-amber-500/15 border-amber-500/30 text-amber-400'
                         : 'bg-blue-500/15 border-blue-500/30 text-blue-400'
-                      : 'bg-transparent border-white/10 text-white/30 hover:border-white/20'
+                      : 'bg-transparent border-slate-200 text-slate-500 hover:border-slate-200'
                   )}
                 >
                   {s.charAt(0).toUpperCase() +

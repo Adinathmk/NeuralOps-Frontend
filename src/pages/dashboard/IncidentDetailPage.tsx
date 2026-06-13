@@ -75,7 +75,7 @@ export default function IncidentDetailPage() {
   }
 
   if (loading && !incident) return <DetailSkeleton />
-  if (!incident) return <div className="text-white/40 text-sm p-6">Incident not found.</div>
+  if (!incident) return <div className="text-slate-500 text-sm p-6">Incident not found.</div>
 
   const severityVariant = { critical: 'critical', warning: 'warning', info: 'info' }[incident.severity] as 'critical' | 'warning' | 'info'
   const statusVariant   = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
@@ -83,12 +83,12 @@ export default function IncidentDetailPage() {
   return (
     <div className="max-w-7xl space-y-5">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-white/40">
-        <Link to="/dashboard/incidents" className="flex items-center gap-1 hover:text-white/70 transition-colors">
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <Link to="/dashboard/incidents" className="flex items-center gap-1 hover:text-slate-700 transition-colors">
           <ArrowLeft size={13} /> Incidents
         </Link>
         <ChevronRight size={13} />
-        <span className="text-white/70 truncate max-w-xs">{incident.error_type}</span>
+        <span className="text-slate-700 truncate max-w-xs">{incident.error_type}</span>
       </div>
 
       {/* Header */}
@@ -97,15 +97,15 @@ export default function IncidentDetailPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant={severityVariant} dot>{incident.severity}</Badge>
             <Badge variant={statusVariant}>{incident.status}</Badge>
-            <span className="text-xs text-white/30">{incident.environment}</span>
+            <span className="text-xs text-slate-500">{incident.environment}</span>
           </div>
-          <h1 className="text-xl font-bold text-white">{incident.error_type}</h1>
-          <p className="text-sm text-white/40 font-mono">
+          <h1 className="text-xl font-bold text-slate-900">{incident.error_type}</h1>
+          <p className="text-sm text-slate-500 font-mono">
             {incident.crash_file}:{incident.crash_line} · {incident.service_name}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-white/30">{formatRelative(incident.created_at)}</span>
+          <span className="text-xs text-slate-500">{formatRelative(incident.created_at)}</span>
         </div>
       </div>
 
@@ -119,14 +119,14 @@ export default function IncidentDetailPage() {
             <div key={s} className="flex items-center">
               <div className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                isCurrent ? 'bg-neural-500/15 text-neural-400 ring-1 ring-neural-500/30' :
-                isDone    ? 'text-white/50' : 'text-white/20'
+                isCurrent ? 'bg-primary/15 text-primary ring-1 ring-neural-500/30' :
+                isDone    ? 'text-slate-600' : 'text-slate-400'
               )}>
                 {isDone && !isCurrent && <CheckCircle size={10} />}
                 {s.charAt(0).toUpperCase() + s.slice(1)}
               </div>
               {i < statusFlow.length - 1 && (
-                <div className={cn('h-px w-8', i < currentIdx ? 'bg-neural-500/30' : 'bg-white/8')} />
+                <div className={cn('h-px w-8', i < currentIdx ? 'bg-primary/30' : 'bg-white/8')} />
               )}
             </div>
           )
@@ -143,24 +143,24 @@ export default function IncidentDetailPage() {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Sparkles size={14} className="text-neural-400" />
+                  <Sparkles size={14} className="text-primary" />
                   <CardTitle>AI Root Cause Analysis</CardTitle>
                   {incident.confidence_score && (
                     <div className="ml-auto flex items-center gap-2">
                       <div className="h-1.5 w-20 rounded-full bg-white/8 overflow-hidden">
-                        <div className="h-full rounded-full bg-neural-500" style={{ width: `${incident.confidence_score * 100}%` }} />
+                        <div className="h-full rounded-full bg-primary" style={{ width: `${incident.confidence_score * 100}%` }} />
                       </div>
-                      <span className="text-xs text-neural-400 font-medium">{Math.round(incident.confidence_score * 100)}% confidence</span>
+                      <span className="text-xs text-primary font-medium">{Math.round(incident.confidence_score * 100)}% confidence</span>
                     </div>
                   )}
                 </div>
               </CardHeader>
               <CardContent>
                 {incident.root_cause ? (
-                  <p className="text-sm text-white/70 leading-relaxed">{incident.root_cause}</p>
+                  <p className="text-sm text-slate-700 leading-relaxed">{incident.root_cause}</p>
                 ) : (
-                  <div className="flex items-center gap-3 text-sm text-white/40">
-                    <div className="h-2 w-2 rounded-full bg-neural-500 animate-pulse" />
+                  <div className="flex items-center gap-3 text-sm text-slate-500">
+                    <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                     Agent is analysing this incident…
                   </div>
                 )}
@@ -185,7 +185,7 @@ export default function IncidentDetailPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <pre className="text-xs text-white/70 bg-surface-2 rounded-lg p-4 overflow-x-auto border border-white/8 font-mono leading-relaxed whitespace-pre-wrap">
+                  <pre className="text-xs text-slate-700 bg-slate-50 rounded-lg p-4 overflow-x-auto border border-slate-200 font-mono leading-relaxed whitespace-pre-wrap">
                     {incident.suggested_fix}
                   </pre>
                 </CardContent>
@@ -208,8 +208,8 @@ export default function IncidentDetailPage() {
                     { label: 'Updated',     value: formatDate(incident.updated_at) },
                   ].map(({ label, value }) => (
                     <div key={label}>
-                      <dt className="text-xs text-white/30 mb-0.5">{label}</dt>
-                      <dd className="text-xs text-white/70 font-mono truncate">{value}</dd>
+                      <dt className="text-xs text-slate-500 mb-0.5">{label}</dt>
+                      <dd className="text-xs text-slate-700 font-mono truncate">{value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -223,9 +223,9 @@ export default function IncidentDetailPage() {
           <Card className="flex flex-col h-full min-h-[520px]">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
-                <MessageSquare size={14} className="text-white/50" />
+                <MessageSquare size={14} className="text-slate-600" />
                 <CardTitle>Discussion Thread</CardTitle>
-                <span className="ml-auto text-xs text-white/30">{messages.length} messages</span>
+                <span className="ml-auto text-xs text-slate-500">{messages.length} messages</span>
               </div>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col pt-0 min-h-0">
@@ -233,22 +233,22 @@ export default function IncidentDetailPage() {
               <div className="flex-1 overflow-y-auto space-y-4 pr-1 mb-4">
                 {messages.map(msg => (
                   <div key={msg.id} className="flex gap-2.5">
-                    <div className="h-7 w-7 rounded-full bg-neural-500/20 border border-neural-500/20 flex items-center justify-center text-[10px] font-bold text-neural-400 shrink-0 mt-0.5">
+                    <div className="h-7 w-7 rounded-full bg-primary/20 border border-primary/20 flex items-center justify-center text-[10px] font-bold text-primary shrink-0 mt-0.5">
                       {msg.author.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline gap-2 mb-1">
-                        <span className="text-xs font-semibold text-white/80">{msg.author.full_name}</span>
-                        <span className="text-[10px] text-white/30">{formatRelative(msg.created_at)}</span>
+                        <span className="text-xs font-semibold text-slate-700">{msg.author.full_name}</span>
+                        <span className="text-[10px] text-slate-500">{formatRelative(msg.created_at)}</span>
                       </div>
-                      <p className="text-xs text-white/60 leading-relaxed">{msg.content}</p>
+                      <p className="text-xs text-slate-600 leading-relaxed">{msg.content}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Composer */}
-              <div className="border-t border-white/8 pt-3">
+              <div className="border-t border-slate-200 pt-3">
                 <div className="flex gap-2">
                   <div className="flex-1 relative">
                     <textarea
@@ -257,9 +257,9 @@ export default function IncidentDetailPage() {
                       onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
                       placeholder="Add a comment… (Enter to send)"
                       rows={2}
-                      className="w-full rounded-lg border border-white/10 bg-surface-2 px-3 py-2 text-xs text-white placeholder:text-white/25 focus:outline-none focus:border-neural-500 resize-none transition-colors"
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary resize-none transition-colors"
                     />
-                    <button className="absolute right-2 bottom-2 text-white/20 hover:text-white/50 transition-colors">
+                    <button className="absolute right-2 bottom-2 text-slate-400 hover:text-slate-600 transition-colors">
                       <AtSign size={12} />
                     </button>
                   </div>

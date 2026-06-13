@@ -14,7 +14,7 @@ const TYPE_CONFIG: Record<NotificationType, { icon: React.ElementType; label: st
   incident_created: { icon: AlertTriangle, label: 'New Incident',    color: 'text-red-400',    bg: 'bg-red-500/10' },
   mention:          { icon: AtSign,        label: 'Mention',         color: 'text-blue-400',   bg: 'bg-blue-500/10' },
   assignment:       { icon: UserCheck,     label: 'Assignment',      color: 'text-amber-400',  bg: 'bg-amber-500/10' },
-  status_change:    { icon: Activity,      label: 'Status Update',   color: 'text-neural-400', bg: 'bg-neural-500/10' },
+  status_change:    { icon: Activity,      label: 'Status Update',   color: 'text-primary', bg: 'bg-primary/10' },
   alert:            { icon: Bell,          label: 'Alert',           color: 'text-purple-400', bg: 'bg-purple-500/10' },
 }
 
@@ -43,8 +43,8 @@ export default function NotificationsPage() {
     <div className="max-w-2xl space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Notifications</h1>
-          <p className="text-sm text-white/40 mt-0.5">
+          <h1 className="text-xl font-bold text-slate-900">Notifications</h1>
+          <p className="text-sm text-slate-500 mt-0.5">
             {unread.length > 0 ? `${unread.length} unread` : 'All caught up'}
           </p>
         </div>
@@ -58,7 +58,7 @@ export default function NotificationsPage() {
       {/* Unread */}
       {unread.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-white/30 uppercase tracking-widest font-medium px-1">Unread</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-medium px-1">Unread</p>
           <AnimatePresence>
             {unread.map((n, i) => (
               <motion.div
@@ -78,7 +78,7 @@ export default function NotificationsPage() {
       {/* Read */}
       {read.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-white/30 uppercase tracking-widest font-medium px-1">Earlier</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-medium px-1">Earlier</p>
           {read.map((n, i) => (
             <motion.div
               key={n.id}
@@ -95,10 +95,10 @@ export default function NotificationsPage() {
       {notifications.length === 0 && (
         <div className="flex flex-col items-center py-20 text-center gap-3">
           <div className="h-14 w-14 rounded-full bg-white/5 flex items-center justify-center">
-            <Bell size={24} className="text-white/20" />
+            <Bell size={24} className="text-slate-400" />
           </div>
-          <p className="text-sm text-white/40">No notifications yet</p>
-          <p className="text-xs text-white/25">You'll be notified about incidents, mentions, and assignments here.</p>
+          <p className="text-sm text-slate-500">No notifications yet</p>
+          <p className="text-xs text-slate-400">You'll be notified about incidents, mentions, and assignments here.</p>
         </div>
       )}
     </div>
@@ -115,8 +115,8 @@ function NotificationRow({ n, onRead }: { n: Notification; onRead: () => void })
       className={cn(
         'w-full flex items-start gap-3 p-4 rounded-xl border text-left transition-all',
         n.is_read
-          ? 'border-white/8 bg-surface-1 hover:bg-surface-2 opacity-60 hover:opacity-80'
-          : 'border-white/12 bg-surface-2 hover:bg-surface-3 ring-1 ring-white/5'
+          ? 'border-slate-200 bg-white hover:bg-slate-50 opacity-60 hover:opacity-80'
+          : 'border-slate-200 bg-slate-50 hover:bg-slate-100 ring-1 ring-slate-200'
       )}
     >
       <div className={cn('h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5', cfg.bg)}>
@@ -124,13 +124,13 @@ function NotificationRow({ n, onRead }: { n: Notification; onRead: () => void })
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <p className="text-sm font-medium text-white/90 leading-tight">{n.title}</p>
-          <span className="text-[11px] text-white/30 shrink-0 mt-0.5">{formatRelative(n.created_at)}</span>
+          <p className="text-sm font-medium text-slate-800 leading-tight">{n.title}</p>
+          <span className="text-[11px] text-slate-500 shrink-0 mt-0.5">{formatRelative(n.created_at)}</span>
         </div>
-        <p className="text-xs text-white/50 mt-1 leading-relaxed">{n.body}</p>
+        <p className="text-xs text-slate-600 mt-1 leading-relaxed">{n.body}</p>
         <div className="flex items-center gap-2 mt-2">
           <Badge variant="neutral">{cfg.label}</Badge>
-          {!n.is_read && <span className="h-1.5 w-1.5 rounded-full bg-neural-500" />}
+          {!n.is_read && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
         </div>
       </div>
     </button>

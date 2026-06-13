@@ -51,7 +51,7 @@ export default function RegisterSuccessPage() {
       ]
 
   return (
-    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -60,14 +60,14 @@ export default function RegisterSuccessPage() {
       >
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-neural-500 flex items-center justify-center shadow-lg shadow-neural-500/30">
-            <Zap size={16} className="text-white" />
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <Zap size={16} className="text-slate-900" />
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">NeuralOps</span>
+          <span className="text-slate-900 font-bold text-lg tracking-tight">NeuralOps</span>
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl border border-white/8 bg-surface-1 p-8 space-y-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 space-y-6">
 
           {/* Icon */}
           <div className="flex justify-center">
@@ -75,43 +75,43 @@ export default function RegisterSuccessPage() {
               <div className={`h-20 w-20 rounded-full flex items-center justify-center ${
                 fromLogin
                   ? 'bg-amber-500/10 border border-amber-500/20'
-                  : 'bg-neural-500/10 border border-neural-500/20'
+                  : 'bg-primary/10 border border-primary/20'
               }`}>
                 {fromLogin
                   ? <ShieldAlert size={34} className="text-amber-400" />
-                  : <Mail      size={34} className="text-neural-400" />
+                  : <Mail      size={34} className="text-primary" />
                 }
               </div>
               {/* Pulse ring */}
               <div className={`absolute inset-0 rounded-full border animate-ping opacity-30 ${
-                fromLogin ? 'border-amber-500/20' : 'border-neural-500/20'
+                fromLogin ? 'border-amber-500/20' : 'border-primary/20'
               }`} />
             </div>
           </div>
 
           {/* Text */}
           <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold text-white">{heading}</h1>
-            <p className="text-sm text-white/50 leading-relaxed">{subtext}</p>
+            <h1 className="text-2xl font-bold text-slate-900">{heading}</h1>
+            <p className="text-sm text-slate-600 leading-relaxed">{subtext}</p>
             {email && (
-              <p className="text-sm font-semibold text-neural-400 break-all">{email}</p>
+              <p className="text-sm font-semibold text-primary break-all">{email}</p>
             )}
             {!fromLogin && (
-              <p className="text-sm text-white/40 leading-relaxed pt-1">
+              <p className="text-sm text-slate-500 leading-relaxed pt-1">
                 Click the link in that email to activate your account. The link expires in{' '}
-                <span className="text-white/60 font-medium">24 hours</span>.
+                <span className="text-slate-600 font-medium">24 hours</span>.
               </p>
             )}
           </div>
 
           {/* Steps */}
-          <div className="rounded-xl border border-white/8 bg-surface-2 p-4 space-y-3">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
             {steps.map(({ step, text }) => (
               <div key={step} className="flex items-center gap-3">
-                <div className="h-6 w-6 rounded-full bg-neural-500/15 border border-neural-500/20 flex items-center justify-center shrink-0">
-                  <span className="text-[11px] font-bold text-neural-400">{step}</span>
+                <div className="h-6 w-6 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center shrink-0">
+                  <span className="text-[11px] font-bold text-primary">{step}</span>
                 </div>
-                <p className="text-sm text-white/60">{text}</p>
+                <p className="text-sm text-slate-600">{text}</p>
               </div>
             ))}
           </div>
@@ -121,10 +121,10 @@ export default function RegisterSuccessPage() {
             <motion.div
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-2 rounded-lg border border-neural-500/20 bg-neural-500/8 px-4 py-3"
+              className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/8 px-4 py-3"
             >
-              <CheckCircle size={14} className="text-neural-400 shrink-0" />
-              <p className="text-sm text-neural-400">Verification email resent!</p>
+              <CheckCircle size={14} className="text-primary shrink-0" />
+              <p className="text-sm text-primary">Verification email resent!</p>
             </motion.div>
           )}
 
@@ -150,7 +150,7 @@ export default function RegisterSuccessPage() {
 
             <Button
               variant="ghost"
-              className="w-full gap-2 text-white/40 hover:text-white/70"
+              className="w-full gap-2 text-slate-500 hover:text-slate-700"
               onClick={() => navigate('/login')}
             >
               <ArrowLeft size={13} />
@@ -160,7 +160,7 @@ export default function RegisterSuccessPage() {
         </div>
 
         {/* Footer note */}
-        <p className="text-center text-xs text-white/25 leading-relaxed">
+        <p className="text-center text-xs text-slate-400 leading-relaxed">
           Didn't receive it? Check your spam folder. If it's still not there,
           use the resend button above.
         </p>

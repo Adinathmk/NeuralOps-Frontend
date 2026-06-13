@@ -51,28 +51,28 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm space-y-6"
       >
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-neural-500 flex items-center justify-center shadow-lg shadow-neural-500/30">
-            <Zap size={16} className="text-white" />
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <Zap size={16} className="text-slate-900" />
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">NeuralOps</span>
+          <span className="text-slate-900 font-bold text-lg tracking-tight">NeuralOps</span>
         </div>
 
         {done ? (
           <div className="space-y-4">
             <div className="flex flex-col items-center text-center gap-3 py-6">
-              <div className="h-12 w-12 rounded-full bg-neural-500/10 border border-neural-500/20 flex items-center justify-center">
-                <CheckCircle size={24} className="text-neural-400" />
+              <div className="h-12 w-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                <CheckCircle size={24} className="text-primary" />
               </div>
               <div>
-                <p className="font-semibold text-white">Password reset!</p>
-                <p className="text-sm text-white/40 mt-1">You can now sign in with your new password.</p>
+                <p className="font-semibold text-slate-900">Password reset!</p>
+                <p className="text-sm text-slate-500 mt-1">You can now sign in with your new password.</p>
               </div>
             </div>
             <Button className="w-full" onClick={() => navigate('/login')}>
@@ -82,8 +82,8 @@ export default function ResetPasswordPage() {
         ) : (
           <>
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-white">Reset password</h2>
-              <p className="text-sm text-white/40">Choose a strong new password</p>
+              <h2 className="text-2xl font-bold text-slate-900">Reset password</h2>
+              <p className="text-sm text-slate-500">Choose a strong new password</p>
             </div>
 
             {error && (
@@ -117,7 +117,7 @@ export default function ResetPasswordPage() {
               </Button>
             </form>
 
-            <Link to="/login" className="flex items-center justify-center gap-2 text-xs text-white/40 hover:text-white/70 transition-colors">
+            <Link to="/login" className="flex items-center justify-center gap-2 text-xs text-slate-500 hover:text-slate-700 transition-colors">
               <ArrowLeft size={12} /> Back to sign in
             </Link>
           </>

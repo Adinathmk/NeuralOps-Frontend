@@ -163,12 +163,12 @@ export function MFASection() {
         <CardHeader>
           <div className="flex items-center gap-2">
             {mfaEnabled
-              ? <ShieldCheck size={14} className="text-neural-400" />
-              : <Shield size={14} className="text-white/50" />}
+              ? <ShieldCheck size={14} className="text-primary" />
+              : <Shield size={14} className="text-slate-600" />}
             <CardTitle>Two-Factor Authentication</CardTitle>
             {mfaEnabled && (
-              <span className="ml-auto flex items-center gap-1.5 text-xs text-neural-400 font-medium">
-                <span className="h-1.5 w-1.5 rounded-full bg-neural-500 animate-pulse" />
+              <span className="ml-auto flex items-center gap-1.5 text-xs text-primary font-medium">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
                 Active
               </span>
             )}
@@ -176,7 +176,7 @@ export function MFASection() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <p className="text-sm text-white/50 leading-relaxed">
+          <p className="text-sm text-slate-600 leading-relaxed">
             {mfaEnabled
               ? 'Your account is protected with TOTP two-factor authentication. You need your authenticator app to sign in.'
               : 'Add an extra layer of security. After enabling, you will need your authenticator app every time you sign in.'}
@@ -198,8 +198,8 @@ export function MFASection() {
               {/* qr + verify */}
               {step === 'qr' && setupData && (
                 <motion.div key="qr" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-5">
-                  <div className="rounded-xl border border-white/8 bg-surface-2 p-4 space-y-4">
-                    <p className="text-xs font-medium text-white/70">
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-4">
+                    <p className="text-xs font-medium text-slate-700">
                       1. Scan this QR code with Google Authenticator, Authy, or Microsoft Authenticator
                     </p>
                     <div className="flex justify-center">
@@ -208,14 +208,14 @@ export function MFASection() {
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <p className="text-xs text-white/40">Can't scan? Enter this key manually:</p>
-                      <div className="flex items-center gap-2 rounded-lg border border-white/8 bg-surface-3 px-3 py-2">
-                        <code className="flex-1 text-xs text-neural-400 font-mono tracking-wider break-all">
+                      <p className="text-xs text-slate-500">Can't scan? Enter this key manually:</p>
+                      <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-100 px-3 py-2">
+                        <code className="flex-1 text-xs text-primary font-mono tracking-wider break-all">
                           {setupData.secret}
                         </code>
-                        <button onClick={copySecret} className="text-white/30 hover:text-white/70 transition-colors shrink-0">
+                        <button onClick={copySecret} className="text-slate-500 hover:text-slate-700 transition-colors shrink-0">
                           {copiedSecret
-                            ? <CheckCircle size={13} className="text-neural-400" />
+                            ? <CheckCircle size={13} className="text-primary" />
                             : <Copy size={13} />}
                         </button>
                       </div>
@@ -223,7 +223,7 @@ export function MFASection() {
                   </div>
 
                   <div className="space-y-3">
-                    <p className="text-xs font-medium text-white/70">
+                    <p className="text-xs font-medium text-slate-700">
                       2. Enter the 6-digit code from your app to verify
                     </p>
                     <div className="flex gap-2">
@@ -234,7 +234,7 @@ export function MFASection() {
                         value={confirmCode}
                         onChange={e => setConfirmCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                         placeholder="000000"
-                        className="flex-1 h-10 rounded-lg border border-white/10 bg-surface-2 px-3 text-center text-lg font-mono font-bold text-white tracking-[0.5em] placeholder:text-white/20 placeholder:tracking-normal focus:outline-none focus:border-neural-500 transition-colors"
+                        className="flex-1 h-10 rounded-lg border border-slate-200 bg-slate-50 px-3 text-center text-lg font-mono font-bold text-slate-900 tracking-[0.5em] placeholder:text-slate-400 placeholder:tracking-normal focus:outline-none focus:border-primary transition-colors"
                       />
                       <Button onClick={confirmSetup} isLoading={loading} disabled={confirmCode.length !== 6}>
                         Verify
@@ -249,7 +249,7 @@ export function MFASection() {
 
                   <button
                     onClick={() => { setStep('idle'); setSetupData(null); setConfirmCode('') }}
-                    className="text-xs text-white/30 hover:text-white/60 transition-colors"
+                    className="text-xs text-slate-500 hover:text-slate-600 transition-colors"
                   >
                     Cancel setup
                   </button>
@@ -271,8 +271,8 @@ export function MFASection() {
 
                   <div className="grid grid-cols-2 gap-2">
                     {backupCodes.map((code, i) => (
-                      <div key={i} className="rounded-lg border border-white/8 bg-surface-2 px-3 py-2 text-center">
-                        <code className="text-xs font-mono text-white/70">{code}</code>
+                      <div key={i} className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center">
+                        <code className="text-xs font-mono text-slate-700">{code}</code>
                       </div>
                     ))}
                   </div>
@@ -334,7 +334,7 @@ export function MFASection() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(v => !v)}
-                  className="text-white/40 hover:text-white/70 transition-colors"
+                  className="text-slate-500 hover:text-slate-700 transition-colors"
                 >
                   {showPassword ? <EyeOff size={13} /> : <Eye size={13} />}
                 </button>

@@ -9,13 +9,13 @@ export function Topbar() {
   const unread  = useAppSelector(s => s.notifications.unreadCount)
 
   return (
-    <header className="h-14 border-b border-white/8 bg-surface-1/80 backdrop-blur-md flex items-center gap-4 px-6 shrink-0">
+    <header className="h-14 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center gap-4 px-6 shrink-0">
       {/* Search */}
       <div className="flex items-center gap-2 flex-1 max-w-sm">
-        <div className="flex items-center gap-2 w-full rounded-lg border border-white/10 bg-surface-2 px-3 py-1.5 text-sm text-white/40 cursor-pointer hover:border-white/20 hover:text-white/60 transition-all">
+        <div className="flex items-center gap-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-500 cursor-pointer hover:border-slate-200 hover:text-slate-600 transition-all">
           <Search size={13} />
           <span className="flex-1 text-xs">Search incidents…</span>
-          <span className="flex items-center gap-1 text-[10px] text-white/25 border border-white/10 rounded px-1.5 py-0.5">
+          <span className="flex items-center gap-1 text-[10px] text-slate-400 border border-slate-200 rounded px-1.5 py-0.5">
             <Command size={10} />K
           </span>
         </div>
@@ -25,12 +25,12 @@ export function Topbar() {
         {/* Notifications */}
         <Link
           to="/dashboard/notifications"
-          className="relative h-8 w-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white/80 hover:bg-white/5 transition-all"
+          className="relative h-8 w-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-700 hover:bg-slate-100 transition-all"
         >
           <Bell size={15} />
           {unread > 0 && (
             <span className={cn(
-              'absolute -top-0.5 -right-0.5 h-4 min-w-[16px] rounded-full bg-neural-500 text-[9px] font-bold text-white flex items-center justify-center px-1'
+              'absolute -top-0.5 -right-0.5 h-4 min-w-[16px] rounded-full bg-primary text-[9px] font-bold text-slate-900 flex items-center justify-center px-1'
             )}>
               {unread > 9 ? '9+' : unread}
             </span>
@@ -39,7 +39,7 @@ export function Topbar() {
 
         {/* Avatar */}
         <Link to="/dashboard/settings" className="flex items-center gap-2 group">
-          <div className="h-7 w-7 rounded-full bg-neural-500/20 border border-neural-500/30 flex items-center justify-center text-xs font-semibold text-neural-400 group-hover:border-neural-500/60 transition-all">
+          <div className="h-7 w-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-xs font-semibold text-primary group-hover:border-primary/60 transition-all">
             {user ? getInitials(user.full_name) : '?'}
           </div>
         </Link>

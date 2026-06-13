@@ -83,20 +83,20 @@ export default function AcceptInvitePage() {
   // ── Render states ─────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="h-8 w-8 rounded-lg bg-neural-500 flex items-center justify-center shadow-lg shadow-neural-500/30">
-            <Zap size={16} className="text-white" />
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <Zap size={16} className="text-slate-900" />
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">NeuralOps</span>
+          <span className="text-slate-900 font-bold text-lg tracking-tight">NeuralOps</span>
         </div>
 
         {pageState === 'loading' && (
           <div className="flex flex-col items-center py-16 gap-3">
-            <Loader2 size={28} className="text-neural-400 animate-spin" />
-            <p className="text-sm text-white/40">Validating invitation…</p>
+            <Loader2 size={28} className="text-primary animate-spin" />
+            <p className="text-sm text-slate-500">Validating invitation…</p>
           </div>
         )}
 
@@ -106,8 +106,8 @@ export default function AcceptInvitePage() {
               <AlertTriangle size={24} className="text-red-400" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">Invalid invitation</p>
-              <p className="text-sm text-white/40 mt-1">This link is invalid, expired, or has already been used.</p>
+              <p className="text-lg font-bold text-slate-900">Invalid invitation</p>
+              <p className="text-sm text-slate-500 mt-1">This link is invalid, expired, or has already been used.</p>
             </div>
             <Link to="/login">
               <Button variant="outline" className="w-full">Go to sign in</Button>
@@ -117,12 +117,12 @@ export default function AcceptInvitePage() {
 
         {pageState === 'joined' && (
           <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-4 py-12">
-            <div className="h-14 w-14 mx-auto rounded-full bg-neural-500/10 border border-neural-500/20 flex items-center justify-center">
-              <CheckCircle size={24} className="text-neural-400" />
+            <div className="h-14 w-14 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <CheckCircle size={24} className="text-primary" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">Welcome aboard!</p>
-              <p className="text-sm text-white/40 mt-1">You've joined {invitation?.tenant.name}. Redirecting…</p>
+              <p className="text-lg font-bold text-slate-900">Welcome aboard!</p>
+              <p className="text-sm text-slate-500 mt-1">You've joined {invitation?.tenant.name}. Redirecting…</p>
             </div>
           </motion.div>
         )}
@@ -130,13 +130,13 @@ export default function AcceptInvitePage() {
         {pageState === 'valid' && invitation && (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
             {/* Invitation card */}
-            <div className="rounded-xl border border-neural-500/20 bg-neural-500/5 p-4 space-y-1">
-              <p className="text-xs text-neural-400 font-medium uppercase tracking-widest">You're invited to join</p>
-              <p className="text-lg font-bold text-white">{invitation.tenant.name}</p>
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-1">
+              <p className="text-xs text-primary font-medium uppercase tracking-widest">You're invited to join</p>
+              <p className="text-lg font-bold text-slate-900">{invitation.tenant.name}</p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-white/50">As</span>
+                <span className="text-xs text-slate-600">As</span>
                 <Badge variant="info">{invitation.role}</Badge>
-                <span className="text-xs text-white/30">· {invitation.email}</span>
+                <span className="text-xs text-slate-500">· {invitation.email}</span>
               </div>
             </div>
 
@@ -160,8 +160,8 @@ export default function AcceptInvitePage() {
             </form>
 
             <div className="relative">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/8" /></div>
-              <div className="relative flex justify-center"><span className="bg-surface-0 px-3 text-xs text-white/30">or join with</span></div>
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+              <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-slate-500">or join with</span></div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -176,9 +176,9 @@ export default function AcceptInvitePage() {
               </Button>
             </div>
 
-            <p className="text-center text-xs text-white/30">
+            <p className="text-center text-xs text-slate-500">
               Already have an account?{' '}
-              <Link to="/login" className="text-neural-400 hover:text-neural-300 transition-colors">Sign in</Link>
+              <Link to="/login" className="text-primary hover:text-primary transition-colors">Sign in</Link>
             </p>
           </motion.div>
         )}

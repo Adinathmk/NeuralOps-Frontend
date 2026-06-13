@@ -35,7 +35,7 @@ export default function RegisterPage() {
   const onSubmit = (data: RegisterFormData) => registerUser(data)
 
   return (
-    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -44,15 +44,15 @@ export default function RegisterPage() {
       >
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-neural-500 flex items-center justify-center shadow-lg shadow-neural-500/30">
-            <Zap size={16} className="text-white" />
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <Zap size={16} className="text-slate-900" />
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">NeuralOps</span>
+          <span className="text-slate-900 font-bold text-lg tracking-tight">NeuralOps</span>
         </div>
 
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-white">Create your workspace</h2>
-          <p className="text-sm text-white/40">Set up NeuralOps for your engineering team</p>
+          <h2 className="text-2xl font-bold text-slate-900">Create your workspace</h2>
+          <p className="text-sm text-slate-500">Set up NeuralOps for your engineering team</p>
         </div>
 
         {error && (
@@ -130,11 +130,11 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <p className="text-[11px] text-white/30 leading-relaxed">
+          <p className="text-[11px] text-slate-500 leading-relaxed">
             By creating an account, you agree to our{' '}
-            <a href="#" className="text-neural-400 hover:underline">Terms of Service</a>{' '}
+            <a href="#" className="text-primary hover:underline">Terms of Service</a>{' '}
             and{' '}
-            <a href="#" className="text-neural-400 hover:underline">Privacy Policy</a>.
+            <a href="#" className="text-primary hover:underline">Privacy Policy</a>.
           </p>
 
           <Button type="submit" className="w-full" isLoading={isLoading}>
@@ -142,9 +142,9 @@ export default function RegisterPage() {
           </Button>
         </form>
 
-        <p className="text-center text-xs text-white/40">
+        <p className="text-center text-xs text-slate-500">
           Already have an account?{' '}
-          <Link to="/login" className="text-neural-400 hover:text-neural-300 font-medium transition-colors">
+          <Link to="/login" className="text-primary hover:text-primary font-medium transition-colors">
             Sign in
           </Link>
         </p>

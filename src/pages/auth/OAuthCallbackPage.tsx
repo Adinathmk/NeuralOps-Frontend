@@ -56,7 +56,7 @@ export default function OAuthCallbackPage() {
   const providerLabel = provider === 'google' ? 'Google' : 'GitHub'
 
   return (
-    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -64,18 +64,18 @@ export default function OAuthCallbackPage() {
       >
         {/* Logo */}
         <div className="flex justify-center">
-          <div className="h-8 w-8 rounded-lg bg-neural-500 flex items-center justify-center shadow-lg shadow-neural-500/30">
-            <Zap size={16} className="text-white" />
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <Zap size={16} className="text-slate-900" />
           </div>
         </div>
 
         {/* Loading */}
         {state === 'loading' && (
           <div className="space-y-4">
-            <Loader2 size={32} className="mx-auto text-neural-400 animate-spin" />
+            <Loader2 size={32} className="mx-auto text-primary animate-spin" />
             <div>
-              <p className="text-white font-semibold">Signing you in with {providerLabel}…</p>
-              <p className="text-sm text-white/40 mt-1">Just a moment while we verify your account.</p>
+              <p className="text-slate-900 font-semibold">Signing you in with {providerLabel}…</p>
+              <p className="text-sm text-slate-500 mt-1">Just a moment while we verify your account.</p>
             </div>
           </div>
         )}
@@ -87,12 +87,12 @@ export default function OAuthCallbackPage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            <div className="h-14 w-14 rounded-full bg-neural-500/10 border border-neural-500/20 flex items-center justify-center mx-auto">
-              <CheckCircle size={28} className="text-neural-400" />
+            <div className="h-14 w-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto">
+              <CheckCircle size={28} className="text-primary" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">Signed in!</p>
-              <p className="text-sm text-white/40 mt-1">Redirecting to your dashboard…</p>
+              <p className="text-lg font-bold text-slate-900">Signed in!</p>
+              <p className="text-sm text-slate-500 mt-1">Redirecting to your dashboard…</p>
             </div>
           </motion.div>
         )}
@@ -104,12 +104,12 @@ export default function OAuthCallbackPage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            <div className="h-14 w-14 rounded-full bg-neural-500/10 border border-neural-500/20 flex items-center justify-center mx-auto">
-              <ShieldCheck size={28} className="text-neural-400" />
+            <div className="h-14 w-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto">
+              <ShieldCheck size={28} className="text-primary" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">Two-factor required</p>
-              <p className="text-sm text-white/40 mt-1">Redirecting to verification…</p>
+              <p className="text-lg font-bold text-slate-900">Two-factor required</p>
+              <p className="text-sm text-slate-500 mt-1">Redirecting to verification…</p>
             </div>
           </motion.div>
         )}
@@ -125,8 +125,8 @@ export default function OAuthCallbackPage() {
               <XCircle size={28} className="text-red-400" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">Sign-in failed</p>
-              <p className="text-sm text-white/40 mt-1 leading-relaxed">{errMsg}</p>
+              <p className="text-lg font-bold text-slate-900">Sign-in failed</p>
+              <p className="text-sm text-slate-500 mt-1 leading-relaxed">{errMsg}</p>
             </div>
             <div className="flex flex-col gap-2">
               <Button className="w-full" onClick={() => navigate('/login', { replace: true })}>

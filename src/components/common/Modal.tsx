@@ -31,7 +31,7 @@ export function Modal({
           <Dialog.Portal forceMount>
             <Dialog.Overlay asChild>
               <motion.div
-                className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+                className="fixed inset-0 z-50 bg-white/60 backdrop-blur-sm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -50,12 +50,12 @@ export function Modal({
                   transition={{ duration: 0.2, ease: 'easeOut' }}
                 >
                   <div className={cn(
-                    'relative rounded-xl border border-white/10 bg-surface-1 shadow-2xl shadow-black/60 p-6',
+                    'relative rounded-xl border border-slate-200 bg-white shadow-2xl shadow-black/60 p-6',
                     className
                   )}>
                     <button
                       onClick={onClose}
-                      className="absolute right-4 top-4 text-white/40 hover:text-white/80 transition-colors"
+                      className="absolute right-4 top-4 text-slate-500 hover:text-slate-700 transition-colors"
                     >
                       <X size={16} />
                     </button>
@@ -63,12 +63,12 @@ export function Modal({
                     {(title || description) && (
                       <div className="mb-5">
                         {title && (
-                          <Dialog.Title className="text-base font-semibold text-white">
+                          <Dialog.Title className="text-base font-semibold text-slate-900">
                             {title}
                           </Dialog.Title>
                         )}
                         {description && (
-                          <Dialog.Description className="mt-1 text-sm text-white/50">
+                          <Dialog.Description className="mt-1 text-sm text-slate-600">
                             {description}
                           </Dialog.Description>
                         )}

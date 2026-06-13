@@ -54,7 +54,7 @@ export default function BackupCodesModal({ isOpen, codes, onClose }: BackupCodes
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-white/60 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -67,7 +67,7 @@ export default function BackupCodesModal({ isOpen, codes, onClose }: BackupCodes
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="w-full max-w-md rounded-2xl border border-white/10 bg-surface-1 shadow-2xl shadow-black/40 overflow-hidden">
+            <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-black/40 overflow-hidden">
 
               {/* Header */}
               <div className="relative flex items-start gap-4 p-6 pb-4">
@@ -75,12 +75,12 @@ export default function BackupCodesModal({ isOpen, codes, onClose }: BackupCodes
                   <ShieldCheck size={22} className="text-emerald-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-white font-bold text-lg leading-tight">MFA enabled!</h2>
-                  <p className="text-sm text-white/40 mt-0.5">Save your backup codes before continuing</p>
+                  <h2 className="text-slate-900 font-bold text-lg leading-tight">MFA enabled!</h2>
+                  <p className="text-sm text-slate-500 mt-0.5">Save your backup codes before continuing</p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 text-white/30 hover:text-white/60 transition-colors"
+                  className="absolute top-4 right-4 text-slate-500 hover:text-slate-600 transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -103,10 +103,10 @@ export default function BackupCodesModal({ isOpen, codes, onClose }: BackupCodes
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.04, duration: 0.25 }}
-                    className="flex items-center gap-2 rounded-lg border border-white/8 bg-surface-2 px-3 py-2"
+                    className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
                   >
-                    <span className="text-white/20 text-xs font-mono tabular-nums w-4 shrink-0">{i + 1}.</span>
-                    <span className="text-white font-mono text-sm tracking-widest">{code}</span>
+                    <span className="text-slate-400 text-xs font-mono tabular-nums w-4 shrink-0">{i + 1}.</span>
+                    <span className="text-slate-900 font-mono text-sm tracking-widest">{code}</span>
                   </motion.div>
                 ))}
               </div>
@@ -115,7 +115,7 @@ export default function BackupCodesModal({ isOpen, codes, onClose }: BackupCodes
               <div className="flex gap-2 px-6 pb-6">
                 <button
                   onClick={handleCopy}
-                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-white/10 bg-surface-2 hover:bg-surface-3 text-xs text-white/60 hover:text-white/90 transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs text-slate-600 hover:text-slate-800 transition-all"
                 >
                   {copied
                     ? <><CheckCheck size={13} className="text-emerald-400" /><span className="text-emerald-400">Copied!</span></>
@@ -125,7 +125,7 @@ export default function BackupCodesModal({ isOpen, codes, onClose }: BackupCodes
 
                 <button
                   onClick={handleDownload}
-                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-white/10 bg-surface-2 hover:bg-surface-3 text-xs text-white/60 hover:text-white/90 transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs text-slate-600 hover:text-slate-800 transition-all"
                 >
                   <Download size={13} />
                   <span>Download .txt</span>

@@ -97,10 +97,10 @@ export default function GitHubIntegrationPage() {
 
   const getStatusIcon = (status?: string) => {
     switch (status) {
-      case 'indexed':   return <CheckCircle size={14} className="text-neural-400" />
+      case 'indexed':   return <CheckCircle size={14} className="text-primary" />
       case 'indexing':  return <RefreshCw size={14} className="text-amber-400 animate-spin" />
       case 'failed':    return <AlertTriangle size={14} className="text-red-400" />
-      case 'pending':   return <Clock size={14} className="text-white/40" />
+      case 'pending':   return <Clock size={14} className="text-slate-500" />
       default:          return null
     }
   }
@@ -108,8 +108,8 @@ export default function GitHubIntegrationPage() {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-white">GitHub Integration</h1>
-        <p className="text-sm text-white/40 mt-0.5">Connect your repository to enable AST-driven code retrieval.</p>
+        <h1 className="text-xl font-bold text-slate-900">GitHub Integration</h1>
+        <p className="text-sm text-slate-500 mt-0.5">Connect your repository to enable AST-driven code retrieval.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -117,21 +117,21 @@ export default function GitHubIntegrationPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <GitBranch size={16} className="text-white/80" />
+                <GitBranch size={16} className="text-slate-700" />
                 <CardTitle>Repository Settings</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               {github ? (
                 <div className="space-y-6">
-                  <div className="p-4 bg-white/5 rounded-lg border border-white/10 flex items-center justify-between">
+                  <div className="p-4 bg-white/5 rounded-lg border border-slate-200 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                        <GitBranch size={20} className="text-white" />
+                        <GitBranch size={20} className="text-slate-900" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-white">Connected Repository</p>
-                        <p className="text-xs text-white/60">{github.repo_owner}/{github.repo_name}</p>
+                        <p className="text-sm font-medium text-slate-900">Connected Repository</p>
+                        <p className="text-xs text-slate-600">{github.repo_owner}/{github.repo_name}</p>
                       </div>
                     </div>
                     <Button variant="destructive" size="sm" onClick={handleDelete} isLoading={isLoading} className="gap-2">
@@ -162,8 +162,8 @@ export default function GitHubIntegrationPage() {
                       {...register('repo_name')}
                     />
                   </div>
-                  <div className="border-t border-white/8 pt-4 space-y-4">
-                    <p className="text-xs text-white/50">
+                  <div className="border-t border-slate-200 pt-4 space-y-4">
+                    <p className="text-xs text-slate-600">
                       Provide a Personal Access Token (PAT) and Webhook Secret to enable sync.
                       These fields are write-only and encrypted at rest. Leave blank to keep existing credentials.
                     </p>
@@ -201,21 +201,21 @@ export default function GitHubIntegrationPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-xs text-white/40 mb-1">Indexing Status</p>
+                <p className="text-xs text-slate-500 mb-1">Indexing Status</p>
                 <div className="flex items-center gap-2">
                   {getStatusIcon(github?.indexing_status)}
                   {getStatusBadge(github?.indexing_status)}
                 </div>
               </div>
               <div>
-                <p className="text-xs text-white/40 mb-1">Last Indexed Commit</p>
-                <p className="text-sm text-white/80 font-mono">
+                <p className="text-xs text-slate-500 mb-1">Last Indexed Commit</p>
+                <p className="text-sm text-slate-700 font-mono">
                   {github?.last_indexed_commit ? github.last_indexed_commit.slice(0, 7) : '—'}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-white/40 mb-1">Connected Repo</p>
-                <p className="text-sm text-white/80">
+                <p className="text-xs text-slate-500 mb-1">Connected Repo</p>
+                <p className="text-sm text-slate-700">
                   {github ? `${github.repo_owner}/${github.repo_name}` : '—'}
                 </p>
               </div>

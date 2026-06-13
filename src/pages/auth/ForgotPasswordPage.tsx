@@ -38,24 +38,24 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm space-y-6"
       >
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-neural-500 flex items-center justify-center shadow-lg shadow-neural-500/30">
-            <Zap size={16} className="text-white" />
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <Zap size={16} className="text-slate-900" />
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">NeuralOps</span>
+          <span className="text-slate-900 font-bold text-lg tracking-tight">NeuralOps</span>
         </div>
 
         {sent ? (
           <div className="space-y-4">
-            <div className="rounded-xl border border-neural-500/20 bg-neural-500/8 p-5 space-y-2">
-              <p className="text-sm font-semibold text-neural-400">Check your inbox</p>
-              <p className="text-xs text-white/50 leading-relaxed">
+            <div className="rounded-xl border border-primary/20 bg-primary/8 p-5 space-y-2">
+              <p className="text-sm font-semibold text-primary">Check your inbox</p>
+              <p className="text-xs text-slate-600 leading-relaxed">
                 We've sent you a password reset link. It expires in 1 hour.
               </p>
             </div>
@@ -68,8 +68,8 @@ export default function ForgotPasswordPage() {
         ) : (
           <>
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-white">Forgot password?</h2>
-              <p className="text-sm text-white/40">Enter your email and we'll send a reset link</p>
+              <h2 className="text-2xl font-bold text-slate-900">Forgot password?</h2>
+              <p className="text-sm text-slate-500">Enter your email and we'll send a reset link</p>
             </div>
 
             {error && (
@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
               </Button>
             </form>
 
-            <Link to="/login" className="flex items-center justify-center gap-2 text-xs text-white/40 hover:text-white/70 transition-colors">
+            <Link to="/login" className="flex items-center justify-center gap-2 text-xs text-slate-500 hover:text-slate-700 transition-colors">
               <ArrowLeft size={12} /> Back to sign in
             </Link>
           </>

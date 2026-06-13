@@ -68,8 +68,8 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-white">Settings</h1>
-        <p className="text-sm text-white/40 mt-0.5">Manage your account and workspace preferences.</p>
+        <h1 className="text-xl font-bold text-slate-900">Settings</h1>
+        <p className="text-sm text-slate-500 mt-0.5">Manage your account and workspace preferences.</p>
       </div>
 
       {/* Profile card */}
@@ -78,12 +78,12 @@ export default function SettingsPage() {
           <CardHeader><CardTitle>Profile</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-full bg-neural-500/20 border-2 border-neural-500/30 flex items-center justify-center text-lg font-bold text-neural-400">
+              <div className="h-14 w-14 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center text-lg font-bold text-primary">
                 {user ? getInitials(user.full_name || `${user.first_name} ${user.last_name}`) : '?'}
               </div>
               <div>
-                <p className="font-semibold text-white">{user?.full_name || `${user?.first_name} ${user?.last_name}`}</p>
-                <p className="text-sm text-white/50">{user?.email}</p>
+                <p className="font-semibold text-slate-900">{user?.full_name || `${user?.first_name} ${user?.last_name}`}</p>
+                <p className="text-sm text-slate-600">{user?.email}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="neutral">{user?.role}</Badge>
                   {user?.is_email_verified
@@ -110,8 +110,8 @@ export default function SettingsPage() {
                 { label: 'Status',    value: tenant?.status     ?? '—' },
               ].map(({ label, value }) => (
                 <div key={label}>
-                  <p className="text-xs text-white/30 mb-0.5">{label}</p>
-                  <p className="text-sm text-white/80 font-medium">{value}</p>
+                  <p className="text-xs text-slate-500 mb-0.5">{label}</p>
+                  <p className="text-sm text-slate-700 font-medium">{value}</p>
                 </div>
               ))}
             </div>
@@ -124,7 +124,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Lock size={14} className="text-white/50" />
+              <Lock size={14} className="text-slate-600" />
               <CardTitle>Change Password</CardTitle>
             </div>
           </CardHeader>
@@ -174,16 +174,16 @@ export default function SettingsPage() {
               <Link
                 key={to}
                 to={to}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-all group"
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-100 transition-all group"
               >
-                <div className="h-8 w-8 rounded-md bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                  <Icon size={14} className="text-white/50" />
+                <div className="h-8 w-8 rounded-md bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-slate-100 transition-colors">
+                  <Icon size={14} className="text-slate-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white/80">{label}</p>
-                  <p className="text-xs text-white/40">{desc}</p>
+                  <p className="text-sm font-medium text-slate-700">{label}</p>
+                  <p className="text-xs text-slate-500">{desc}</p>
                 </div>
-                <ChevronRight size={14} className="text-white/20 group-hover:text-white/50 transition-colors" />
+                <ChevronRight size={14} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
               </Link>
             ))}
           </CardContent>

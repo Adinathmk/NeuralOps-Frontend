@@ -74,40 +74,40 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-0 flex">
+    <div className="min-h-screen bg-white flex">
       {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 bg-surface-1 border-r border-white/8 overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 bg-white border-r border-slate-200 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_50%,rgba(34,197,94,0.08),transparent_70%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(34,197,94,0.05),transparent_60%)]" />
         <div className="absolute inset-0 opacity-[0.03]"
           style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }}
         />
         <div className="relative flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-neural-500 flex items-center justify-center shadow-lg shadow-neural-500/30">
-            <Zap size={16} className="text-white" />
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <Zap size={16} className="text-slate-900" />
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">NeuralOps</span>
+          <span className="text-slate-900 font-bold text-lg tracking-tight">NeuralOps</span>
         </div>
         <div className="relative space-y-6">
           <div className="space-y-2">
-            <div className="text-neural-400 text-sm font-medium uppercase tracking-widest">AI-Powered Incident Intelligence</div>
-            <h1 className="text-4xl font-bold text-white leading-tight">
-              Debug production<br /><span className="text-neural-400">in under 2 minutes.</span>
+            <div className="text-primary text-sm font-medium uppercase tracking-widest">AI-Powered Incident Intelligence</div>
+            <h1 className="text-4xl font-bold text-slate-900 leading-tight">
+              Debug production<br /><span className="text-primary">in under 2 minutes.</span>
             </h1>
-            <p className="text-white/40 text-sm leading-relaxed max-w-sm">
+            <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
               NeuralOps reads your logs, traces root causes through your codebase, and delivers actionable fixes — before your team even wakes up.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-4">
             {[{ label: 'Avg MTTR', value: '1.8m' }, { label: 'Accuracy', value: '94%' }, { label: 'Incidents/mo', value: '10k+' }].map(({ label, value }) => (
-              <div key={label} className="rounded-lg bg-white/5 border border-white/8 p-3">
-                <p className="text-xl font-bold text-neural-400">{value}</p>
-                <p className="text-xs text-white/40 mt-0.5">{label}</p>
+              <div key={label} className="rounded-lg bg-white/5 border border-slate-200 p-3">
+                <p className="text-xl font-bold text-primary">{value}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{label}</p>
               </div>
             ))}
           </div>
         </div>
-        <p className="relative text-xs text-white/20">© 2024 NeuralOps Inc. All rights reserved.</p>
+        <p className="relative text-xs text-slate-400">© 2024 NeuralOps Inc. All rights reserved.</p>
       </div>
 
       {/* Right form panel */}
@@ -119,8 +119,8 @@ export default function LoginPage() {
           className="w-full max-w-sm space-y-6"
         >
           <div className="space-y-1">
-            <h2 className="text-2xl font-bold text-white">Welcome back</h2>
-            <p className="text-sm text-white/40">Sign in to your workspace</p>
+            <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
+            <p className="text-sm text-slate-500">Sign in to your workspace</p>
           </div>
 
           {error && (
@@ -145,7 +145,7 @@ export default function LoginPage() {
               {...register('password')}
             />
             <div className="flex justify-end">
-              <Link to="/forgot-password" className="text-xs text-neural-400 hover:text-neural-300 transition-colors">
+              <Link to="/forgot-password" className="text-xs text-primary hover:text-primary transition-colors">
                 Forgot password?
               </Link>
             </div>
@@ -157,9 +157,9 @@ export default function LoginPage() {
           {/* OAuth — existing accounts only */}
           <div className="space-y-3">
             <div className="relative">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/8" /></div>
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
               <div className="relative flex justify-center">
-                <span className="bg-surface-0 px-3 text-xs text-white/30">or sign in with</span>
+                <span className="bg-white px-3 text-xs text-slate-500">or sign in with</span>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -173,17 +173,17 @@ export default function LoginPage() {
                 <GitBranch size={14} /> GitHub
               </Button>
             </div>
-            <div className="flex items-start gap-2 rounded-lg border border-white/8 bg-surface-2 px-3 py-2.5">
-              <Info size={13} className="text-white/30 mt-0.5 shrink-0" />
-              <p className="text-xs text-white/40 leading-relaxed">
+            <div className="flex items-start gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
+              <Info size={13} className="text-slate-500 mt-0.5 shrink-0" />
+              <p className="text-xs text-slate-500 leading-relaxed">
                 OAuth sign-in is for existing accounts only. New workspaces require email and password registration.
               </p>
             </div>
           </div>
 
-          <p className="text-center text-xs text-white/40">
+          <p className="text-center text-xs text-slate-500">
             No account?{' '}
-            <Link to="/register" className="text-neural-400 hover:text-neural-300 font-medium transition-colors">
+            <Link to="/register" className="text-primary hover:text-primary font-medium transition-colors">
               Create workspace
             </Link>
           </p>

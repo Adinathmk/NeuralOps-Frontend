@@ -44,25 +44,25 @@ export function Sidebar() {
     <motion.aside
       animate={{ width: collapsed ? 64 : 220 }}
       transition={{ duration: 0.25, ease: 'easeInOut' }}
-      className="relative flex flex-col h-screen bg-surface-1 border-r border-white/8 shrink-0 overflow-hidden z-20"
+      className="relative flex flex-col h-screen bg-white border-r border-slate-200 shrink-0 overflow-hidden z-20"
     >
       {/* Logo / Interactive Toggle Header */}
       <div
         onClick={() => collapsed && dispatch(toggleSidebar())}
         className={cn(
-          "flex items-center justify-between h-14 pl-4 pr-3 border-b border-white/8 shrink-0 select-none",
-          collapsed && "cursor-pointer hover:bg-white/4 justify-center px-0 relative group"
+          "flex items-center justify-between h-14 pl-4 pr-3 border-b border-slate-200 shrink-0 select-none",
+          collapsed && "cursor-pointer hover:bg-slate-100 justify-center px-0 relative group"
         )}
       >
         <div className="flex items-center gap-3">
           <div className={cn(
-            "h-7 w-7 rounded-lg bg-neural-500 flex items-center justify-center shrink-0 shadow-lg shadow-neural-500/30 transition-all duration-300",
+            "h-7 w-7 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 transition-all duration-300",
             collapsed && "group-hover:scale-0 opacity-100 group-hover:opacity-0"
           )}>
-            <Zap size={14} className="text-white" />
+            <Zap size={14} className="text-slate-900" />
           </div>
           {!collapsed && (
-            <span className="text-sm font-bold text-white tracking-tight whitespace-nowrap">
+            <span className="text-sm font-bold text-slate-900 tracking-tight whitespace-nowrap">
               NeuralOps
             </span>
           )}
@@ -72,7 +72,7 @@ export function Sidebar() {
         {!collapsed && (
           <button
             onClick={(e) => { e.stopPropagation(); dispatch(toggleSidebar()) }}
-            className="h-7 w-7 rounded-lg bg-surface-2 border border-white/8 hover:bg-surface-3 flex items-center justify-center text-white/50 hover:text-white/90 transition-all shadow-sm shadow-black/10"
+            className="h-7 w-7 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-800 transition-all shadow-sm shadow-black/10"
             title="Collapse Sidebar"
           >
             <ChevronLeft size={13} />
@@ -82,7 +82,7 @@ export function Sidebar() {
         {/* Expand Indicator for Collapsed State on Hover */}
         {collapsed && (
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <ChevronRight size={16} className="text-neural-400" />
+            <ChevronRight size={16} className="text-primary" />
           </div>
         )}
       </div>
@@ -94,13 +94,13 @@ export function Sidebar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="mx-3 mt-3 px-3 py-2 rounded-md bg-surface-2 border border-white/8"
+            className="mx-3 mt-3 px-3 py-2 rounded-md bg-slate-50 border border-slate-200"
           >
-            <p className="text-xs font-medium text-white/80 truncate">{tenant.name}</p>
+            <p className="text-xs font-medium text-slate-700 truncate">{tenant.name}</p>
             <p className={cn(
               'text-[10px] font-medium mt-0.5',
-              tenant.plan_tier === 'enterprise' ? 'text-neural-400' :
-              tenant.plan_tier === 'pro'        ? 'text-amber-400'  : 'text-white/40'
+              tenant.plan_tier === 'enterprise' ? 'text-primary' :
+              tenant.plan_tier === 'pro'        ? 'text-amber-400'  : 'text-slate-500'
             )}>
               {tenant.plan_tier.toUpperCase()}
             </p>
@@ -126,9 +126,9 @@ export function Sidebar() {
       </nav>
 
       {/* User footer */}
-      <div className="border-t border-white/8 p-3 shrink-0">
+      <div className="border-t border-slate-200 p-3 shrink-0">
         <div className={cn('flex items-center gap-2', collapsed && 'justify-center')}>
-          <div className="h-7 w-7 rounded-full bg-neural-500/20 border border-neural-500/30 flex items-center justify-center text-xs font-semibold text-neural-400 shrink-0">
+          <div className="h-7 w-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-xs font-semibold text-primary shrink-0">
             {user ? getInitials(user.full_name) : '?'}
           </div>
           <AnimatePresence>
@@ -139,8 +139,8 @@ export function Sidebar() {
                 exit={{ opacity: 0 }}
                 className="flex-1 min-w-0"
               >
-                <p className="text-xs font-medium text-white/80 truncate">{user?.full_name}</p>
-                <p className="text-[10px] text-white/40 truncate">{user?.role}</p>
+                <p className="text-xs font-medium text-slate-700 truncate">{user?.full_name}</p>
+                <p className="text-[10px] text-slate-500 truncate">{user?.role}</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -151,7 +151,7 @@ export function Sidebar() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={handleLogout}
-                className="text-white/30 hover:text-white/70 transition-colors shrink-0"
+                className="text-slate-500 hover:text-slate-700 transition-colors shrink-0"
                 title="Logout"
               >
                 <LogOut size={14} />
@@ -175,7 +175,7 @@ function NavSection({ label, collapsed, children }: {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="px-2 pb-1 text-[10px] uppercase tracking-widest text-white/30 font-medium"
+            className="px-2 pb-1 text-[10px] uppercase tracking-widest text-slate-500 font-medium"
           >
             {label}
           </motion.p>
@@ -196,8 +196,8 @@ function SidebarItem({ to, icon: Icon, label, collapsed, badge }: {
       className={({ isActive }) => cn(
         'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-all duration-150 relative group',
         isActive
-          ? 'bg-neural-500/10 text-neural-400 font-medium'
-          : 'text-white/50 hover:bg-white/5 hover:text-white/80',
+          ? 'bg-primary/10 text-primary font-medium'
+          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-700',
         collapsed && 'justify-center px-2'
       )}
     >
@@ -216,7 +216,7 @@ function SidebarItem({ to, icon: Icon, label, collapsed, badge }: {
       </AnimatePresence>
       {badge !== undefined && (
         <span className={cn(
-          'flex items-center justify-center text-[10px] font-bold rounded-full bg-neural-500 text-white min-w-[16px] h-4 px-1',
+          'flex items-center justify-center text-[10px] font-bold rounded-full bg-primary text-slate-900 min-w-[16px] h-4 px-1',
           collapsed ? 'absolute -top-0.5 -right-0.5' : ''
         )}>
           {badge > 99 ? '99+' : badge}
@@ -224,7 +224,7 @@ function SidebarItem({ to, icon: Icon, label, collapsed, badge }: {
       )}
       {/* Tooltip when collapsed */}
       {collapsed && (
-        <div className="absolute left-full ml-2 px-2 py-1 rounded-md bg-surface-3 border border-white/10 text-xs text-white/80 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
+        <div className="absolute left-full ml-2 px-2 py-1 rounded-md bg-slate-100 border border-slate-200 text-xs text-slate-700 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
           {label}
         </div>
       )}

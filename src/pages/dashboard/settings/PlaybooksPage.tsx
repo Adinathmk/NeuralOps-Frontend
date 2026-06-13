@@ -117,8 +117,8 @@ export default function PlaybooksPage() {
     <div className="max-w-3xl space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Playbooks</h1>
-          <p className="text-sm text-white/40 mt-0.5">Runbooks matched against errors to guide AI agent analysis.</p>
+          <h1 className="text-xl font-bold text-slate-900">Playbooks</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Runbooks matched against errors to guide AI agent analysis.</p>
         </div>
         <Button size="sm" className="gap-2" onClick={openCreate}>
           <Plus size={13} /> New playbook
@@ -129,9 +129,9 @@ export default function PlaybooksPage() {
       {playbooks.length === 0 && !isLoading && (
         <Card>
           <CardContent className="py-12 text-center">
-            <BookOpen size={32} className="mx-auto text-white/15 mb-3" />
-            <p className="text-sm text-white/40">No playbooks configured yet.</p>
-            <p className="text-xs text-white/25 mt-1">Create your first playbook to guide the AI agent's analysis.</p>
+            <BookOpen size={32} className="mx-auto text-slate-900/15 mb-3" />
+            <p className="text-sm text-slate-500">No playbooks configured yet.</p>
+            <p className="text-xs text-slate-400 mt-1">Create your first playbook to guide the AI agent's analysis.</p>
           </CardContent>
         </Card>
       )}
@@ -146,15 +146,15 @@ export default function PlaybooksPage() {
                     <BookOpen size={15} className="text-amber-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-surface-2 border border-white/8 w-fit">
-                      <Code2 size={11} className="text-white/30" />
-                      <code className="text-[11px] text-white/50 font-mono">{pb.error_pattern}</code>
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-50 border border-slate-200 w-fit">
+                      <Code2 size={11} className="text-slate-500" />
+                      <code className="text-[11px] text-slate-600 font-mono">{pb.error_pattern}</code>
                     </div>
-                    <p className="text-xs text-white/50 mt-2 line-clamp-2">{pb.instructions}</p>
-                    <p className="text-[11px] text-white/25 mt-2">Created {formatDate(pb.created_at)}</p>
+                    <p className="text-xs text-slate-600 mt-2 line-clamp-2">{pb.instructions}</p>
+                    <p className="text-[11px] text-slate-400 mt-2">Created {formatDate(pb.created_at)}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white/70" onClick={() => openEdit(pb)}>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-700" onClick={() => openEdit(pb)}>
                       <Edit2 size={12} />
                     </Button>
                     <Button variant="ghost" size="icon" className="h-7 w-7 text-red-400/50 hover:text-red-400" onClick={() => handleDelete(pb.id)}>
@@ -184,12 +184,12 @@ export default function PlaybooksPage() {
             {...register('error_pattern')}
           />
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-white/60 uppercase tracking-wide">Instructions for AI Agent</label>
+            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide">Instructions for AI Agent</label>
             <textarea
               {...register('instructions')}
               rows={5}
               placeholder="Step-by-step instructions for the AI agent when this error type is detected…"
-              className="w-full rounded-md border border-white/10 bg-surface-2 px-3 py-2 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-neural-500 resize-none transition-colors"
+              className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary resize-none transition-colors"
             />
             {errors.instructions && <p className="text-xs text-red-400">{errors.instructions.message}</p>}
           </div>

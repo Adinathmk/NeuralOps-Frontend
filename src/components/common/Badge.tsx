@@ -7,13 +7,13 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default:    'bg-neural-500/10 text-neural-400 ring-neural-500/20',
+        default:    'bg-primary/10 text-primary ring-neural-500/20',
         critical:   'bg-red-500/10     text-red-400     ring-red-500/20',
         warning:    'bg-amber-500/10   text-amber-400   ring-amber-500/20',
         info:       'bg-blue-500/10    text-blue-400    ring-blue-500/20',
-        success:    'bg-neural-500/10  text-neural-400  ring-neural-500/20',
-        neutral:    'bg-white/5        text-white/60    ring-white/10',
-        outline:    'border border-white/10 text-white/70 ring-0 bg-transparent',
+        success:    'bg-primary/10  text-primary  ring-neural-500/20',
+        neutral:    'bg-white/5        text-slate-600    ring-slate-200',
+        outline:    'border border-slate-200 text-slate-700 ring-0 bg-transparent',
       },
     },
     defaultVariants: { variant: 'default' },
@@ -35,7 +35,7 @@ function Badge({ className, variant, dot, children, ...props }: BadgeProps) {
           variant === 'critical' ? 'bg-red-400'    :
           variant === 'warning'  ? 'bg-amber-400'  :
           variant === 'info'     ? 'bg-blue-400'   :
-          variant === 'success'  ? 'bg-neural-400' :
+          variant === 'success'  ? 'bg-primary' :
           'bg-current'
         )} />
       )}

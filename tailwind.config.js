@@ -2,7 +2,6 @@ import tailwindcssAnimate from 'tailwindcss-animate'
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ['class'],
 
   content: [
     './index.html',
@@ -68,11 +67,11 @@ export default {
         },
 
         surface: {
-          0: '#0a0c0f',
-          1: '#0f1117',
-          2: '#151821',
-          3: '#1c2030',
-          4: '#232840',
+          0: '#f8fafc',
+          1: '#ffffff',
+          2: '#f1f5f9',
+          3: '#e2e8f0',
+          4: '#cbd5e1',
         },
       },
 
@@ -87,7 +86,7 @@ export default {
       },
 
       boxShadow: {
-        neural: '0 0 20px rgba(34, 197, 94, 0.15)',
+        neural: '0 0 20px rgba(37, 99, 235, 0.15)',
       },
 
       keyframes: {

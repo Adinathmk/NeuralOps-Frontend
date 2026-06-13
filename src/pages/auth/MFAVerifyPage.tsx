@@ -69,7 +69,7 @@ export default function MFAVerifyPage() {
   const codeComplete = useBackup ? backupCode.trim().length > 0 : digits.every(d => d !== '')
 
   return (
-    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -78,20 +78,20 @@ export default function MFAVerifyPage() {
       >
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-neural-500 flex items-center justify-center shadow-lg shadow-neural-500/30">
-            <Zap size={16} className="text-white" />
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <Zap size={16} className="text-slate-900" />
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">NeuralOps</span>
+          <span className="text-slate-900 font-bold text-lg tracking-tight">NeuralOps</span>
         </div>
 
         {/* Header */}
         <div className="flex flex-col items-center text-center gap-3 py-2">
-          <div className="h-14 w-14 rounded-full bg-neural-500/10 border border-neural-500/20 flex items-center justify-center">
-            <ShieldCheck size={26} className="text-neural-400" />
+          <div className="h-14 w-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <ShieldCheck size={26} className="text-primary" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Two-factor verification</h2>
-            <p className="text-sm text-white/40 mt-1">
+            <h2 className="text-xl font-bold text-slate-900">Two-factor verification</h2>
+            <p className="text-sm text-slate-500 mt-1">
               {useBackup
                 ? 'Enter one of your backup codes'
                 : 'Enter the 6-digit code from your authenticator app'}
@@ -126,7 +126,7 @@ export default function MFAVerifyPage() {
                 value={d}
                 onChange={e => handleDigit(i, e.target.value)}
                 onKeyDown={e => handleKeyDown(i, e)}
-                className="h-12 w-11 rounded-lg border border-white/10 bg-surface-2 text-center text-lg font-bold text-white focus:outline-none focus:border-neural-500 focus:ring-1 focus:ring-neural-500/40 transition-colors caret-transparent"
+                className="h-12 w-11 rounded-lg border border-slate-200 bg-slate-50 text-center text-lg font-bold text-slate-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-neural-500/40 transition-colors caret-transparent"
               />
             ))}
           </div>
@@ -139,9 +139,9 @@ export default function MFAVerifyPage() {
               onChange={e => setBackupCode(e.target.value)}
               placeholder="e.g. a1b2c3d4"
               autoFocus
-              className="w-full h-10 rounded-lg border border-white/10 bg-surface-2 px-3 text-sm text-white font-mono placeholder:text-white/25 focus:outline-none focus:border-neural-500 transition-colors"
+              className="w-full h-10 rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 font-mono placeholder:text-slate-400 focus:outline-none focus:border-primary transition-colors"
             />
-            <p className="text-xs text-white/30 text-center">
+            <p className="text-xs text-slate-500 text-center">
               Backup codes were provided when you set up MFA
             </p>
           </div>
@@ -160,7 +160,7 @@ export default function MFAVerifyPage() {
         {/* Switch between TOTP / backup code */}
         <button
           onClick={() => { setUseBackup(v => !v); setDigits(Array(6).fill('')); setBackupCode('') }}
-          className="flex items-center justify-center gap-2 w-full text-xs text-white/40 hover:text-white/70 transition-colors"
+          className="flex items-center justify-center gap-2 w-full text-xs text-slate-500 hover:text-slate-700 transition-colors"
         >
           <KeyRound size={12} />
           {useBackup ? 'Use authenticator app instead' : "Can't access your app? Use a backup code"}
@@ -169,7 +169,7 @@ export default function MFAVerifyPage() {
         {/* Back to login */}
         <button
           onClick={handleBack}
-          className="flex items-center justify-center gap-2 w-full text-xs text-white/30 hover:text-white/60 transition-colors"
+          className="flex items-center justify-center gap-2 w-full text-xs text-slate-500 hover:text-slate-600 transition-colors"
         >
           <ArrowLeft size={12} /> Back to sign in
         </button>
