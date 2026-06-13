@@ -1,20 +1,25 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import AlertRulesTab from './tabs/AlertRulesTab'
-import PlaybooksTab from './tabs/PlaybooksTab'
+import AlertRulesTab, { TabHandle as AlertRulesTabHandle } from './tabs/AlertRulesTab'
+import PlaybooksTab, { TabHandle as PlaybooksTabHandle } from './tabs/PlaybooksTab'
 import { cn } from '@utils/cn'
+import { Plus } from 'lucide-react'
+import { Button } from '@components/common/Button'
 
 export default function ConfigurationPage() {
   const [activeTab, setActiveTab] = useState<'alert-rules' | 'playbooks'>('alert-rules')
+  const alertRulesRef = useRef<AlertRulesTabHandle>(null)
+  const playbooksRef = useRef<PlaybooksTabHandle>(null)
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="w-full space-y-6">
       <div>
         <h1 className="text-xl font-bold text-slate-900">Configuration</h1>
         <p className="text-sm text-slate-500 mt-0.5">Manage your incident response automation and alert thresholds.</p>
       </div>
 
-      <div className="flex items-center gap-6 border-b border-slate-200">
+      <div className="flex items-center justify-between border-b border-slate-200">
+        <div className="flex items-center gap-6">
         <button
           onClick={() => setActiveTab('alert-rules')}
           className={cn(
@@ -45,6 +50,19 @@ export default function ConfigurationPage() {
             />
           )}
         </button>
+        </div>
+        <div className="pb-2">
+          {activeTab === 'alert-rules' && (
+            <Button size="sm" className="gap-2" onClick={() => alertRulesRef.current?.openCreate()}>
+              <Plus size={13} /> New rule
+            </Button>
+          )}
+          {activeTab === 'playbooks' && (
+            <Button size="sm" className="gap-2" onClick={() => playbooksRef.current?.openCreate()}>
+              <Plus size={13} /> New playbook
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="pt-2">
@@ -56,8 +74,8 @@ export default function ConfigurationPage() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15 }}
           >
-            {activeTab === 'alert-rules' && <AlertRulesTab />}
-            {activeTab === 'playbooks' && <PlaybooksTab />}
+            {activeTab === 'alert-rules' && <AlertRulesTab ref={alertRulesRef} />}
+            {activeTab === 'playbooks' && <PlaybooksTab ref={playbooksRef} />}
           </motion.div>
         </AnimatePresence>
       </div>

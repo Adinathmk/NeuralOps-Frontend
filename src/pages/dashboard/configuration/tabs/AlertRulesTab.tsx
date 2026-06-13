@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, forwardRef, useImperativeHandle } from 'react'
 import { motion } from 'framer-motion'
 import {
   Plus,
@@ -53,9 +53,9 @@ const ruleSchema = z.object({
   ),
 })
 
-type RuleForm = z.infer<typeof ruleSchema>
+export interface TabHandle { openCreate: () => void }
 
-export default function AlertRulesTab() {
+const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
   const { toast } = useToast()
   const dispatch = useAppDispatch()
 
@@ -89,12 +89,10 @@ export default function AlertRulesTab() {
   const openCreate = () => {
     setEditRule(null)
     setSeverities(['critical'])
-    reset({
-      confidence_threshold: 0.8,
-      recipients_raw: '',
-    })
+    reset({ confidence_threshold: 0.8, recipients_raw: '' })
     setModalOpen(true)
   }
+  useImperativeHandle(ref, () => ({ openCreate }))
 
   const openEdit = (rule: AlertRule) => {
     setEditRule(rule)
@@ -177,7 +175,7 @@ export default function AlertRulesTab() {
   // ── Loading skeleton ────────────────────────────────────────────────────────
   if (isLoading && rules.length === 0) {
     return (
-      <div className="max-w-3xl space-y-5">
+      <div className="w-full space-y-5">
         <div className="flex items-center justify-between">
           <div>
             <Skeleton className="h-7 w-32" />
@@ -195,17 +193,7 @@ export default function AlertRulesTab() {
   }
 
   return (
-    <div className="max-w-3xl space-y-5">
-      <div className="flex items-center justify-end">        <Button
-          size="sm"
-          className="gap-2"
-          onClick={openCreate}
-        >
-          <Plus size={13} />
-          New rule
-        </Button>
-      </div>
-
+    <div className="w-full space-y-5">
       {/* Empty state */}
       {rules.length === 0 && !isLoading && (
         <Card>
@@ -461,4 +449,6 @@ export default function AlertRulesTab() {
       </Modal>
     </div>
   )
-}
+})
+
+export default AlertRulesTab

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, forwardRef, useImperativeHandle } from 'react'
 import { motion } from 'framer-motion'
 import { Plus, BookOpen, Trash2, Edit2, Code2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
@@ -28,7 +28,9 @@ const schema = z.object({
 })
 type PlaybookForm = z.infer<typeof schema>
 
-export default function PlaybooksTab() {
+export interface TabHandle { openCreate: () => void }
+
+const PlaybooksTab = forwardRef<TabHandle>((props, ref) => {
   const { toast } = useToast()
   const dispatch = useAppDispatch()
 
@@ -49,6 +51,8 @@ export default function PlaybooksTab() {
 
   // ── Modal openers ───────────────────────────────────────────────────────────
   const openCreate = () => { setEditItem(null); reset(); setModalOpen(true) }
+  useImperativeHandle(ref, () => ({ openCreate }))
+
   const openEdit   = (pb: Playbook) => {
     setEditItem(pb)
     setValue('error_pattern', pb.error_pattern)
@@ -96,7 +100,7 @@ export default function PlaybooksTab() {
   // ── Loading skeleton ────────────────────────────────────────────────────────
   if (isLoading && playbooks.length === 0) {
     return (
-      <div className="max-w-3xl space-y-5">
+      <div className="w-full space-y-5">
         <div className="flex items-center justify-between">
           <div>
             <Skeleton className="h-7 w-28" />
@@ -114,13 +118,7 @@ export default function PlaybooksTab() {
   }
 
   return (
-    <div className="max-w-3xl space-y-5">
-      <div className="flex items-center justify-end">
-        <Button size="sm" className="gap-2" onClick={openCreate}>
-          <Plus size={13} /> New playbook
-        </Button>
-      </div>
-
+    <div className="w-full space-y-5">
       {/* Empty state */}
       {playbooks.length === 0 && !isLoading && (
         <Card>
@@ -197,4 +195,6 @@ export default function PlaybooksTab() {
       </Modal>
     </div>
   )
-}
+})
+
+export default PlaybooksTab
