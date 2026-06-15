@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import {
   ArrowLeft, AlertTriangle, Clock, User, Code2,
   Sparkles, MessageSquare, ChevronRight, CheckCircle,
-  Copy, Send, AtSign,
+  Copy, Send, AtSign, Terminal,
 } from 'lucide-react'
 import { Badge } from '@components/common/Badge'
 import { Button } from '@components/common/Button'
@@ -14,6 +14,7 @@ import { formatDate, formatRelative, cn } from '@utils/cn'
 import type { Incident, ThreadMessage } from '@/types'
 import { useAppSelector, useAppDispatch } from '@store/index'
 import { fetchIncidentThunk } from '@store/slices/incidentsSlice'
+import { incidentsApi } from '@features/dashboard/api/incidentsApi'
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
@@ -47,9 +48,27 @@ export default function IncidentDetailPage() {
   const [copied, setCopied]     = useState(false)
   const user = useAppSelector(s => s.auth.user)
 
+  const [contextLogs, setContextLogs] = useState<string | null>(null)
+  const [contextLoading, setContextLoading] = useState(false)
+
   useEffect(() => {
     if (id) {
       dispatch(fetchIncidentThunk(id))
+      
+      setContextLoading(true)
+      incidentsApi.getContextLogs(id)
+        .then(res => {
+          const downloadUrl = res.data.data?.download_url
+          if (downloadUrl) {
+            return fetch(downloadUrl).then(r => r.text())
+          }
+          return null
+        })
+        .then(text => {
+          if (text) setContextLogs(text)
+        })
+        .catch(err => console.error("Failed to load context logs", err))
+        .finally(() => setContextLoading(false))
     }
   }, [id, dispatch])
 
@@ -192,6 +211,32 @@ export default function IncidentDetailPage() {
               </Card>
             </motion.div>
           )}
+
+          {/* Code Context Viewer */}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Terminal size={14} className="text-blue-500" />
+                  <CardTitle>Code Context Viewer</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {contextLoading ? (
+                  <div className="flex items-center gap-3 text-sm text-slate-500">
+                    <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                    Loading context logs…
+                  </div>
+                ) : contextLogs ? (
+                  <pre className="text-xs text-slate-700 bg-slate-50 rounded-lg p-4 overflow-x-auto border border-slate-200 font-mono leading-relaxed whitespace-pre-wrap">
+                    {contextLogs}
+                  </pre>
+                ) : (
+                  <div className="text-sm text-slate-500">No context logs available.</div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
 
           {/* Metadata */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>

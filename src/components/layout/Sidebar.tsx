@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home, AlertCircle, MessageSquare,
   Settings, BarChart2, Users,
-  ChevronLeft, ChevronRight, Zap, LogOut
+  ChevronLeft, ChevronRight, Zap, LogOut, Terminal
 } from 'lucide-react'
 import { cn } from '@utils/cn'
 import { useAppDispatch, useAppSelector } from '@store/index'
@@ -13,6 +13,7 @@ import { logoutThunk } from '@store/slices/authSlice'
 const navItems = [
   { to: '/dashboard',               icon: Home,          label: 'Overview' },
   { to: '/dashboard/incidents',     icon: AlertCircle,   label: 'Incidents' },
+  { to: '/dashboard/logs',          icon: Terminal,      label: 'Log Explorer' },
   { to: '/dashboard/collaboration', icon: MessageSquare, label: 'Collaboration' },
   { to: '/dashboard/configuration', icon: Settings,      label: 'Configuration' },
   { to: '/dashboard/analytics',     icon: BarChart2,     label: 'Analytics' },

@@ -25,6 +25,7 @@ import NotificationsPage  from '@pages/dashboard/NotificationsPage'
 import SessionsPage       from '@pages/dashboard/SessionsPage'
 import ConfigurationPage  from '@pages/dashboard/configuration/ConfigurationPage'
 import TeamPage           from '@pages/dashboard/TeamPage'
+import LogsExplorerPage   from '@pages/dashboard/LogsExplorerPage'
 
 // Settings pages
 import SettingsPage       from '@pages/dashboard/settings/SettingsPage'
@@ -97,6 +98,7 @@ export default function App() {
           <Route path="/dashboard/incidents"               element={<IncidentsPage />} />
           <Route path="/dashboard/incidents/:id"           element={<IncidentDetailPage />} />
           <Route path="/dashboard/analytics"               element={<AnalyticsPage />} />
+          <Route path="/dashboard/logs"                    element={<LogsExplorerPage />} />
           <Route path="/dashboard/notifications"           element={<NotificationsPage />} />
           <Route path="/dashboard/sessions"                element={<SessionsPage />} />
           <Route path="/dashboard/team"                    element={<TeamPage />} />
