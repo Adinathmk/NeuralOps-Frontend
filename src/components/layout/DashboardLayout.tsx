@@ -8,6 +8,7 @@ import { useWebSocket } from '@hooks/useWebSocket'
 import { useAuth } from '@hooks/useAuth'
 import { useAppDispatch } from '@store/index'
 import { addToast } from '@store/slices/uiSlice'
+import { updateGitHubIntegrationStatus } from '@store/slices/integrationsSlice'
 
 export function DashboardLayout() {
   const isAuth = useRequireAuth()
@@ -27,11 +28,26 @@ export function DashboardLayout() {
           type: 'info'
         }))
       } else if (lastMessage.type === 'incident.created') {
-         dispatch(addToast({
+        dispatch(addToast({
           title: 'Incident Created',
           description: `A new incident has been detected.`,
           type: 'warning'
         }))
+      } else if (lastMessage.type === 'collaboration.github_indexing') {
+        dispatch(updateGitHubIntegrationStatus(lastMessage.data))
+        if (lastMessage.data.status === 'indexed') {
+          dispatch(addToast({
+            title: 'GitHub Integration',
+            description: 'Repository indexing complete.',
+            type: 'success'
+          }))
+        } else if (lastMessage.data.status === 'failed') {
+          dispatch(addToast({
+            title: 'GitHub Integration',
+            description: 'Repository indexing failed.',
+            type: 'error'
+          }))
+        }
       }
     }
   }, [lastMessage, dispatch])

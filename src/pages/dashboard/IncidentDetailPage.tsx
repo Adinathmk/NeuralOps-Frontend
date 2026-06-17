@@ -97,7 +97,7 @@ export default function IncidentDetailPage() {
   if (!incident) return <div className="text-slate-500 text-sm p-6">Incident not found.</div>
 
   const severityVariant = { critical: 'critical', warning: 'warning', info: 'info' }[incident.severity] as 'critical' | 'warning' | 'info'
-  const statusVariant   = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
+  const statusVariant   = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (
     <div className="max-w-7xl space-y-5">
@@ -164,7 +164,7 @@ export default function IncidentDetailPage() {
                 <div className="flex items-center gap-2">
                   <Sparkles size={14} className="text-primary" />
                   <CardTitle>AI Root Cause Analysis</CardTitle>
-                  {incident.confidence_score && (
+                  {incident.confidence_score !== undefined && incident.confidence_score !== null && (
                     <div className="ml-auto flex items-center gap-2">
                       <div className="h-1.5 w-20 rounded-full bg-white/8 overflow-hidden">
                         <div className="h-full rounded-full bg-primary" style={{ width: `${incident.confidence_score * 100}%` }} />

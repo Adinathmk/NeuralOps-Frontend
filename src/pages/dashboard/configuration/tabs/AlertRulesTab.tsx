@@ -53,6 +53,8 @@ const ruleSchema = z.object({
   ),
 })
 
+export type RuleForm = z.infer<typeof ruleSchema>
+
 export interface TabHandle { openCreate: () => void }
 
 const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
@@ -106,7 +108,7 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
   const onSubmit = async (data: RuleForm) => {
     const recipient_ids = data.recipients_raw
       .split(',')
-      .map(s => s.trim())
+      .map((s: string) => s.trim())
       .filter(Boolean)
 
     setSubmitting(true)

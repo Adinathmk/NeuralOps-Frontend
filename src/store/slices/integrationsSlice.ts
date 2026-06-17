@@ -21,7 +21,10 @@ export const fetchGitHubIntegrationThunk = createAsyncThunk(
       const res = await integrationsApi.getGitHubIntegration()
       return res.data
     } catch (err: unknown) {
-      const e = err as { response?: { data?: { message?: string } } }
+      const e = err as { response?: { status?: number, data?: { message?: string } } }
+      if (e.response?.status === 404) {
+        return null
+      }
       return rejectWithValue(e.response?.data?.message ?? 'Failed to fetch GitHub integration')
     }
   }
@@ -59,6 +62,14 @@ const integrationsSlice = createSlice({
   reducers: {
     clearError(state) {
       state.error = null
+    },
+    updateGitHubIntegrationStatus(state, action: import('@reduxjs/toolkit').PayloadAction<{status: string, commit_sha: string | null}>) {
+      if (state.github) {
+        state.github.indexing_status = action.payload.status
+        if (action.payload.commit_sha) {
+          state.github.last_indexed_commit = action.payload.commit_sha
+        }
+      }
     },
   },
   extraReducers: builder => {
@@ -109,5 +120,5 @@ const integrationsSlice = createSlice({
   },
 })
 
-export const { clearError } = integrationsSlice.actions
+export const { clearError, updateGitHubIntegrationStatus } = integrationsSlice.actions
 export default integrationsSlice.reducer

@@ -111,7 +111,7 @@ export interface JoinPayload {
 
 // ─── Incidents ────────────────────────────────────────────────────────────────
 
-export type IncidentStatus   = 'open' | 'investigating' | 'resolved' | 'closed'
+export type IncidentStatus   = 'open' | 'investigating' | 'resolved' | 'closed' | 'draft'
 export type IncidentSeverity = 'critical' | 'warning' | 'info'
 
 export interface AnalysisDetail {

@@ -179,6 +179,7 @@ function IncidentRow({ incident }: { incident: Incident }) {
     investigating: 'warning',
     resolved:     'success',
     closed:       'neutral',
+    draft:        'neutral',
   }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (
@@ -194,7 +195,7 @@ function IncidentRow({ incident }: { incident: Incident }) {
         <div className="flex items-center gap-2 mt-1.5">
           <Badge variant={severityVariant} dot>{incident.severity}</Badge>
           <Badge variant={statusVariant}>{incident.status}</Badge>
-          {incident.confidence_score && (
+          {incident.confidence_score !== undefined && incident.confidence_score !== null && (
             <span className="text-[10px] text-slate-500">
               {Math.round(incident.confidence_score * 100)}% confidence
             </span>

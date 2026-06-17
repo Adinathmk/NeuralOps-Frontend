@@ -1,6 +1,9 @@
 // src/App.tsx
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAppSelector } from '@store/index'
+import { setupWebPush } from '@lib/push'
+import apiClient from '@lib/axios'
 
 // Layouts
 import { DashboardLayout } from '@components/layout/DashboardLayout'
@@ -42,6 +45,13 @@ import NotFoundPage       from '@pages/NotFoundPage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAppSelector(s => s.auth.isAuthenticated)
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setupWebPush(apiClient).catch(console.error)
+    }
+  }, [isAuthenticated])
+
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
 }
 

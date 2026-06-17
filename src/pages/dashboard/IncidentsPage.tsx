@@ -24,6 +24,7 @@ const STATUS_FILTERS: Array<{ label: string; value: string }> = [
   { label: 'Investigating', value: 'investigating' },
   { label: 'Resolved',      value: 'resolved' },
   { label: 'Closed',        value: 'closed' },
+  { label: 'Draft',         value: 'draft' },
 ]
 
 export default function IncidentsPage() {
@@ -37,6 +38,7 @@ export default function IncidentsPage() {
       severity: filters.severity !== 'all' ? filters.severity : undefined,
       search: filters.search || undefined,
       page: filters.page,
+      is_draft: true,
     }))
   }, [dispatch, filters.status, filters.severity, filters.search, filters.page])
 
@@ -58,6 +60,7 @@ export default function IncidentsPage() {
           severity: filters.severity !== 'all' ? filters.severity : undefined,
           search: filters.search || undefined,
           page: filters.page,
+          is_draft: true,
         }))} isLoading={isLoading}>
           <RefreshCw size={13} /> Refresh
         </Button>
@@ -132,7 +135,7 @@ export default function IncidentsPage() {
 
 function IncidentCard({ incident }: { incident: Incident }) {
   const severityVariant = { critical: 'critical', warning: 'warning', info: 'info' }[incident.severity] as 'critical' | 'warning' | 'info'
-  const statusVariant = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
+  const statusVariant = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (
     <div className={cn(
@@ -166,7 +169,7 @@ function IncidentCard({ incident }: { incident: Incident }) {
       {/* Meta */}
       <div className="text-right shrink-0 space-y-1">
         <p className="text-xs text-slate-600 font-medium">{incident.service_name}</p>
-        {incident.confidence_score && (
+        {incident.confidence_score !== undefined && incident.confidence_score !== null && (
           <div className="flex items-center justify-end gap-1.5">
             <div className="h-1 w-16 rounded-full bg-white/10 overflow-hidden">
               <div
