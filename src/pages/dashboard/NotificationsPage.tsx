@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Bell, CheckCheck, AlertTriangle, AtSign, UserCheck, Activity, RefreshCw } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '@store/index'
@@ -18,26 +19,27 @@ const TYPE_CONFIG: Record<NotificationType, { icon: React.ElementType; label: st
   alert:            { icon: Bell,          label: 'Alert',           color: 'text-purple-400', bg: 'bg-purple-500/10' },
 }
 
-// Mock notifications
-const MOCK: Notification[] = [
-  { id: '1', user_id: 'u1', type: 'incident_created', title: 'Critical incident detected', body: 'NullPointerException in payment-service:142', incident_id: '1', is_read: false, created_at: new Date(Date.now() - 4 * 60000).toISOString() },
-  { id: '2', user_id: 'u1', type: 'mention',          title: 'Alice Chen mentioned you', body: 'Can you take a look at the payment-service incident?', incident_id: '1', is_read: false, created_at: new Date(Date.now() - 18 * 60000).toISOString() },
-  { id: '3', user_id: 'u1', type: 'assignment',       title: 'Incident assigned to you', body: 'ConnectionTimeout in api-gateway was assigned by Bob Torres', incident_id: '2', is_read: false, created_at: new Date(Date.now() - 45 * 60000).toISOString() },
-  { id: '4', user_id: 'u1', type: 'status_change',    title: 'Incident resolved', body: 'OutOfMemoryError in worker was resolved by the team', incident_id: '3', is_read: true,  created_at: new Date(Date.now() - 2 * 3600000).toISOString() },
-  { id: '5', user_id: 'u1', type: 'alert',            title: 'Alert rule triggered', body: 'High severity threshold exceeded for payment-service', incident_id: '1', is_read: true,  created_at: new Date(Date.now() - 5 * 3600000).toISOString() },
-  { id: '6', user_id: 'u1', type: 'incident_created', title: 'New incident: KeyError', body: 'KeyError in user-service:87 — confidence 88%', incident_id: '4', is_read: true,  created_at: new Date(Date.now() - 8 * 3600000).toISOString() },
-]
-
 export default function NotificationsPage() {
   const dispatch      = useAppDispatch()
-  const { items, unreadCount, isLoading } = useAppSelector(s => s.notifications)
+  const { items: notifications, unreadCount, isLoading } = useAppSelector(s => s.notifications)
   const user = useAppSelector(s => s.auth.user)
+  const navigate = useNavigate()
 
-  // Use mock data until backend ready
-  const notifications = items.length > 0 ? items : MOCK
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(fetchNotificationsThunk(user.id))
+    }
+  }, [user?.id, dispatch])
 
   const unread = notifications.filter(n => !n.is_read)
   const read   = notifications.filter(n => n.is_read)
+
+  const handleRead = (n: Notification) => {
+    dispatch(markReadThunk(n.id))
+    if (n.incident_id) {
+      navigate(`/dashboard/incidents/${n.incident_id}`)
+    }
+  }
 
   return (
     <div className="max-w-2xl space-y-5">
@@ -68,7 +70,15 @@ export default function NotificationsPage() {
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ delay: i * 0.05 }}
               >
-                <NotificationRow n={n} onRead={() => dispatch(markReadThunk(n.id))} />
+                <NotificationRow 
+                  n={n} 
+                  onRead={() => handleRead(n)} 
+                  onMarkRead={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    dispatch(markReadThunk(n.id))
+                  }}
+                />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -86,7 +96,14 @@ export default function NotificationsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04 + 0.2 }}
             >
-              <NotificationRow n={n} onRead={() => dispatch(markReadThunk(n.id))} />
+              <NotificationRow 
+                n={n} 
+                onRead={() => handleRead(n)} 
+                onMarkRead={(e) => {
+                  e.stopPropagation()
+                  dispatch(markReadThunk(n.id))
+                }} 
+              />
             </motion.div>
           ))}
         </div>
@@ -105,15 +122,15 @@ export default function NotificationsPage() {
   )
 }
 
-function NotificationRow({ n, onRead }: { n: Notification; onRead: () => void }) {
+function NotificationRow({ n, onRead, onMarkRead }: { n: Notification; onRead: () => void; onMarkRead: (e: React.MouseEvent) => void }) {
   const cfg = TYPE_CONFIG[n.type]
   const Icon = cfg.icon
 
   return (
-    <button
+    <div
       onClick={onRead}
       className={cn(
-        'w-full flex items-start gap-3 p-4 rounded-xl border text-left transition-all',
+        'group w-full flex items-start gap-3 p-4 rounded-xl border text-left cursor-pointer transition-all',
         n.is_read
           ? 'border-slate-200 bg-white hover:bg-slate-50 opacity-60 hover:opacity-80'
           : 'border-slate-200 bg-slate-50 hover:bg-slate-100 ring-1 ring-slate-200'
@@ -127,12 +144,22 @@ function NotificationRow({ n, onRead }: { n: Notification; onRead: () => void })
           <p className="text-sm font-medium text-slate-800 leading-tight">{n.title}</p>
           <span className="text-[11px] text-slate-500 shrink-0 mt-0.5">{formatRelative(n.created_at)}</span>
         </div>
-        <p className="text-xs text-slate-600 mt-1 leading-relaxed">{n.body}</p>
-        <div className="flex items-center gap-2 mt-2">
-          <Badge variant="neutral">{cfg.label}</Badge>
-          {!n.is_read && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+        <p className="text-xs text-slate-600 mt-1 leading-relaxed whitespace-pre-wrap">{n.body}</p>
+        <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center gap-2.5">
+            <Badge variant="neutral">{cfg.label}</Badge>
+            {!n.is_read && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+          </div>
+          {!n.is_read && (
+            <button
+              onClick={onMarkRead}
+              className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 hover:border-indigo-200 px-2.5 py-0.5 rounded-md transition-colors"
+            >
+              Mark as read
+            </button>
+          )}
         </div>
       </div>
-    </button>
+    </div>
   )
 }

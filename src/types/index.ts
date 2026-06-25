@@ -24,7 +24,7 @@ export interface Tenant {
   id: string
   name: string
   slug: string
-  plan_tier: 'free' | 'pro' | 'enterprise'
+  plan_tier: 'free' | 'pro' | 'max'
   status: 'active' | 'suspended'
   created_at: string
 }
@@ -151,7 +151,7 @@ export interface Incident {
   occurrence_count: number
   occurrences: string[]
   is_draft: boolean
-  assigned_user_id?: string
+  assigned_user_ids: string[]
   source_log_id?: string
   first_seen_at: string
   last_seen_at: string
@@ -163,15 +163,36 @@ export interface Incident {
 
 // ─── Collaboration ────────────────────────────────────────────────────────────
 
+export interface ThreadAuthor {
+  id: string
+  first_name: string
+  last_name: string
+  full_name: string
+  avatar_colour: string
+}
+
 export interface ThreadMessage {
   id: string
   thread_id: string
-  author: User
+  /** null for system-generated messages (status changes, assignments, AI events) */
+  author: ThreadAuthor | null
+  /** Returns 'This message was deleted.' for soft-deleted messages */
   content: string
-  parent_id?: string
-  mentions: User[]
+  parent_id: string | null
+  /** Direct replies to this message — only populated on top-level messages */
+  replies?: ThreadMessage[]
+  is_system_message: boolean
+  is_deleted: boolean
   created_at: string
   updated_at: string
+}
+
+export interface ThreadMeta {
+  id: string
+  incident_id: string
+  message_count: number
+  participant_count: number
+  created_at: string
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────────

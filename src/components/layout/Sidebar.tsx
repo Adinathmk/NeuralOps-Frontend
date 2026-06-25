@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home, AlertCircle, MessageSquare,
-  Settings, BarChart2, Users,
+  Settings, BarChart2, Users, CreditCard,
   ChevronLeft, ChevronRight, Zap, LogOut, Terminal
 } from 'lucide-react'
 import { cn } from '@utils/cn'
@@ -14,12 +14,12 @@ const navItems = [
   { to: '/dashboard',               icon: Home,          label: 'Overview' },
   { to: '/dashboard/incidents',     icon: AlertCircle,   label: 'Incidents' },
   { to: '/dashboard/logs',          icon: Terminal,      label: 'Log Explorer' },
-  { to: '/dashboard/collaboration', icon: MessageSquare, label: 'Collaboration' },
   { to: '/dashboard/configuration', icon: Settings,      label: 'Configuration' },
   { to: '/dashboard/analytics',     icon: BarChart2,     label: 'Analytics' },
   { to: '/dashboard/team',          icon: Users,         label: 'Team Management' },
   { to: '/dashboard/demo',          icon: Zap,           label: 'SDK Demo' },
   { to: '/dashboard/settings',      icon: Settings,      label: 'Settings' },
+  { to: '/dashboard/billing',       icon: CreditCard,    label: 'Billing' },
 ]
 
 export function Sidebar() {

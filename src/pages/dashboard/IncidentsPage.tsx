@@ -30,17 +30,19 @@ const STATUS_FILTERS: Array<{ label: string; value: string }> = [
 export default function IncidentsPage() {
   const dispatch = useAppDispatch()
   const { items, filters, isLoading, error } = useAppSelector(s => s.incidents)
+  const user = useAppSelector(s => s.auth.user)
   const [search, setSearch] = useState('')
 
   useEffect(() => {
     dispatch(fetchIncidentsThunk({
       status: filters.status !== 'all' ? filters.status : undefined,
       severity: filters.severity !== 'all' ? filters.severity : undefined,
+      assigned_user_id: filters.assignedToMe && user?.id ? user.id : undefined,
       search: filters.search || undefined,
       page: filters.page,
       is_draft: true,
     }))
-  }, [dispatch, filters.status, filters.severity, filters.search, filters.page])
+  }, [dispatch, filters.status, filters.severity, filters.search, filters.page, filters.assignedToMe, user?.id])
 
   // Debounced search
   useEffect(() => {
@@ -58,12 +60,29 @@ export default function IncidentsPage() {
         <Button variant="outline" size="sm" className="gap-2" onClick={() => dispatch(fetchIncidentsThunk({
           status: filters.status !== 'all' ? filters.status : undefined,
           severity: filters.severity !== 'all' ? filters.severity : undefined,
+          assigned_user_id: filters.assignedToMe && user?.id ? user.id : undefined,
           search: filters.search || undefined,
           page: filters.page,
           is_draft: true,
         }))} isLoading={isLoading}>
           <RefreshCw size={13} /> Refresh
         </Button>
+      </div>
+
+      {/* View Tabs */}
+      <div className="flex items-center gap-2 border-b border-slate-200 mt-2 mb-4">
+        <button 
+          onClick={() => dispatch(setFilter({ assignedToMe: false }))}
+          className={cn("px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px", !filters.assignedToMe ? "border-primary text-primary" : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300")}
+        >
+          All Incidents
+        </button>
+        <button 
+          onClick={() => dispatch(setFilter({ assignedToMe: true }))}
+          className={cn("px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px", filters.assignedToMe ? "border-primary text-primary" : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300")}
+        >
+          My Incidents
+        </button>
       </div>
 
       {/* Filters */}

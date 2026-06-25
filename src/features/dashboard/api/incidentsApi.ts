@@ -34,7 +34,7 @@ export const incidentsApi = {
     apiClient.get<SingleIncidentResponse>(`/incidents/${id}`),
 
   // PATCH /api/v1/incidents/:id
-  update: (id: string, data: { status?: IncidentStatus; assigned_user_id?: string | null }) =>
+  update: (id: string, data: { status?: IncidentStatus; assigned_user_ids?: string[] | null; actor_id?: string; note?: string }) =>
     apiClient.patch(`/incidents/${id}`, data),
 
   // GET /api/v1/incidents/:id/context-logs

@@ -13,6 +13,7 @@ interface IncidentsState {
     severity: string
     search:   string
     page:     number
+    assignedToMe: boolean
   }
 }
 
@@ -27,6 +28,7 @@ const initialState: IncidentsState = {
     severity: 'all',
     search:   '',
     page:     1,
+    assignedToMe: false,
   },
 }
 
@@ -59,7 +61,7 @@ export const fetchIncidentThunk = createAsyncThunk(
 
 export const updateIncidentThunk = createAsyncThunk(
   'incidents/update',
-  async ({ id, ...data }: { id: string, status?: IncidentStatus, assigned_user_id?: string | null }, { rejectWithValue }) => {
+  async ({ id, ...data }: { id: string, status?: IncidentStatus, assigned_user_ids?: string[] | null, actor_id?: string, note?: string }, { rejectWithValue }) => {
     try {
       const res = await incidentsApi.update(id, data)
       // The API returns the updated fields in res.data.data
@@ -82,6 +84,15 @@ const incidentsSlice = createSlice({
       const idx = state.items.findIndex(i => i.id === action.payload.id)
       if (idx >= 0) state.items[idx] = action.payload
       else state.items.unshift(action.payload)
+    },
+    patchIncidentInStore(state, action: PayloadAction<Partial<Incident> & { id: string }>) {
+      const idx = state.items.findIndex(i => i.id === action.payload.id)
+      if (idx >= 0) {
+        state.items[idx] = { ...state.items[idx], ...action.payload }
+      }
+      if (state.selected?.id === action.payload.id) {
+        state.selected = { ...state.selected, ...action.payload }
+      }
     },
     setFilter(state, action: PayloadAction<Partial<IncidentsState['filters']>>) {
       state.filters = { ...state.filters, ...action.payload, page: 1 }
@@ -124,5 +135,5 @@ const incidentsSlice = createSlice({
   },
 })
 
-export const { setSelected, upsertIncident, setFilter, clearError } = incidentsSlice.actions
+export const { setSelected, upsertIncident, patchIncidentInStore, setFilter, clearError } = incidentsSlice.actions
 export default incidentsSlice.reducer

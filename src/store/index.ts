@@ -7,6 +7,7 @@ import notificationsReducer from './slices/notificationsSlice'
 import alertRulesReducer    from './slices/alertRulesSlice'
 import playbooksReducer     from './slices/playbooksSlice'
 import integrationsReducer  from './slices/integrationsSlice'
+import collaborationReducer from './slices/collaborationSlice'
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     alertRules:    alertRulesReducer,
     playbooks:     playbooksReducer,
     integrations:  integrationsReducer,
+    collaboration: collaborationReducer,
   },
   middleware: getDefault =>
     getDefault({ serializableCheck: { ignoredActionPaths: ['payload.created_at'] } }),

@@ -18,7 +18,8 @@ export const fetchNotificationsThunk = createAsyncThunk(
   'notifications/fetchAll',
   async (userId: string) => {
     const res = await notificationsApi.listByUser(userId)
-    return res.data
+    // The backend returns an APIResponse wrapper, so we extract the data array
+    return (res.data as any).data as Notification[]
   }
 )
 
