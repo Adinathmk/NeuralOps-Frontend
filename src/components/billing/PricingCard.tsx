@@ -76,7 +76,7 @@ export function PricingCard({
       </ul>
 
       <Button
-        variant={isActive ? "secondary" : (isPopular ? "primary" : "outline")}
+        variant={isActive ? "secondary" : (isPopular ? "default" : "outline")}
         disabled={isDisabled}
         onClick={() => onSubscribe(id)}
         className={`w-full mt-auto ${

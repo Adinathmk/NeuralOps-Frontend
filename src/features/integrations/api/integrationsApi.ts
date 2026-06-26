@@ -10,12 +10,14 @@ export const integrationsApi = {
 
   // POST /api/v1/integrations/github/
   saveGitHubIntegration: (data: GitHubIntegrationFormData) => {
-    const { webhook_secret, ...rest } = data
-    const payload = { ...rest, webhook_secret_input: webhook_secret }
-    return apiClient.post<BackendResponse<GitHubIntegrationStatus>>('/integrations/github/', payload).then(unwrap)
+    return apiClient.post<BackendResponse<GitHubIntegrationStatus>>('/integrations/github/', data).then(unwrap)
   },
 
   // DELETE /api/v1/integrations/github/
   deleteGitHubIntegration: () =>
     apiClient.delete<BackendResponse<void>>('/integrations/github/').then(unwrap),
+
+  // GET /api/v1/integrations/github/available-repos/
+  getAvailableRepos: (installationId: number) =>
+    apiClient.get<BackendResponse<{ repositories: Array<{ id: number; name: string; full_name: string; owner: string; html_url: string }> }>>(`/integrations/github/available-repos/?installation_id=${installationId}`).then(unwrap),
 }

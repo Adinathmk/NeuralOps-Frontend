@@ -5,6 +5,7 @@ import {
   ArrowLeft, AlertTriangle, Clock, User, Code2,
   Sparkles, ChevronRight, CheckCircle,
   Copy, Terminal, MessageSquare, X, UserPlus, UserMinus,
+  GitPullRequest, XCircle, ExternalLink
 } from 'lucide-react'
 import { Badge } from '@components/common/Badge'
 import { Button } from '@components/common/Button'
@@ -90,7 +91,7 @@ export default function IncidentDetailPage() {
   useEffect(() => {
     if (id) {
       collaborationApi.fetchStatusHistory(id)
-        .then(res => setStatusHistory(res.data.data))
+        .then(res => setStatusHistory(res.data.data || []))
         .catch(err => console.error("Failed to load status history", err))
     }
   }, [id, incident?.status])
@@ -200,8 +201,8 @@ export default function IncidentDetailPage() {
   if (loading && !incident) return <DetailSkeleton />
   if (!incident) return <div className="text-slate-500 text-sm p-6">Incident not found.</div>
 
-  const severityVariant = { critical: 'critical', warning: 'warning', info: 'info' }[incident.severity] as 'critical' | 'warning' | 'info'
-  const statusVariant   = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
+  const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info', info: 'info', unknown: 'neutral' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
+  const statusVariant   = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral', duplicate: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (
     <ErrorBoundary>
@@ -480,6 +481,52 @@ export default function IncidentDetailPage() {
         {/* Left col — analysis */}
         <div className="xl:col-span-2 space-y-4">
 
+          {/* Pull Request Status Banner */}
+          {(incident.pr_status || incident.pr_url) && (
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}>
+              {incident.pr_status === 'open' || incident.pr_status === 'merged' ? (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                  <div className="flex items-start md:items-center gap-3">
+                    <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600 shrink-0">
+                      <GitPullRequest size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-emerald-800 font-semibold text-sm">Automated Pull Request Created</h3>
+                      <p className="text-emerald-600/90 text-xs mt-0.5 max-w-xl">
+                        {incident.pr_title || `A patch has been generated and a PR (#${incident.pr_number}) was opened successfully.`}
+                      </p>
+                    </div>
+                  </div>
+                  {incident.pr_url && (
+                    <a 
+                      href={incident.pr_url} 
+                      target="_blank" 
+                      rel="noreferrer"
+                      className="shrink-0 bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition-colors flex items-center gap-1.5"
+                    >
+                      View Pull Request <ExternalLink size={14} />
+                    </a>
+                  )}
+                </div>
+              ) : incident.pr_status ? (
+                <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                  <div className="flex items-start md:items-center gap-3">
+                    <div className="bg-rose-100 p-2 rounded-lg text-rose-600 shrink-0">
+                      <XCircle size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-rose-800 font-semibold text-sm">Automated Patch Failed</h3>
+                      <p className="text-rose-600/90 text-xs mt-0.5 max-w-xl">
+                        {incident.pr_error || "NeuralOps agent encountered an issue while generating or creating the pull request."}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant="critical" className="bg-white">Status: {incident.pr_status}</Badge>
+                </div>
+              ) : null}
+            </motion.div>
+          )}
+
           {/* Root cause */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
             <Card>
@@ -687,7 +734,7 @@ export default function IncidentDetailPage() {
           transition={{ delay: 0.2 }}
         >
           <div className="rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-120px)] min-h-[520px] sticky top-6">
-            {id && <ThreadPanel incidentId={id} />}
+            {incident?.id && <ThreadPanel incidentId={incident.id} />}
           </div>
         </motion.div>
       </div>

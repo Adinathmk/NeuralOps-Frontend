@@ -63,7 +63,7 @@ const integrationsSlice = createSlice({
     clearError(state) {
       state.error = null
     },
-    updateGitHubIntegrationStatus(state, action: import('@reduxjs/toolkit').PayloadAction<{status: string, commit_sha: string | null}>) {
+    updateGitHubIntegrationStatus(state, action: import('@reduxjs/toolkit').PayloadAction<{status: import('@/types').GitHubIntegrationStatus['indexing_status'], commit_sha: string | null}>) {
       if (state.github) {
         state.github.indexing_status = action.payload.status
         if (action.payload.commit_sha) {

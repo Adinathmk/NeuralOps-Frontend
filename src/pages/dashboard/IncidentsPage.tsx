@@ -14,8 +14,11 @@ import type { Incident, IncidentSeverity, IncidentStatus } from '@/types'
 const SEVERITY_FILTERS: Array<{ label: string; value: string }> = [
   { label: 'All',      value: 'all' },
   { label: 'Critical', value: 'critical' },
-  { label: 'Warning',  value: 'warning' },
+  { label: 'High',     value: 'high' },
+  { label: 'Medium',   value: 'medium' },
+  { label: 'Low',      value: 'low' },
   { label: 'Info',     value: 'info' },
+  { label: 'Unknown',  value: 'unknown' },
 ]
 
 const STATUS_FILTERS: Array<{ label: string; value: string }> = [
@@ -25,6 +28,7 @@ const STATUS_FILTERS: Array<{ label: string; value: string }> = [
   { label: 'Resolved',      value: 'resolved' },
   { label: 'Closed',        value: 'closed' },
   { label: 'Draft',         value: 'draft' },
+  { label: 'Duplicate',     value: 'duplicate' },
 ]
 
 export default function IncidentsPage() {
@@ -153,21 +157,21 @@ export default function IncidentsPage() {
 }
 
 function IncidentCard({ incident }: { incident: Incident }) {
-  const severityVariant = { critical: 'critical', warning: 'warning', info: 'info' }[incident.severity] as 'critical' | 'warning' | 'info'
-  const statusVariant = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
+  const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info', info: 'info', unknown: 'neutral' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
+  const statusVariant = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral', duplicate: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (
     <div className={cn(
       'flex items-center gap-4 p-4 rounded-xl border bg-white hover:bg-slate-50 transition-all cursor-pointer group',
       incident.severity === 'critical' ? 'border-red-500/15 hover:border-red-500/25' :
-      incident.severity === 'warning'  ? 'border-amber-500/15 hover:border-amber-500/25' :
-                                         'border-slate-200 hover:border-slate-200'
+      ['high', 'medium'].includes(incident.severity) ? 'border-amber-500/15 hover:border-amber-500/25' :
+      'border-slate-200 hover:border-slate-300'
     )}>
       {/* Severity indicator */}
       <div className={cn(
         'h-10 w-1 rounded-full shrink-0',
-        incident.severity === 'critical' ? 'bg-red-500'   :
-        incident.severity === 'warning'  ? 'bg-amber-500' : 'bg-blue-500'
+        incident.severity === 'critical' ? 'bg-red-500' :
+        ['high', 'medium'].includes(incident.severity) ? 'bg-amber-500' : 'bg-blue-500'
       )} />
 
       {/* Main content */}

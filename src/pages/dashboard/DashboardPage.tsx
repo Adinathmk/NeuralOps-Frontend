@@ -26,7 +26,7 @@ const mockIncidents = [
   {
     id: '2', tenant_id: 't1', error_type: 'ConnectionTimeout', crash_file: 'lib/db/pool.ts',
     crash_line: 87, service_name: 'api-gateway', environment: 'production',
-    status: 'investigating', severity: 'warning', confidence_score: 0.76,
+    status: 'investigating', severity: 'high', confidence_score: 0.76,
     created_at: new Date(Date.now() - 28 * 60000).toISOString(), updated_at: new Date().toISOString(),
   },
   {
@@ -170,9 +170,12 @@ export default function DashboardPage() {
 function IncidentRow({ incident }: { incident: Incident }) {
   const severityVariant = {
     critical: 'critical',
-    warning:  'warning',
+    high:     'warning',
+    medium:   'warning',
+    low:      'info',
     info:     'info',
-  }[incident.severity] as 'critical' | 'warning' | 'info'
+    unknown:  'neutral',
+  }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
 
   const statusVariant = {
     open:         'critical',
@@ -180,6 +183,7 @@ function IncidentRow({ incident }: { incident: Incident }) {
     resolved:     'success',
     closed:       'neutral',
     draft:        'neutral',
+    duplicate:    'neutral',
   }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (
@@ -187,7 +191,7 @@ function IncidentRow({ incident }: { incident: Incident }) {
       <div className={cn(
         'mt-0.5 h-2 w-2 rounded-full shrink-0',
         incident.severity === 'critical' ? 'bg-red-400' :
-        incident.severity === 'warning'  ? 'bg-amber-400' : 'bg-blue-400'
+        ['high', 'medium'].includes(incident.severity) ? 'bg-amber-400' : 'bg-blue-400'
       )} />
       <div className="flex-1 min-w-0">
         <p className="text-xs font-medium text-slate-700 truncate">{incident.error_type}</p>

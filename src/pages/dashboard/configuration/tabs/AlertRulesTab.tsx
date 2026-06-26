@@ -268,10 +268,9 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
                           <Badge
                             key={s}
                             variant={
-                              s as
-                                | 'critical'
-                                | 'warning'
-                                | 'info'
+                              (s === 'critical' ? 'critical' :
+                               ['high', 'medium'].includes(s) ? 'warning' :
+                               s === 'unknown' ? 'neutral' : 'info') as 'critical' | 'warning' | 'info' | 'neutral'
                             }
                             dot
                           >
@@ -365,8 +364,11 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
               {(
                 [
                   'critical',
-                  'warning',
+                  'high',
+                  'medium',
+                  'low',
                   'info',
+                  'unknown'
                 ] as IncidentSeverity[]
               ).map(s => (
                 <button
@@ -381,7 +383,7 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
                     severities.includes(s)
                       ? s === 'critical'
                         ? 'bg-red-500/15 border-red-500/30 text-red-400'
-                        : s === 'warning'
+                        : ['high', 'medium'].includes(s)
                         ? 'bg-amber-500/15 border-amber-500/30 text-amber-400'
                         : 'bg-blue-500/15 border-blue-500/30 text-blue-400'
                       : 'bg-transparent border-slate-200 text-slate-500 hover:border-slate-200'

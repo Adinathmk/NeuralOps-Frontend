@@ -69,7 +69,7 @@ export default function BillingPage() {
       setLoadingPlan(tier);
       
       // 1. Fetch Subscription ID or Scheduled Status from backend
-      const response = await subscribeToPlan(planId, tier);
+      const response: any = await subscribeToPlan(planId, tier);
 
       if (response.status === 'scheduled') {
         toast({ 

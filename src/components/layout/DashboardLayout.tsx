@@ -35,7 +35,7 @@ export function DashboardLayout() {
       dispatch(patchIncidentInStore({
         id: msg.data.incident_id,
         status: msg.data.status,
-        assigned_user_id: msg.data.assigned_user_id,
+        assigned_user_ids: msg.data.assigned_user_ids,
         updated_at: msg.data.updated_at,
       }))
     } else if (msg.type === 'incident.created') {

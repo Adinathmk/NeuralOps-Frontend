@@ -111,8 +111,8 @@ export interface JoinPayload {
 
 // ─── Incidents ────────────────────────────────────────────────────────────────
 
-export type IncidentStatus   = 'open' | 'investigating' | 'resolved' | 'closed' | 'draft'
-export type IncidentSeverity = 'critical' | 'warning' | 'info'
+export type IncidentStatus   = 'open' | 'investigating' | 'resolved' | 'closed' | 'draft' | 'duplicate'
+export type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info' | 'unknown'
 
 export interface AnalysisDetail {
   id: string
@@ -158,6 +158,11 @@ export interface Incident {
   resolved_at?: string
   created_at: string
   updated_at: string
+  pr_url?: string
+  pr_number?: number
+  pr_status?: string
+  pr_title?: string
+  pr_error?: string
   analysis?: AnalysisDetail | null
 }
 
@@ -306,12 +311,12 @@ export interface GitHubIntegrationStatus {
   repo_name: string
   indexing_status: 'pending' | 'indexing' | 'completed' | 'failed'
   last_indexed_commit?: string
+  github_installation_id?: number
 }
 
 export interface GitHubIntegrationFormData {
   repo_url: string
   repo_owner: string
   repo_name: string
-  pat?: string
-  webhook_secret?: string
+  github_installation_id: number
 }

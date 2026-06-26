@@ -27,8 +27,8 @@ const errorTypes = [
 
 const serviceBreakdown = [
   { service: 'payment-service', incidents: 38, severity: 'critical' as const },
-  { service: 'api-gateway',     incidents: 29, severity: 'warning' as const  },
-  { service: 'worker',          incidents: 22, severity: 'warning' as const  },
+  { service: 'api-gateway',     incidents: 29, severity: 'high' as const     },
+  { service: 'worker',          incidents: 22, severity: 'medium' as const   },
   { service: 'user-service',    incidents: 15, severity: 'info' as const     },
   { service: 'cache-service',   incidents: 11, severity: 'info' as const     },
 ]
@@ -128,8 +128,8 @@ export default function AnalyticsPage() {
             <CardContent className="space-y-4">
               {[
                 { label: 'Critical', count: 38, pct: 31, color: 'bg-red-500',   bar: 'bg-red-500/20' },
-                { label: 'Warning',  count: 51, pct: 42, color: 'bg-amber-500', bar: 'bg-amber-500/20' },
-                { label: 'Info',     count: 33, pct: 27, color: 'bg-blue-500',  bar: 'bg-blue-500/20' },
+                { label: 'High',     count: 51, pct: 42, color: 'bg-amber-500', bar: 'bg-amber-500/20' },
+                { label: 'Medium',   count: 33, pct: 27, color: 'bg-blue-500',  bar: 'bg-blue-500/20' },
               ].map(({ label, count, pct, color, bar }) => (
                 <div key={label} className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
@@ -148,8 +148,8 @@ export default function AnalyticsPage() {
                 <p className="text-xs text-slate-500 font-medium">MTTR by severity</p>
                 {[
                   { label: 'Critical', mttr: '0.9m' },
-                  { label: 'Warning',  mttr: '1.8m' },
-                  { label: 'Info',     mttr: '3.2m' },
+                  { label: 'High',     mttr: '1.8m' },
+                  { label: 'Medium',   mttr: '3.2m' },
                 ].map(({ label, mttr }) => (
                   <div key={label} className="flex justify-between text-xs">
                     <span className="text-slate-600">{label}</span>
@@ -192,13 +192,13 @@ export default function AnalyticsPage() {
             <CardHeader><CardTitle>By Service</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               {serviceBreakdown.map(({ service, incidents, severity }) => {
-                const variant = { critical: 'critical', warning: 'warning', info: 'info' }[severity] as 'critical' | 'warning' | 'info'
+                const variant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info', info: 'info', unknown: 'neutral' }[severity] as 'critical' | 'warning' | 'info' | 'neutral'
                 return (
                   <div key={service} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-100 transition-colors">
                     <div className={cn(
                       'h-2 w-2 rounded-full shrink-0',
                       severity === 'critical' ? 'bg-red-400' :
-                      severity === 'warning'  ? 'bg-amber-400' : 'bg-blue-400'
+                      ['high', 'medium'].includes(severity) ? 'bg-amber-400' : 'bg-blue-400'
                     )} />
                     <span className="text-xs text-slate-700 flex-1 font-mono truncate">{service}</span>
                     <Badge variant={variant}>{incidents} incidents</Badge>
