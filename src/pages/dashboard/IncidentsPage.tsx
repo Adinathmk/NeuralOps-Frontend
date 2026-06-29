@@ -17,8 +17,6 @@ const SEVERITY_FILTERS: Array<{ label: string; value: string }> = [
   { label: 'High',     value: 'high' },
   { label: 'Medium',   value: 'medium' },
   { label: 'Low',      value: 'low' },
-  { label: 'Info',     value: 'info' },
-  { label: 'Unknown',  value: 'unknown' },
 ]
 
 const STATUS_FILTERS: Array<{ label: string; value: string }> = [
@@ -157,7 +155,7 @@ export default function IncidentsPage() {
 }
 
 function IncidentCard({ incident }: { incident: Incident }) {
-  const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info', info: 'info', unknown: 'neutral' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
+  const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
   const statusVariant = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral', duplicate: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (

@@ -112,7 +112,7 @@ export interface JoinPayload {
 // ─── Incidents ────────────────────────────────────────────────────────────────
 
 export type IncidentStatus   = 'open' | 'investigating' | 'resolved' | 'closed' | 'draft' | 'duplicate'
-export type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info' | 'unknown'
+export type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low'
 
 export interface AnalysisDetail {
   id: string
@@ -231,12 +231,18 @@ export interface AnalyticsDashboard {
 
 // ─── Alert Rules ──────────────────────────────────────────────────────────────
 
+export type AlertDestination = 
+  | { type: 'email'; address: string }
+  | { type: 'in_app'; user_id: string }
+  | { type: 'pagerduty'; integration_key?: string }
+  | { type: 'slack'; webhook_url?: string }
+
 export interface AlertRule {
   id: string
   tenant: string
   confidence_threshold: number
   severity_filter: IncidentSeverity[]
-  recipient_ids: string[]
+  destinations: AlertDestination[]
   enabled: boolean
   source_version: number
   created_at: string

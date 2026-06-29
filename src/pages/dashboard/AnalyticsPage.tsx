@@ -192,7 +192,7 @@ export default function AnalyticsPage() {
             <CardHeader><CardTitle>By Service</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               {serviceBreakdown.map(({ service, incidents, severity }) => {
-                const variant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info', info: 'info', unknown: 'neutral' }[severity] as 'critical' | 'warning' | 'info' | 'neutral'
+                const variant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info' }[severity] as 'critical' | 'warning' | 'info' | 'neutral'
                 return (
                   <div key={service} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-100 transition-colors">
                     <div className={cn(

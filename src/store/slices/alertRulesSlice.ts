@@ -36,7 +36,7 @@ export const createAlertRule = createAsyncThunk(
   async (data: {
     confidence_threshold: number
     severity_filter: string[]
-    recipient_ids: string[]
+    destinations: import('@/types').AlertDestination[]
     enabled?: boolean
   }, { rejectWithValue }) => {
     try {
@@ -54,7 +54,7 @@ export const updateAlertRule = createAsyncThunk(
   async ({ id, ...data }: { id: string } & Partial<{
     confidence_threshold: number
     severity_filter: string[]
-    recipient_ids: string[]
+    destinations: import('@/types').AlertDestination[]
     enabled: boolean
   }>, { rejectWithValue }) => {
     try {

@@ -173,8 +173,6 @@ function IncidentRow({ incident }: { incident: Incident }) {
     high:     'warning',
     medium:   'warning',
     low:      'info',
-    info:     'info',
-    unknown:  'neutral',
   }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
 
   const statusVariant = {

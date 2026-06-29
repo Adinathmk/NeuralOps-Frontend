@@ -8,58 +8,96 @@ import { cn } from '@/utils/cn'
 export default function DemoIngestPage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
-  const [incidentId, setIncidentId] = useState<string>(crypto.randomUUID())
-  const [serviceName, setServiceName] = useState('payment-service')
-  const [environment, setEnvironment] = useState('production')
-  const [logs, setLogs] = useState(
+  const [result, setResult] = useState<any>(null)
+  
+  const [payloadStr, setPayloadStr] = useState(
     JSON.stringify(
-      [
-        {
-          seq: 1,
-          level: 'info',
-          message: 'Processing payment for order #12345',
-          timestamp: new Date(Date.now() - 5000).toISOString(),
+      {
+        "incident_id": "4b9f1d8e-9c7a-4b6d-a123-f9e8d7c6b5a4",
+        "service_name": "fastapi-testbed",
+        "environment": "development",
+        "severity": "error",
+        "error_type": "ZeroDivisionError",
+        "file_path": "/app/services/payment.py",
+        "line_number": 42,
+        "trigger": {
+          "level": "error",
+          "message": "Payment processing failed!",
+          "timestamp": "2026-06-26T10:55:00.000Z",
+          "stack_trace": {
+            "exception_type": "ZeroDivisionError",
+            "exception_message": "division by zero",
+            "frames": [
+              {
+                "file": "/app/main.py",
+                "line": 15,
+                "function": "checkout_endpoint",
+                "code_context": "    return process_payment(order_id)"
+              },
+              {
+                "file": "/app/services/payment.py",
+                "line": 42,
+                "function": "process_payment",
+                "code_context": "    tax_rate = amount / 0"
+              }
+            ]
+          }
         },
-        {
-          seq: 2,
-          level: 'error',
-          message: 'NullPointerException in ChargeService.charge()',
-          timestamp: new Date().toISOString(),
-          stack_trace:
-            'java.lang.NullPointerException\n  at com.example.ChargeService.charge(ChargeService.java:42)\n  at com.example.PaymentController.process(PaymentController.java:18)',
-        },
-      ],
+        "context_logs": [
+          {
+            "level": "info",
+            "message": "Received checkout request for order_id=9921",
+            "timestamp": "2026-06-26T10:54:58.123Z",
+            "logger": "app.main",
+            "module": "main",
+            "function": "checkout_endpoint",
+            "line": 12,
+            "file": "/app/main.py"
+          },
+          {
+            "level": "info",
+            "message": "Initiating payment gateway connection...",
+            "timestamp": "2026-06-26T10:54:59.456Z",
+            "logger": "app.services.payment",
+            "module": "payment",
+            "function": "process_payment",
+            "line": 39,
+            "file": "/app/services/payment.py"
+          }
+        ],
+        "sdk_meta": {
+          "sdk_version": "1.0.0",
+          "python_version": "3.12.1",
+          "hostname": "testbed-worker-node-1",
+          "framework": "fastapi"
+        }
+      },
       null,
       2
     )
   )
-  const [result, setResult] = useState<any>(null)
 
   const handleIngest = async () => {
     try {
       setLoading(true)
       setResult(null)
 
-      let parsedLogs
+      let parsedPayload
       try {
-        parsedLogs = JSON.parse(logs)
+        parsedPayload = JSON.parse(payloadStr)
       } catch (err) {
-        toast({ type: 'error', title: 'Invalid JSON in context logs' })
+        toast({ type: 'error', title: 'Invalid JSON payload' })
         setLoading(false)
         return
       }
 
-      const payload = {
-        incident_id: incidentId,
-        service_name: serviceName,
-        environment,
-        context_logs: Array.isArray(parsedLogs) ? parsedLogs : [parsedLogs],
-      }
-
-      const response = await apiClient.post('/ingest/logs', payload)
+      const response = await apiClient.post('/ingest/logs', parsedPayload)
       setResult(response.data)
       toast({ type: 'success', title: 'Logs ingested successfully!' })
-      setIncidentId(crypto.randomUUID()) // Reset for the next demo
+      
+      // Auto-update incident ID in the textbox to make repeated testing easy
+      parsedPayload.incident_id = crypto.randomUUID()
+      setPayloadStr(JSON.stringify(parsedPayload, null, 2))
     } catch (error: any) {
       console.error(error)
       toast({ type: 'error', title: error?.response?.data?.detail || error?.response?.data?.message || 'Failed to ingest logs' })
@@ -73,49 +111,18 @@ export default function DemoIngestPage() {
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">Manual Log Ingestion Demo</h1>
         <p className="text-sm text-slate-600">
-          Simulate an SDK error payload. This sends a payload to the <code>/api/v1/ingest/logs</code> endpoint, simulating the NeuralOps SDK.
+          Simulate an SDK error payload. This sends a payload to the <code>/api/v1/ingest/logs</code> endpoint, simulating exactly what the NeuralOps SDK sends.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-700">Incident ID (UUID)</label>
-            <input
-              type="text"
-              value={incidentId}
-              onChange={(e) => setIncidentId(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-neural-500/50"
-            />
-          </div>
-
-          <div className="flex gap-4">
-            <div className="space-y-1 flex-1">
-              <label className="text-xs font-medium text-slate-700">Service Name</label>
-              <input
-                type="text"
-                value={serviceName}
-                onChange={(e) => setServiceName(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-neural-500/50"
-              />
-            </div>
-            <div className="space-y-1 flex-1">
-              <label className="text-xs font-medium text-slate-700">Environment</label>
-              <input
-                type="text"
-                value={environment}
-                onChange={(e) => setEnvironment(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-neural-500/50"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-700">Context Logs (JSON Array)</label>
+            <label className="text-xs font-medium text-slate-700">Raw Payload (JSON)</label>
             <textarea
-              value={logs}
-              onChange={(e) => setLogs(e.target.value)}
-              rows={12}
+              value={payloadStr}
+              onChange={(e) => setPayloadStr(e.target.value)}
+              rows={24}
               className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-sm text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-neural-500/50"
             />
           </div>

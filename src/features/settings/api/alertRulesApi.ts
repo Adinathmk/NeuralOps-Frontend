@@ -22,7 +22,7 @@ export const alertRulesApi = {
   create: (data: {
     confidence_threshold: number
     severity_filter: string[]
-    recipient_ids: string[]
+    destinations: import('@/types').AlertDestination[]
     enabled?: boolean
   }) =>
     apiClient.post<AlertRuleSingleResponse>('/alerts/alert-rules/', data),
@@ -31,7 +31,7 @@ export const alertRulesApi = {
   update: (id: string, data: Partial<{
     confidence_threshold: number
     severity_filter: string[]
-    recipient_ids: string[]
+    destinations: import('@/types').AlertDestination[]
     enabled: boolean
   }>) =>
     apiClient.patch<AlertRuleSingleResponse>(`/alerts/alert-rules/${id}/`, data),

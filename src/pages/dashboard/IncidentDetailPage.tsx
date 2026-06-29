@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -60,6 +60,18 @@ export default function IncidentDetailPage() {
   const [popoverState, setPopoverState] = useState<{ status: Incident['status']; x: number; y: number } | null>(null)
   const [transitionNote, setTransitionNote] = useState('')
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
+
+  const logsContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (logsContainerRef.current) {
+      setTimeout(() => {
+        if (logsContainerRef.current) {
+          logsContainerRef.current.scrollTop = logsContainerRef.current.scrollHeight
+        }
+      }, 50)
+    }
+  }, [contextLogs])
 
   useEffect(() => {
     if (id) {
@@ -201,7 +213,7 @@ export default function IncidentDetailPage() {
   if (loading && !incident) return <DetailSkeleton />
   if (!incident) return <div className="text-slate-500 text-sm p-6">Incident not found.</div>
 
-  const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info', info: 'info', unknown: 'neutral' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
+  const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
   const statusVariant   = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral', duplicate: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (
@@ -599,7 +611,7 @@ export default function IncidentDetailPage() {
                   </div>
                 ) : contextLogs ? (
                   <div className="bg-[#1e1e1e] rounded-lg overflow-hidden border border-slate-800 shadow-inner">
-                    <div className="p-4 text-[13px] font-mono text-slate-300 max-h-[500px] overflow-y-auto whitespace-pre-wrap leading-relaxed tracking-wide">
+                    <div ref={logsContainerRef} className="p-4 text-[13px] font-mono text-slate-300 max-h-[500px] overflow-y-auto whitespace-pre-wrap leading-relaxed tracking-wide">
                       {(() => {
                         try {
                           const logs = JSON.parse(contextLogs)

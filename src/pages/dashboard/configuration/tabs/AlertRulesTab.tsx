@@ -39,18 +39,15 @@ import {
 import type {
   AlertRule,
   IncidentSeverity,
+  User
 } from '@/types'
+import { teamApi } from '@features/team/api/teamApi'
 
 const ruleSchema = z.object({
   confidence_threshold: z
     .number()
     .min(0, 'Minimum is 0')
     .max(1, 'Maximum is 1'),
-
-  recipients_raw: z.string().min(
-    1,
-    'At least one recipient ID'
-  ),
 })
 
 export type RuleForm = z.infer<typeof ruleSchema>
@@ -67,6 +64,8 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
   const [editRule, setEditRule] = useState<AlertRule | null>(null)
   const [severities, setSeverities] = useState<IncidentSeverity[]>(['critical'])
   const [submitting, setSubmitting] = useState(false)
+  const [teamMembers, setTeamMembers] = useState<User[]>([])
+  const [destinations, setDestinations] = useState<Record<string, any>[]>([])
 
   const {
     register,
@@ -78,20 +77,25 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
     resolver: zodResolver(ruleSchema),
     defaultValues: {
       confidence_threshold: 0.8,
-      recipients_raw: '',
     },
   })
 
   // ── Fetch on mount ──────────────────────────────────────────────────────────
   useEffect(() => {
     dispatch(fetchAlertRules())
+    teamApi.listMembers().then(res => {
+      if (res.success && res.data) {
+        setTeamMembers(res.data)
+      }
+    }).catch(err => console.error("Failed to load team members", err))
   }, [dispatch])
 
   // ── Modal openers ───────────────────────────────────────────────────────────
   const openCreate = () => {
     setEditRule(null)
     setSeverities(['critical'])
-    reset({ confidence_threshold: 0.8, recipients_raw: '' })
+    setDestinations([])
+    reset({ confidence_threshold: 0.8 })
     setModalOpen(true)
   }
   useImperativeHandle(ref, () => ({ openCreate }))
@@ -99,17 +103,25 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
   const openEdit = (rule: AlertRule) => {
     setEditRule(rule)
     setSeverities(rule.severity_filter)
+    setDestinations(rule.destinations || [])
     setValue('confidence_threshold', rule.confidence_threshold)
-    setValue('recipients_raw', rule.recipient_ids.join(', '))
     setModalOpen(true)
   }
 
   // ── Form submit ─────────────────────────────────────────────────────────────
   const onSubmit = async (data: RuleForm) => {
-    const recipient_ids = data.recipients_raw
-      .split(',')
-      .map((s: string) => s.trim())
-      .filter(Boolean)
+    const validDestinations = destinations.filter(d => {
+      if (d.type === 'in_app') return !!d.user_id
+      if (d.type === 'email') return !!d.address
+      if (d.type === 'pagerduty') return !!d.integration_key
+      if (d.type === 'slack') return !!d.webhook_url
+      return false
+    })
+
+    if (validDestinations.length === 0) {
+      toast({ type: 'error', title: 'At least one valid destination is required' })
+      return
+    }
 
     setSubmitting(true)
 
@@ -119,7 +131,7 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
           id: editRule.id,
           confidence_threshold: data.confidence_threshold,
           severity_filter: severities,
-          recipient_ids,
+          destinations: validDestinations,
         })).unwrap()
 
         toast({ type: 'success', title: 'Rule updated' })
@@ -127,7 +139,7 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
         await dispatch(createAlertRule({
           confidence_threshold: data.confidence_threshold,
           severity_filter: severities,
-          recipient_ids,
+          destinations: validDestinations,
           enabled: true,
         })).unwrap()
 
@@ -270,7 +282,7 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
                             variant={
                               (s === 'critical' ? 'critical' :
                                ['high', 'medium'].includes(s) ? 'warning' :
-                               s === 'unknown' ? 'neutral' : 'info') as 'critical' | 'warning' | 'info' | 'neutral'
+                               'info') as 'critical' | 'warning' | 'info'
                             }
                             dot
                           >
@@ -287,7 +299,7 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
                       />
 
                       <p className="text-xs text-slate-900/35 truncate">
-                        {rule.recipient_ids.length} recipient(s)
+                        {(rule.destinations || []).length} destination(s)
                       </p>
                     </div>
                   </div>
@@ -366,9 +378,7 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
                   'critical',
                   'high',
                   'medium',
-                  'low',
-                  'info',
-                  'unknown'
+                  'low'
                 ] as IncidentSeverity[]
               ).map(s => (
                 <button
@@ -416,15 +426,108 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
             )}
           />
 
-          <Input
-            label="Recipient IDs"
-            placeholder="uuid-1, uuid-2"
-            hint="Comma-separated user UUIDs"
-            error={
-              errors.recipients_raw?.message
-            }
-            {...register('recipients_raw')}
-          />
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide">
+              Destinations
+            </label>
+            <div className="flex flex-col gap-2">
+              {destinations.map((dest, idx) => (
+                <div key={idx} className="flex gap-2 items-center p-2 border border-slate-200 rounded-md bg-slate-50/50">
+                  <select 
+                    value={dest.type || 'in_app'}
+                    onChange={(e) => {
+                      const newDests = [...destinations]
+                      newDests[idx] = { type: e.target.value }
+                      setDestinations(newDests)
+                    }}
+                    className="h-9 rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 outline-none focus:border-primary w-[140px]"
+                  >
+                    <option value="in_app">In-App</option>
+                    <option value="email">Email</option>
+                    <option value="pagerduty">PagerDuty</option>
+                    <option value="slack">Slack</option>
+                  </select>
+
+                  {dest.type === 'in_app' && (
+                    <select
+                      value={dest.user_id || ''}
+                      onChange={(e) => {
+                        const newDests = [...destinations]
+                        newDests[idx].user_id = e.target.value
+                        setDestinations(newDests)
+                      }}
+                      className="h-9 flex-1 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-primary"
+                    >
+                      <option value="" disabled>Select Team Member...</option>
+                      {teamMembers.map(u => (
+                        <option key={u.id} value={u.id}>{u.full_name || u.email}</option>
+                      ))}
+                    </select>
+                  )}
+
+                  {dest.type === 'email' && (
+                    <div className="flex-1">
+                      <input 
+                        type="email"
+                        placeholder="engineer@example.com" 
+                        value={dest.address || ''} 
+                        onChange={e => {
+                          const newDests = [...destinations]
+                          newDests[idx].address = e.target.value
+                          setDestinations(newDests)
+                        }}
+                        className="h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-primary placeholder:text-slate-400"
+                      />
+                    </div>
+                  )}
+
+                  {dest.type === 'pagerduty' && (
+                    <div className="flex-1">
+                      <input 
+                        type="text"
+                        placeholder="Integration Key (e.g. 46558a5d...)" 
+                        value={dest.integration_key || ''} 
+                        onChange={e => {
+                          const newDests = [...destinations]
+                          newDests[idx].integration_key = e.target.value
+                          setDestinations(newDests)
+                        }}
+                        className="h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-primary placeholder:text-slate-400"
+                      />
+                    </div>
+                  )}
+
+                  {dest.type === 'slack' && (
+                    <div className="flex-1">
+                      <input 
+                        type="text"
+                        placeholder="Webhook URL (e.g. https://hooks.slack.com/...)" 
+                        value={dest.webhook_url || ''} 
+                        onChange={e => {
+                          const newDests = [...destinations]
+                          newDests[idx].webhook_url = e.target.value
+                          setDestinations(newDests)
+                        }}
+                        className="h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-primary placeholder:text-slate-400"
+                      />
+                    </div>
+                  )}
+
+                  <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500" onClick={() => {
+                    setDestinations(destinations.filter((_, i) => i !== idx))
+                  }}>
+                    <Trash2 size={14} />
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <Button type="button" variant="outline" size="sm" className="w-fit mt-1 text-xs h-8" onClick={() => {
+              setDestinations([...destinations, { type: 'in_app', user_id: '' }])
+            }}>
+              <Plus size={14} className="mr-1.5" /> Add Destination
+            </Button>
+          </div>
 
           <div className="flex gap-2 pt-1">
             <Button

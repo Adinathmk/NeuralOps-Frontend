@@ -34,6 +34,7 @@ import LogsExplorerPage   from '@pages/dashboard/LogsExplorerPage'
 import SettingsPage       from '@pages/dashboard/settings/SettingsPage'
 import GitHubIntegrationPage from '@pages/dashboard/settings/GitHubIntegrationPage'
 import DemoIngestPage       from '@pages/dashboard/settings/DemoIngestPage'
+import ApiKeysPage          from '@pages/dashboard/settings/ApiKeysPage'
 import BillingPage          from '@pages/dashboard/BillingPage'
 
 // Invitation pages
@@ -117,6 +118,7 @@ export default function App() {
           <Route path="/dashboard/configuration"           element={<ConfigurationPage />} />
           <Route path="/dashboard/settings"                element={<SettingsPage />} />
           <Route path="/dashboard/settings/github"         element={<GitHubIntegrationPage />} />
+          <Route path="/dashboard/settings/api-keys"       element={<ApiKeysPage />} />
           <Route path="/dashboard/billing"                 element={<BillingPage />} />
         </Route>
 
