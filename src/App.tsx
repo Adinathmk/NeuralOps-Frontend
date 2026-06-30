@@ -33,7 +33,6 @@ import LogsExplorerPage   from '@pages/dashboard/LogsExplorerPage'
 // Settings pages
 import SettingsPage       from '@pages/dashboard/settings/SettingsPage'
 import GitHubIntegrationPage from '@pages/dashboard/settings/GitHubIntegrationPage'
-import DemoIngestPage       from '@pages/dashboard/settings/DemoIngestPage'
 import ApiKeysPage          from '@pages/dashboard/settings/ApiKeysPage'
 import BillingPage          from '@pages/dashboard/BillingPage'
 
@@ -114,7 +113,6 @@ export default function App() {
           <Route path="/dashboard/notifications"           element={<NotificationsPage />} />
           <Route path="/dashboard/sessions"                element={<SessionsPage />} />
           <Route path="/dashboard/team"                    element={<TeamPage />} />
-          <Route path="/dashboard/demo"                    element={<DemoIngestPage />} />
           <Route path="/dashboard/configuration"           element={<ConfigurationPage />} />
           <Route path="/dashboard/settings"                element={<SettingsPage />} />
           <Route path="/dashboard/settings/github"         element={<GitHubIntegrationPage />} />

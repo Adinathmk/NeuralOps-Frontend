@@ -1,83 +1,126 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { AlertTriangle, CheckCircle, Clock, TrendingUp, Zap, Activity } from 'lucide-react'
+import { 
+  CheckCircle, Clock, Activity, 
+  Server, Zap, FileCode, Flame, Cpu, ShieldAlert 
+} from 'lucide-react'
 import { useAppSelector } from '@store/index'
 import { Card, CardContent, CardHeader, CardTitle } from '@components/common/Card'
 import { Badge } from '@components/common/Badge'
-import { Skeleton, SkeletonCard } from '@components/common/Skeleton'
-import { formatRelative } from '@utils/cn'
-import { cn } from '@utils/cn'
-import type { Incident } from '@/types'
-
-const mockStats = [
-  { label: 'Open Incidents',    value: '12',  delta: '+3',   icon: AlertTriangle, color: 'text-red-400',    bg: 'bg-red-500/10' },
-  { label: 'Resolved Today',   value: '8',   delta: '+2',   icon: CheckCircle,  color: 'text-primary', bg: 'bg-primary/10' },
-  { label: 'Avg MTTR',         value: '1.8m', delta: '-12%', icon: Clock,        color: 'text-blue-400',   bg: 'bg-blue-500/10' },
-  { label: 'Agent Accuracy',   value: '94%', delta: '+2%',  icon: TrendingUp,   color: 'text-amber-400',  bg: 'bg-amber-500/10' },
-]
-
-const mockIncidents = [
-  {
-    id: '1', tenant_id: 't1', error_type: 'NullPointerException', crash_file: 'services/payment/processor.py',
-    crash_line: 142, service_name: 'payment-service', environment: 'production',
-    status: 'open', severity: 'critical', root_cause: 'Unhandled None value in transaction dict',
-    confidence_score: 0.91, created_at: new Date(Date.now() - 4 * 60000).toISOString(), updated_at: new Date().toISOString(),
-  },
-  {
-    id: '2', tenant_id: 't1', error_type: 'ConnectionTimeout', crash_file: 'lib/db/pool.ts',
-    crash_line: 87, service_name: 'api-gateway', environment: 'production',
-    status: 'investigating', severity: 'high', confidence_score: 0.76,
-    created_at: new Date(Date.now() - 28 * 60000).toISOString(), updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3', tenant_id: 't1', error_type: 'OutOfMemoryError', crash_file: 'workers/job_queue.go',
-    crash_line: 312, service_name: 'worker', environment: 'production',
-    status: 'resolved', severity: 'critical', root_cause: 'Unclosed file descriptors causing memory leak',
-    confidence_score: 0.88, created_at: new Date(Date.now() - 2 * 3600000).toISOString(), updated_at: new Date().toISOString(),
-  },
-] as Incident[]
+import { formatRelative, cn } from '@utils/cn'
+import { Link } from 'react-router-dom'
+import {
+  getDashboardMetrics,
+  getCrashLocations,
+  getActionableIncidents,
+  getAIInsights,
+  getLogVolume,
+  DashboardMetrics,
+  CrashLocation,
+  ActionableIncident,
+  AIInsight
+} from '@api/dashboard'
 
 const container = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.07 } },
+  show: { transition: { staggerChildren: 0.05 } },
 }
 const item = {
   hidden: { opacity: 0, y: 12 },
   show:   { opacity: 1, y: 0, transition: { duration: 0.3 } },
 }
 
+function getTimeOfDay() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'morning'
+  if (hour < 18) return 'afternoon'
+  return 'evening'
+}
+
 export default function DashboardPage() {
   const user = useAppSelector(s => s.auth.user)
 
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
+  const [logVolume, setLogVolume] = useState<number | null>(null)
+  const [crashLocations, setCrashLocations] = useState<CrashLocation[]>([])
+  const [incidents, setIncidents] = useState<ActionableIncident[]>([])
+  const [insights, setInsights] = useState<AIInsight[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [m, l, c, i, ins] = await Promise.all([
+          getDashboardMetrics(),
+          getLogVolume(),
+          getCrashLocations(),
+          getActionableIncidents(),
+          getAIInsights()
+        ])
+        setMetrics(m)
+        setLogVolume(l)
+        setCrashLocations(c)
+        setIncidents(i)
+        setInsights(ins)
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [])
+
+  const stats = [
+    { label: 'Active Criticals',  value: metrics?.active_criticals?.toString() || '0',     delta: '',    icon: Flame,         color: 'text-red-500',    bg: 'bg-red-500/10' },
+    { label: 'Error Volume (24h)',value: logVolume ? (logVolume > 1000 ? `${(logVolume/1000).toFixed(1)}k` : logVolume.toString()) : '0',  delta: '',  icon: Activity,      color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
+    { label: 'New Issues',        value: metrics?.new_issues?.toString() || '0',     delta: '',     icon: ShieldAlert,   color: 'text-amber-500',  bg: 'bg-amber-500/10' },
+    { label: 'Avg MTTR',          value: metrics?.avg_mttr || '0m',  delta: '',  icon: Clock,         color: 'text-emerald-500',bg: 'bg-emerald-500/10' },
+  ]
+
+  if (loading) {
+    return <div className="p-8 text-center text-slate-500">Loading dashboard...</div>
+  }
+
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-6 max-w-[1400px] w-full pb-10">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-slate-900">
-          Good {getTimeOfDay()}, {user?.full_name?.split(' ')[0]} 👋
-        </h1>
-        <p className="text-sm text-slate-500 mt-1">Here's what's happening across your production systems.</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Good {getTimeOfDay()}, {user?.full_name?.split(' ')[0] || 'Developer'} 👋
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">Here is the current health of your microservices and recent production errors.</p>
+        </div>
       </div>
 
-      {/* Stats grid */}
+      {/* Top Metrics Grid */}
       <motion.div
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-2 xl:grid-cols-4 gap-4"
       >
-        {mockStats.map(stat => (
+        {stats.map(stat => (
           <motion.div key={stat.label} variants={item}>
-            <Card className="relative overflow-hidden">
-              <CardContent className="p-4">
+            <Card className="relative overflow-hidden border-slate-200/60 shadow-sm hover:shadow-md transition-shadow group">
+              <CardContent className="p-5">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-xs text-slate-500 mb-1">{stat.label}</p>
-                    <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-                    <p className={cn('text-xs mt-1 font-medium', stat.color)}>{stat.delta} vs yesterday</p>
+                    <p className="text-[13px] font-medium text-slate-500 mb-1">{stat.label}</p>
+                    <p className="text-3xl font-bold text-slate-900 tracking-tight">{stat.value}</p>
+                    {stat.delta && (
+                      <p className={cn('text-xs mt-2 font-medium flex items-center gap-1', 
+                        stat.delta.startsWith('+') && stat.label === 'Active Criticals' ? 'text-red-500' :
+                        stat.delta.startsWith('-') && stat.label === 'Avg MTTR' ? 'text-emerald-500' :
+                        'text-slate-500'
+                      )}>
+                        {stat.delta} vs yesterday
+                      </p>
+                    )}
                   </div>
-                  <div className={cn('h-9 w-9 rounded-lg flex items-center justify-center', stat.bg)}>
-                    <stat.icon size={16} className={stat.color} />
+                  <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110', stat.bg)}>
+                    <stat.icon size={20} className={stat.color} />
                   </div>
                 </div>
               </CardContent>
@@ -86,132 +129,129 @@ export default function DashboardPage() {
         ))}
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent incidents */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Main Column - Active Incidents */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-2"
+          className="xl:col-span-2 space-y-6"
         >
-          <Card>
-            <CardHeader className="pb-4">
+          <Card className="shadow-sm border-slate-200/60 h-full">
+            <CardHeader className="pb-4 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center justify-between">
-                <CardTitle>Recent Incidents</CardTitle>
-                <a href="/dashboard/incidents" className="text-xs text-primary hover:text-primary transition-colors">
-                  View all →
-                </a>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <ShieldAlert className="w-5 h-5 text-indigo-500" />
+                  Actionable Incidents
+                </CardTitle>
+                <Link to="/dashboard/incidents" className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+                  View all alerts &rarr;
+                </Link>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-2">
-                {mockIncidents.map(incident => (
-                  <IncidentRow key={incident.id} incident={incident} />
-                ))}
-              </div>
+            <CardContent className="p-0">
+              {incidents.length === 0 ? (
+                <div className="p-8 text-center text-slate-500 text-sm">No active incidents! 🎉</div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {incidents.map(incident => (
+                    <Link key={incident.id} to={`/dashboard/incidents/${incident.id}`} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 hover:bg-slate-50 transition-colors group">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={cn(
+                            "inline-flex items-center justify-center h-5 w-5 rounded-md",
+                            incident.severity === 'critical' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'
+                          )}>
+                            <Flame size={12} strokeWidth={3} />
+                          </span>
+                          <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-indigo-600 transition-colors">{incident.error_type}</h4>
+                        </div>
+                        <div className="flex items-center gap-3 text-[12px] text-slate-500 font-medium">
+                          <span className="flex items-center gap-1"><Server size={12} className="text-slate-400" /> {incident.service_name}</span>
+                          <span className="flex items-center gap-1 font-mono text-[11px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-600"><FileCode size={12} /> {incident.file_path}</span>
+                        </div>
+                      </div>
+                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0">
+                        <span className="text-[11px] text-slate-400 flex items-center gap-1"><Clock size={10} /> {incident.created_at ? formatRelative(new Date(incident.created_at)) : ''}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Agent status */}
+        {/* Right Sidebar */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
+          className="space-y-6"
         >
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle>AI Agent Status</CardTitle>
+          {/* Top Crash Locations */}
+          <Card className="shadow-sm border-slate-200/60">
+            <CardHeader className="pb-3 border-b border-slate-100">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-500" />
+                Top Crash Locations
+              </CardTitle>
             </CardHeader>
-            <CardContent className="pt-0 space-y-3">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/15">
-                <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                <div>
-                  <p className="text-xs font-medium text-slate-700">LangGraph Agent</p>
-                  <p className="text-[11px] text-primary">Running · 3 active tasks</p>
-                </div>
-              </div>
-
-              {[
-                { label: 'Celery Workers', status: 'Healthy', count: '12/20', ok: true },
-                { label: 'Kafka Lag',      status: 'Normal',  count: '42ms',  ok: true },
-                { label: 'pgvector',       status: 'Indexed', count: '14.2k chunks', ok: true },
-                { label: 'GPT-4 API',      status: 'Nominal', count: '99.8%', ok: true },
-              ].map(({ label, status, count, ok }) => (
-                <div key={label} className="flex items-center justify-between py-1">
-                  <div className="flex items-center gap-2">
-                    <div className={cn('h-1.5 w-1.5 rounded-full', ok ? 'bg-primary' : 'bg-red-500')} />
-                    <span className="text-xs text-slate-600">{label}</span>
+            <CardContent className="p-4 space-y-4">
+              {crashLocations.length === 0 ? (
+                <div className="text-center text-slate-500 text-xs py-4">No crash locations found.</div>
+              ) : (
+                crashLocations.map(loc => (
+                  <div key={loc.path} className="flex items-center justify-between">
+                    <div className="flex flex-col min-w-0 pr-4">
+                      <span className="text-[13px] font-semibold text-slate-900 truncate">{loc.type}</span>
+                      <span className="text-[11px] font-mono text-slate-500 truncate">{loc.path}</span>
+                    </div>
+                    <span className={cn(
+                      "text-xs font-bold px-2 py-0.5 rounded-full shrink-0",
+                      loc.count > 100 ? 'bg-red-50 text-red-600' :
+                      loc.count > 50 ? 'bg-orange-50 text-orange-600' : 'bg-slate-100 text-slate-600'
+                    )}>
+                      {loc.count} err
+                    </span>
                   </div>
-                  <div className="text-right">
-                    <span className="text-xs text-slate-500">{count}</span>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
+            </CardContent>
+          </Card>
 
-              <div className="pt-2 border-t border-slate-200">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-slate-500">Last 24h analysis</span>
-                  <span className="text-xs font-medium text-slate-700">47 incidents</span>
-                </div>
-                <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
-                  <div className="h-full w-[78%] rounded-full bg-primary" />
-                </div>
-                <p className="text-[11px] text-slate-500 mt-1">78% resolved automatically</p>
-              </div>
+          {/* AI Insights */}
+          <Card className="shadow-sm border-slate-200/60 bg-gradient-to-b from-indigo-50/50 to-white">
+            <CardHeader className="pb-3 border-b border-indigo-100/50">
+              <CardTitle className="text-sm flex items-center gap-2 text-indigo-900">
+                <Cpu className="w-4 h-4 text-indigo-500" />
+                AI Root Cause Insights
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              {insights.length === 0 ? (
+                <div className="text-center text-slate-500 text-xs py-4">No recent AI insights available.</div>
+              ) : (
+                insights.map((insight, i) => (
+                  <div key={i} className="flex gap-3 items-start group">
+                    <div className="mt-0.5 shrink-0">
+                      <Zap size={14} className={cn(
+                        insight.type === 'performance' ? 'text-amber-500' : 'text-red-500'
+                      )} />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[13px] leading-snug text-slate-700 font-medium group-hover:text-indigo-700 transition-colors">
+                        {insight.description}
+                      </p>
+                      <p className="text-[10px] text-slate-400">{insight.title}</p>
+                    </div>
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
         </motion.div>
       </div>
     </div>
   )
-}
-
-function IncidentRow({ incident }: { incident: Incident }) {
-  const severityVariant = {
-    critical: 'critical',
-    high:     'warning',
-    medium:   'warning',
-    low:      'info',
-  }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
-
-  const statusVariant = {
-    open:         'critical',
-    investigating: 'warning',
-    resolved:     'success',
-    closed:       'neutral',
-    draft:        'neutral',
-    duplicate:    'neutral',
-  }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
-
-  return (
-    <a href={`/dashboard/incidents/${incident.id}`} className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all group">
-      <div className={cn(
-        'mt-0.5 h-2 w-2 rounded-full shrink-0',
-        incident.severity === 'critical' ? 'bg-red-400' :
-        ['high', 'medium'].includes(incident.severity) ? 'bg-amber-400' : 'bg-blue-400'
-      )} />
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-slate-700 truncate">{incident.error_type}</p>
-        <p className="text-[11px] text-slate-500 truncate mt-0.5">{incident.crash_file}:{incident.crash_line}</p>
-        <div className="flex items-center gap-2 mt-1.5">
-          <Badge variant={severityVariant} dot>{incident.severity}</Badge>
-          <Badge variant={statusVariant}>{incident.status}</Badge>
-          {incident.confidence_score !== undefined && incident.confidence_score !== null && (
-            <span className="text-[10px] text-slate-500">
-              {Math.round(incident.confidence_score * 100)}% confidence
-            </span>
-          )}
-        </div>
-      </div>
-      <span className="text-[11px] text-slate-500 shrink-0 mt-0.5">{formatRelative(incident.created_at)}</span>
-    </a>
-  )
-}
-
-function getTimeOfDay() {
-  const h = new Date().getHours()
-  if (h < 12) return 'morning'
-  if (h < 17) return 'afternoon'
-  return 'evening'
 }

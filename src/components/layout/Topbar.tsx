@@ -1,4 +1,4 @@
-import { Bell, Search, Command } from 'lucide-react'
+import { Bell } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAppSelector } from '@store/index'
 import { getInitials } from '@utils/cn'
@@ -10,17 +10,6 @@ export function Topbar() {
 
   return (
     <header className="h-14 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center gap-4 px-6 shrink-0">
-      {/* Search */}
-      <div className="flex items-center gap-2 flex-1 max-w-sm">
-        <div className="flex items-center gap-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-500 cursor-pointer hover:border-slate-200 hover:text-slate-600 transition-all">
-          <Search size={13} />
-          <span className="flex-1 text-xs">Search incidents…</span>
-          <span className="flex items-center gap-1 text-[10px] text-slate-400 border border-slate-200 rounded px-1.5 py-0.5">
-            <Command size={10} />K
-          </span>
-        </div>
-      </div>
-
       <div className="ml-auto flex items-center gap-3">
         {/* Notifications */}
         <Link

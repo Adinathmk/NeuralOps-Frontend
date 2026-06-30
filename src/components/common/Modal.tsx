@@ -50,7 +50,7 @@ export function Modal({
                   transition={{ duration: 0.2, ease: 'easeOut' }}
                 >
                   <div className={cn(
-                    'relative rounded-xl border border-slate-200 bg-white shadow-2xl shadow-black/60 p-6',
+                    'relative rounded-xl border border-slate-200 bg-white shadow-2xl shadow-black/60 p-6 max-h-[calc(100vh-4rem)] overflow-y-auto',
                     className
                   )}>
                     <button

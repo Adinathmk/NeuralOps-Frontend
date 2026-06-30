@@ -121,7 +121,6 @@ export default function IncidentDetailPage() {
     if (clickedStatus === incident.status) return
     
     // Prevent invalid transitions
-    if (incident.status === 'draft') return
     if (incident.status === clickedStatus) return
     
     const isAllowed = (() => {
@@ -214,7 +213,7 @@ export default function IncidentDetailPage() {
   if (!incident) return <div className="text-slate-500 text-sm p-6">Incident not found.</div>
 
   const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
-  const statusVariant   = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral', duplicate: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
+  const statusVariant   = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (
     <ErrorBoundary>
@@ -405,7 +404,7 @@ export default function IncidentDetailPage() {
             const isDone    = i <= currentIdx
             const isCurrent = i === currentIdx
             const isValidTarget = (() => {
-              if (!canEditStatus || incident.status === 'draft') return false;
+              if (!canEditStatus) return false;
               if (incident.status === s) return false;
               if (incident.status === 'open') return s === 'investigating';
               if (incident.status === 'investigating') return s === 'resolved';

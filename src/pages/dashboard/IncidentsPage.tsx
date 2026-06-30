@@ -25,8 +25,6 @@ const STATUS_FILTERS: Array<{ label: string; value: string }> = [
   { label: 'Investigating', value: 'investigating' },
   { label: 'Resolved',      value: 'resolved' },
   { label: 'Closed',        value: 'closed' },
-  { label: 'Draft',         value: 'draft' },
-  { label: 'Duplicate',     value: 'duplicate' },
 ]
 
 export default function IncidentsPage() {
@@ -42,7 +40,6 @@ export default function IncidentsPage() {
       assigned_user_id: filters.assignedToMe && user?.id ? user.id : undefined,
       search: filters.search || undefined,
       page: filters.page,
-      is_draft: true,
     }))
   }, [dispatch, filters.status, filters.severity, filters.search, filters.page, filters.assignedToMe, user?.id])
 
@@ -65,7 +62,6 @@ export default function IncidentsPage() {
           assigned_user_id: filters.assignedToMe && user?.id ? user.id : undefined,
           search: filters.search || undefined,
           page: filters.page,
-          is_draft: true,
         }))} isLoading={isLoading}>
           <RefreshCw size={13} /> Refresh
         </Button>
@@ -156,7 +152,7 @@ export default function IncidentsPage() {
 
 function IncidentCard({ incident }: { incident: Incident }) {
   const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
-  const statusVariant = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral', duplicate: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
+  const statusVariant = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (
     <div className={cn(

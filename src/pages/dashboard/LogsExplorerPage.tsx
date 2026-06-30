@@ -298,7 +298,7 @@ export default function LogsExplorerPage() {
                           {log.severity?.toUpperCase() === 'CRITICAL' || log.severity?.toUpperCase() === 'ERROR' 
                             ? <XCircle className="h-3 w-3" /> 
                             : <AlertCircle className="h-3 w-3" />}
-                          {log.severity}
+                          {log.severity?.toLowerCase()}
                         </span>
                       </div>
 

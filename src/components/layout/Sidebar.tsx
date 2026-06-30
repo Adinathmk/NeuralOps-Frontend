@@ -17,7 +17,6 @@ const navItems = [
   { to: '/dashboard/configuration', icon: Settings,      label: 'Configuration' },
   { to: '/dashboard/analytics',     icon: BarChart2,     label: 'Analytics' },
   { to: '/dashboard/team',          icon: Users,         label: 'Team Management' },
-  { to: '/dashboard/demo',          icon: Zap,           label: 'SDK Demo' },
   { to: '/dashboard/settings',      icon: Settings,      label: 'Settings' },
   { to: '/dashboard/billing',       icon: CreditCard,    label: 'Billing' },
 ]

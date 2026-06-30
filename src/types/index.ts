@@ -111,7 +111,7 @@ export interface JoinPayload {
 
 // ─── Incidents ────────────────────────────────────────────────────────────────
 
-export type IncidentStatus   = 'open' | 'investigating' | 'resolved' | 'closed' | 'draft' | 'duplicate'
+export type IncidentStatus   = 'open' | 'investigating' | 'resolved' | 'closed'
 export type IncidentSeverity = 'critical' | 'high' | 'medium' | 'low'
 
 export interface AnalysisDetail {
@@ -150,7 +150,6 @@ export interface Incident {
   confidence_score?: number
   occurrence_count: number
   occurrences: string[]
-  is_draft: boolean
   assigned_user_ids: string[]
   source_log_id?: string
   first_seen_at: string

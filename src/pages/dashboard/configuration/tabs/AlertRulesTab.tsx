@@ -9,6 +9,14 @@ import {
   Edit2,
   Users,
   Loader2,
+  Bell,
+  Activity,
+  AlertTriangle,
+  Zap,
+  MessageSquare,
+  Mail,
+  Smartphone,
+  PhoneCall,
 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -72,6 +80,7 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<RuleForm>({
     resolver: zodResolver(ruleSchema),
@@ -356,117 +365,157 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
           setModalOpen(false)
           reset()
         }}
-        title={
-          editRule
-            ? 'Edit alert rule'
-            : 'Create alert rule'
-        }
-        size="md"
+        title={editRule ? 'Edit alert rule' : 'Create alert rule'}
+        description="Configure conditions and actions for automated incident alerts."
+        size="lg"
       >
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4 mt-4"
-        >
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide">
-              Severity Filter
-            </label>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-2">
+          {/* SECTION 1: Conditions */}
+          <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-5 space-y-5">
+            <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+              <Activity size={16} className="text-indigo-500" />
+              Trigger Conditions
+            </h3>
+            
+            <div className="flex flex-col gap-2">
+              <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                Severity Level
+              </label>
+              <div className="grid grid-cols-4 gap-3">
+                {(['critical', 'high', 'medium', 'low'] as IncidentSeverity[]).map(s => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => toggleSeverity(s)}
+                    className={cn(
+                      'relative flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all duration-200 group',
+                      severities.includes(s)
+                        ? s === 'critical'
+                          ? 'bg-red-50/50 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)]'
+                          : ['high', 'medium'].includes(s)
+                          ? 'bg-amber-50/50 border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.15)]'
+                          : 'bg-blue-50/50 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                        : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                    )}
+                  >
+                    {s === 'critical' && <AlertTriangle size={20} className={cn("mb-1.5", severities.includes(s) ? "text-red-500" : "text-slate-400")} />}
+                    {s === 'high' && <AlertTriangle size={20} className={cn("mb-1.5", severities.includes(s) ? "text-amber-500" : "text-slate-400")} />}
+                    {s === 'medium' && <Bell size={20} className={cn("mb-1.5", severities.includes(s) ? "text-amber-500" : "text-slate-400")} />}
+                    {s === 'low' && <Bell size={20} className={cn("mb-1.5", severities.includes(s) ? "text-blue-500" : "text-slate-400")} />}
+                    
+                    <span className={cn(
+                      "text-xs font-semibold",
+                      severities.includes(s) 
+                        ? s === 'critical' ? 'text-red-600' : ['high','medium'].includes(s) ? 'text-amber-600' : 'text-blue-600'
+                        : 'text-slate-500'
+                    )}>
+                      {s.charAt(0).toUpperCase() + s.slice(1)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="flex gap-2">
-              {(
-                [
-                  'critical',
-                  'high',
-                  'medium',
-                  'low'
-                ] as IncidentSeverity[]
-              ).map(s => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() =>
-                    toggleSeverity(s)
-                  }
-                  className={cn(
-                    'flex-1 py-1.5 rounded-md text-xs font-medium border transition-all',
-
-                    severities.includes(s)
-                      ? s === 'critical'
-                        ? 'bg-red-500/15 border-red-500/30 text-red-400'
-                        : ['high', 'medium'].includes(s)
-                        ? 'bg-amber-500/15 border-amber-500/30 text-amber-400'
-                        : 'bg-blue-500/15 border-blue-500/30 text-blue-400'
-                      : 'bg-transparent border-slate-200 text-slate-500 hover:border-slate-200'
-                  )}
-                >
-                  {s.charAt(0).toUpperCase() +
-                    s.slice(1)}
-                </button>
-              ))}
+            <div className="flex flex-col gap-2 pt-2 border-t border-slate-200/60">
+              <div className="flex justify-between items-end">
+                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                  AI Confidence Threshold
+                </label>
+                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                  {Math.round((watch('confidence_threshold') || 0) * 100)}%
+                </span>
+              </div>
+              <p className="text-[13px] text-slate-500 mb-2">Only trigger this alert if the AI analysis confidence score is above this value.</p>
+              
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                {...register('confidence_threshold', { valueAsNumber: true })}
+              />
+              <div className="flex justify-between text-[11px] font-medium text-slate-400 mt-1">
+                <span>0% (All errors)</span>
+                <span>100% (High Certainty)</span>
+              </div>
+              {errors.confidence_threshold?.message && (
+                <p className="text-xs text-red-500 mt-1">{errors.confidence_threshold.message}</p>
+              )}
             </div>
           </div>
 
-          <Input
-            label="Confidence Threshold (0–1)"
-            type="number"
-            step="0.05"
-            min="0"
-            max="1"
-            placeholder="0.80"
-            hint="Only notify when AI confidence exceeds this value"
-            error={
-              errors.confidence_threshold
-                ?.message
-            }
-            {...register(
-              'confidence_threshold',
-              {
-                valueAsNumber: true,
-              }
-            )}
-          />
-
-          <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide">
-              Destinations
-            </label>
-            <div className="flex flex-col gap-2">
+          {/* SECTION 2: Destinations */}
+          <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-5 space-y-4">
+            <div className="flex flex-col gap-3 border-b border-slate-200/60 pb-4">
+              <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                <Zap size={16} className="text-amber-500" />
+                Notification Actions
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  type="button" variant="outline" size="sm" className="h-8 text-xs bg-white hover:bg-slate-50 shadow-sm" 
+                  onClick={() => setDestinations([...destinations, { type: 'in_app', user_id: '' }])}
+                >
+                  <Plus size={14} className="mr-1 text-indigo-500" /> In-App
+                </Button>
+                <Button 
+                  type="button" variant="outline" size="sm" className="h-8 text-xs bg-white hover:bg-slate-50 shadow-sm" 
+                  onClick={() => setDestinations([...destinations, { type: 'email', address: '' }])}
+                >
+                  <Plus size={14} className="mr-1 text-blue-500" /> Email
+                </Button>
+                <Button 
+                  type="button" variant="outline" size="sm" className="h-8 text-xs bg-white hover:bg-slate-50 shadow-sm" 
+                  onClick={() => setDestinations([...destinations, { type: 'pagerduty', integration_key: '' }])}
+                >
+                  <Plus size={14} className="mr-1 text-emerald-500" /> PagerDuty
+                </Button>
+                <Button 
+                  type="button" variant="outline" size="sm" className="h-8 text-xs bg-white hover:bg-slate-50 shadow-sm" 
+                  onClick={() => setDestinations([...destinations, { type: 'slack', webhook_url: '' }])}
+                >
+                  <Plus size={14} className="mr-1 text-pink-500" /> Slack
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              {destinations.length === 0 && (
+                <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-lg bg-white">
+                  <p className="text-sm text-slate-500">No actions configured yet. Click above to add one.</p>
+                </div>
+              )}
+              
               {destinations.map((dest, idx) => (
-                <div key={idx} className="flex gap-2 items-center p-2 border border-slate-200 rounded-md bg-slate-50/50">
-                  <select 
-                    value={dest.type || 'in_app'}
-                    onChange={(e) => {
-                      const newDests = [...destinations]
-                      newDests[idx] = { type: e.target.value }
-                      setDestinations(newDests)
-                    }}
-                    className="h-9 rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 outline-none focus:border-primary w-[140px]"
-                  >
-                    <option value="in_app">In-App</option>
-                    <option value="email">Email</option>
-                    <option value="pagerduty">PagerDuty</option>
-                    <option value="slack">Slack</option>
-                  </select>
+                <div key={idx} className="flex gap-3 items-center p-3 border border-slate-200 rounded-lg bg-white shadow-sm group hover:border-indigo-200 transition-colors">
+                  
+                  <div className="w-32 shrink-0 flex items-center gap-2 pl-1">
+                    {dest.type === 'in_app' && <><Smartphone size={16} className="text-indigo-500" /><span className="text-sm font-medium text-slate-700">In-App</span></>}
+                    {dest.type === 'email' && <><Mail size={16} className="text-blue-500" /><span className="text-sm font-medium text-slate-700">Email</span></>}
+                    {dest.type === 'pagerduty' && <><PhoneCall size={16} className="text-emerald-500" /><span className="text-sm font-medium text-slate-700">PagerDuty</span></>}
+                    {dest.type === 'slack' && <><MessageSquare size={16} className="text-pink-500" /><span className="text-sm font-medium text-slate-700">Slack</span></>}
+                  </div>
 
-                  {dest.type === 'in_app' && (
-                    <select
-                      value={dest.user_id || ''}
-                      onChange={(e) => {
-                        const newDests = [...destinations]
-                        newDests[idx].user_id = e.target.value
-                        setDestinations(newDests)
-                      }}
-                      className="h-9 flex-1 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-primary"
-                    >
-                      <option value="" disabled>Select Team Member...</option>
-                      {teamMembers.map(u => (
-                        <option key={u.id} value={u.id}>{u.full_name || u.email}</option>
-                      ))}
-                    </select>
-                  )}
+                  <div className="flex-1 min-w-0">
+                    {dest.type === 'in_app' && (
+                      <select
+                        value={dest.user_id || ''}
+                        onChange={(e) => {
+                          const newDests = [...destinations]
+                          newDests[idx].user_id = e.target.value
+                          setDestinations(newDests)
+                        }}
+                        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-indigo-500 transition-colors cursor-pointer"
+                      >
+                        <option value="" disabled>Select Team Member...</option>
+                        {teamMembers.map(u => (
+                          <option key={u.id} value={u.id}>{u.full_name || u.email}</option>
+                        ))}
+                      </select>
+                    )}
 
-                  {dest.type === 'email' && (
-                    <div className="flex-1">
+                    {dest.type === 'email' && (
                       <input 
                         type="email"
                         placeholder="engineer@example.com" 
@@ -476,13 +525,11 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
                           newDests[idx].address = e.target.value
                           setDestinations(newDests)
                         }}
-                        className="h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-primary placeholder:text-slate-400"
+                        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-indigo-500 placeholder:text-slate-400 transition-colors"
                       />
-                    </div>
-                  )}
+                    )}
 
-                  {dest.type === 'pagerduty' && (
-                    <div className="flex-1">
+                    {dest.type === 'pagerduty' && (
                       <input 
                         type="text"
                         placeholder="Integration Key (e.g. 46558a5d...)" 
@@ -492,13 +539,11 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
                           newDests[idx].integration_key = e.target.value
                           setDestinations(newDests)
                         }}
-                        className="h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-primary placeholder:text-slate-400"
+                        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-indigo-500 placeholder:text-slate-400 transition-colors"
                       />
-                    </div>
-                  )}
+                    )}
 
-                  {dest.type === 'slack' && (
-                    <div className="flex-1">
+                    {dest.type === 'slack' && (
                       <input 
                         type="text"
                         placeholder="Webhook URL (e.g. https://hooks.slack.com/...)" 
@@ -508,48 +553,45 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
                           newDests[idx].webhook_url = e.target.value
                           setDestinations(newDests)
                         }}
-                        className="h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-primary placeholder:text-slate-400"
+                        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-900 outline-none focus:border-indigo-500 placeholder:text-slate-400 transition-colors"
                       />
-                    </div>
-                  )}
+                    )}
+                  </div>
 
-                  <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500" onClick={() => {
-                    setDestinations(destinations.filter((_, i) => i !== idx))
-                  }}>
-                    <Trash2 size={14} />
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-10 w-10 shrink-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100" 
+                    onClick={() => {
+                      setDestinations(destinations.filter((_, i) => i !== idx))
+                    }}
+                  >
+                    <Trash2 size={16} />
                   </Button>
                 </div>
               ))}
             </div>
-
-            <Button type="button" variant="outline" size="sm" className="w-fit mt-1 text-xs h-8" onClick={() => {
-              setDestinations([...destinations, { type: 'in_app', user_id: '' }])
-            }}>
-              <Plus size={14} className="mr-1.5" /> Add Destination
-            </Button>
           </div>
 
-          <div className="flex gap-2 pt-1">
-            <Button
-              type="submit"
-              className="flex-1"
-              isLoading={submitting}
-            >
-              {editRule
-                ? 'Save changes'
-                : 'Create rule'}
-            </Button>
-
+          <div className="flex gap-3 pt-2">
             <Button
               type="button"
               variant="outline"
-              className="flex-1"
+              className="flex-1 h-11 font-medium bg-white hover:bg-slate-50"
               onClick={() => {
                 setModalOpen(false)
                 reset()
               }}
             >
               Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="flex-1 h-11 font-medium shadow-md shadow-indigo-500/20"
+              isLoading={submitting}
+            >
+              {editRule ? 'Save Changes' : 'Create Alert Rule'}
             </Button>
           </div>
         </form>
