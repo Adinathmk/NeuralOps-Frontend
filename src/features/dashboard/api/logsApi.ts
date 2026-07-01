@@ -35,6 +35,7 @@ export interface LogSearchParams {
   environment?: string
   error_type?: string
   file_path?: string
+  search_query?: string
   status?: string
   time_window?: string
   time_from?: string

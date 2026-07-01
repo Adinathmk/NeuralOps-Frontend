@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getInitials, cn } from '@utils/cn'
+import { cn } from '@utils/cn'
+import { Avatar } from '@components/common/Avatar'
 import type { User } from '@/types'
 
 interface Props {
@@ -109,9 +110,7 @@ export function MentionPicker({ query, users, onSelect, onClose }: Props) {
                     isActive ? 'bg-indigo-50' : 'hover:bg-slate-50'
                   )}
                 >
-                  <div className="w-6 h-6 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-[10px] font-semibold text-primary flex-shrink-0">
-                    {getInitials(user.full_name)}
-                  </div>
+                  <Avatar user={user} className="!h-6 !w-6 !text-[10px]" />
                   <div className="flex flex-col overflow-hidden">
                     <span className="text-sm font-medium text-slate-800 truncate">
                       {user.full_name}

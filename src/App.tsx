@@ -29,6 +29,7 @@ import SessionsPage       from '@pages/dashboard/SessionsPage'
 import ConfigurationPage  from '@pages/dashboard/configuration/ConfigurationPage'
 import TeamPage           from '@pages/dashboard/TeamPage'
 import LogsExplorerPage   from '@pages/dashboard/LogsExplorerPage'
+import ProfilePage        from '@pages/dashboard/ProfilePage'
 
 // Settings pages
 import SettingsPage       from '@pages/dashboard/settings/SettingsPage'
@@ -66,6 +67,15 @@ function RequireMFA({ children }: { children: React.ReactNode }) {
   const mfaRequired = useAppSelector(s => s.auth.mfaRequired)
   const mfaToken    = useAppSelector(s => s.auth.mfaToken)
   if (!mfaRequired || !mfaToken) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
+// Only accessible by specific roles
+function RequireRole({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) {
+  const user = useAppSelector(s => s.auth.user)
+  if (!user || !allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" replace />
+  }
   return <>{children}</>
 }
 
@@ -114,10 +124,11 @@ export default function App() {
           <Route path="/dashboard/sessions"                element={<SessionsPage />} />
           <Route path="/dashboard/team"                    element={<TeamPage />} />
           <Route path="/dashboard/configuration"           element={<ConfigurationPage />} />
+          <Route path="/dashboard/profile"                 element={<ProfilePage />} />
           <Route path="/dashboard/settings"                element={<SettingsPage />} />
           <Route path="/dashboard/settings/github"         element={<GitHubIntegrationPage />} />
           <Route path="/dashboard/settings/api-keys"       element={<ApiKeysPage />} />
-          <Route path="/dashboard/billing"                 element={<BillingPage />} />
+          <Route path="/dashboard/billing"                 element={<RequireRole allowedRoles={['admin', 'engineer']}><BillingPage /></RequireRole>} />
         </Route>
 
         {/* ── 404 ── */}

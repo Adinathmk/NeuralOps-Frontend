@@ -70,4 +70,21 @@ export const authApi = {
       code,
       ...(invite_token ? { invite_token } : {}),
     }).then(unwrap),
+
+  // POST /api/auth/me/profile-picture/presigned-url
+  getProfilePicturePresignedUrl: (filename: string, content_type: string) =>
+    apiClient.post<BackendResponse<{ url: string; object_key: string }>>('/auth/me/profile-picture/presigned-url', {
+      filename,
+      content_type,
+    }).then(unwrap),
+
+  // POST /api/auth/me/profile-picture/confirm
+  confirmProfilePictureUpload: (object_key: string) =>
+    apiClient.post<BackendResponse<User>>('/auth/me/profile-picture/confirm', {
+      object_key,
+    }).then(unwrap),
+
+  // DELETE /api/auth/me/profile-picture
+  deleteProfilePicture: () =>
+    apiClient.delete<BackendResponse<User>>('/auth/me/profile-picture').then(unwrap),
 }

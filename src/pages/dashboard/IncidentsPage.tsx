@@ -8,6 +8,7 @@ import { Card, CardContent } from '@components/common/Card'
 import { Badge } from '@components/common/Badge'
 import { Button } from '@components/common/Button'
 import { Skeleton } from '@components/common/Skeleton'
+import { Select } from '@components/common/Select'
 import { formatRelative, cn } from '@utils/cn'
 import type { Incident, IncidentSeverity, IncidentStatus } from '@/types'
 
@@ -50,7 +51,7 @@ export default function IncidentsPage() {
   }, [search, dispatch])
 
   return (
-    <div className="space-y-5 max-w-6xl">
+    <div className="space-y-5 w-full">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-900">Incidents</h1>
@@ -85,15 +86,17 @@ export default function IncidentsPage() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="py-4 flex flex-wrap gap-4 items-center">
+        <CardContent className="py-5 flex flex-wrap gap-4 items-center bg-white rounded-2xl">
           {/* Search */}
-          <div className="relative flex-1 min-w-48">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+          <div className="relative flex-1 min-w-[250px]">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-slate-400" />
+            </div>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by error type or file…"
-              className="w-full h-8 pl-8 pr-3 rounded-md border border-slate-200 bg-slate-50 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-primary transition-colors"
+              className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-shadow"
             />
           </div>
 
@@ -210,24 +213,14 @@ function FilterGroup({ label, options, active, onChange }: {
   onChange: (v: string) => void
 }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-xs text-slate-500 shrink-0">{label}:</span>
-      <div className="flex items-center gap-1">
-        {options.map(opt => (
-          <button
-            key={opt.value}
-            onClick={() => onChange(opt.value)}
-            className={cn(
-              'px-2.5 py-1 rounded-md text-xs font-medium transition-all',
-              active === opt.value
-                ? 'bg-primary/15 text-primary ring-1 ring-neural-500/20'
-                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
-            )}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-medium text-slate-700 shrink-0">{label}:</span>
+      <Select
+        value={active}
+        onChange={onChange}
+        options={options}
+        className="w-40"
+      />
     </div>
   )
 }

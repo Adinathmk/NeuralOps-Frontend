@@ -11,12 +11,6 @@ import { useToast } from '@hooks/useProtectedRoute'
 import { formatDate, formatRelative, cn } from '@utils/cn'
 import type { Session } from '@/types'
 
-// Mock sessions
-const MOCK_SESSIONS: Session[] = [
-  { id: 'current', device_name: 'Chrome on macOS', ip_address: '192.168.1.1', last_activity: new Date().toISOString(), created_at: new Date(Date.now() - 3600000).toISOString(), expires_at: new Date(Date.now() + 86400000 * 7).toISOString() },
-  { id: 's2', device_name: 'Firefox on Windows', ip_address: '203.0.113.42', last_activity: new Date(Date.now() - 7200000).toISOString(), created_at: new Date(Date.now() - 86400000 * 2).toISOString(), expires_at: new Date(Date.now() + 86400000 * 5).toISOString() },
-  { id: 's3', device_name: 'Safari on iPhone', ip_address: '198.51.100.7', last_activity: new Date(Date.now() - 86400000).toISOString(), created_at: new Date(Date.now() - 86400000 * 5).toISOString(), expires_at: new Date(Date.now() + 86400000 * 2).toISOString() },
-]
 
 function getDeviceIcon(deviceName: string) {
   if (/iphone|android|mobile/i.test(deviceName)) return Smartphone
@@ -24,7 +18,7 @@ function getDeviceIcon(deviceName: string) {
 }
 
 export default function SessionsPage() {
-  const [sessions, setSessions]   = useState<Session[]>(MOCK_SESSIONS)
+  const [sessions, setSessions]   = useState<Session[]>([])
   const [loading, setLoading]     = useState(false)
   const [revoking, setRevoking]   = useState<string | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
@@ -33,8 +27,25 @@ export default function SessionsPage() {
   useEffect(() => {
     setLoading(true)
     authApi.getSessions()
-      .then(res => { if (res.data) setSessions(res.data) })
-      .catch(() => { /* use mock */ })
+      .then(res => { 
+        if (res.data) {
+          // Map over data to update last_activity for the current session
+          const updatedData = res.data.map((session: Session) => 
+            session.is_current 
+              ? { ...session, last_activity: new Date().toISOString() } 
+              : session
+          );
+
+          // Sort to ensure the current session is always at the top
+          const sorted = updatedData.sort((a, b) => {
+            if (a.is_current && !b.is_current) return -1;
+            if (!a.is_current && b.is_current) return 1;
+            return 0; // retain original order (last active) for the rest
+          });
+          setSessions(sorted);
+        }
+      })
+      .catch((err) => { toast({ type: 'error', title: 'Failed to load sessions' }) })
       .finally(() => setLoading(false))
   }, [])
 
@@ -49,10 +60,10 @@ export default function SessionsPage() {
     } finally { setRevoking(null) }
   }
 
-  const currentSession = sessions[0] // first in list is current
+
 
   return (
-    <div className="max-w-2xl space-y-5">
+    <div className="w-full space-y-5">
       <div>
         <h1 className="text-xl font-bold text-slate-900">Active Sessions</h1>
         <p className="text-sm text-slate-500 mt-0.5">Manage where you're signed in. Revoke access from devices you don't recognise.</p>
@@ -74,7 +85,7 @@ export default function SessionsPage() {
         <div className="space-y-3">
           {sessions.map((session, idx) => {
             const DeviceIcon = getDeviceIcon(session.device_name)
-            const isCurrent = idx === 0
+            const isCurrent = session.is_current
 
             return (
               <motion.div

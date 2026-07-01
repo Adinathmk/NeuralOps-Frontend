@@ -4,7 +4,8 @@
 
 import { useState } from 'react'
 import { Reply, Trash2, Bot, ChevronDown, ChevronUp } from 'lucide-react'
-import { cn, formatRelative, formatDate, getInitials } from '@utils/cn'
+import { cn, formatRelative, formatDate } from '@utils/cn'
+import { Avatar } from '@components/common/Avatar'
 import type { ThreadMessage } from '@/types'
 
 interface Props {
@@ -54,9 +55,6 @@ export function ThreadMessageItem({
   // ── Human message ──────────────────────────────────────────────────────────
   const author = message.author
   const avatarColour = author?.avatar_colour ?? '#94A3B8'
-  const initials = author
-    ? getInitials(`${author.first_name} ${author.last_name}`)
-    : '??'
   const displayName = author?.full_name ?? 'Unknown'
 
   // ── Helper: Render Mentions ────────────────────────────────────────────────
@@ -97,12 +95,8 @@ export function ThreadMessageItem({
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Avatar */}
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 mt-0.5 select-none"
-          style={{ backgroundColor: avatarColour }}
-          title={displayName}
-        >
-          {initials}
+        <div className="mt-0.5 shrink-0" title={displayName}>
+          <Avatar user={author} className="!h-8 !w-8 !text-xs select-none" />
         </div>
 
         {/* Content */}

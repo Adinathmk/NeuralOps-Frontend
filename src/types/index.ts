@@ -67,6 +67,7 @@ export interface Session {
   id: string
   device_name: string
   ip_address: string
+  is_current: boolean
   last_activity: string
   created_at: string
   expires_at: string

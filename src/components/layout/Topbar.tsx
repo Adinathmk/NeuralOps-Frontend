@@ -1,8 +1,9 @@
 import { Bell } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAppSelector } from '@store/index'
-import { getInitials } from '@utils/cn'
+
 import { cn } from '@utils/cn'
+import { Avatar } from '@components/common/Avatar'
 
 export function Topbar() {
   const user    = useAppSelector(s => s.auth.user)
@@ -27,10 +28,8 @@ export function Topbar() {
         </Link>
 
         {/* Avatar */}
-        <Link to="/dashboard/settings" className="flex items-center gap-2 group">
-          <div className="h-7 w-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-xs font-semibold text-primary group-hover:border-primary/60 transition-all">
-            {user ? getInitials(user.full_name) : '?'}
-          </div>
+        <Link to="/dashboard/profile" className="flex items-center gap-2 group hover:opacity-80 transition-opacity">
+          <Avatar user={user} size="md" />
         </Link>
       </div>
     </header>

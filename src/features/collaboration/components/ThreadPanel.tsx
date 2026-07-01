@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { MessageSquare, Users, Loader2, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { cn, getInitials } from '@utils/cn'
+import { cn } from '@utils/cn'
 import { useAppDispatch, useAppSelector } from '@store/index'
 import {
   fetchMessagesThunk,
@@ -23,16 +23,7 @@ interface Props {
   incidentId: string
 }
 
-// Deterministic avatar colour — mirrors the backend _avatar_colour_for logic
-const AVATAR_COLOURS = [
-  '#6366F1', '#8B5CF6', '#EC4899', '#F59E0B',
-  '#10B981', '#3B82F6', '#EF4444', '#14B8A6',
-]
-function avatarColourFor(userId?: string): string {
-  if (!userId) return '#94A3B8'
-  const hex = userId.replace(/-/g, '').slice(-4)
-  return AVATAR_COLOURS[parseInt(hex, 16) % AVATAR_COLOURS.length]
-}
+
 
 export function ThreadPanel({ incidentId }: Props) {
   const dispatch = useAppDispatch()
@@ -135,12 +126,6 @@ export function ThreadPanel({ incidentId }: Props) {
   const handleDelete = async (messageId: string) => {
     await dispatch(deleteMessageThunk({ incidentId, messageId }))
   }
-
-  // ── Current user avatar ───────────────────────────────────────────────────
-  const currentUserInitials = currentUser
-    ? getInitials(`${currentUser.first_name} ${currentUser.last_name}`)
-    : '?'
-  const currentUserColour = avatarColourFor(currentUser?.id)
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -256,8 +241,7 @@ export function ThreadPanel({ incidentId }: Props) {
           onChange={setComposerValue}
           onSend={handleSend}
           onCancelReply={handleCancelReply}
-          currentUserInitials={currentUserInitials}
-          currentUserColour={currentUserColour}
+          currentUser={currentUser}
         />
       </div>
     </div>

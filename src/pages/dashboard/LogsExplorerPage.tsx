@@ -6,6 +6,15 @@ import { format } from 'date-fns'
 
 import { logsApi, LogEventResponse, FilterOptionsResponse, LogSearchParams } from '@/features/dashboard/api/logsApi'
 import { cn } from '@/utils/cn'
+import { Select } from '@/components/common/Select'
+
+const TIME_OPTIONS = [
+  { value: '1h', label: 'Last 1 hour' },
+  { value: '6h', label: 'Last 6 hours' },
+  { value: '24h', label: 'Last 24 hours' },
+  { value: '7d', label: 'Last 7 days' },
+  { value: '30d', label: 'Last 30 days' },
+]
 
 export default function LogsExplorerPage() {
   const navigate = useNavigate()
@@ -91,8 +100,11 @@ export default function LogsExplorerPage() {
   const getSeverityColor = (severity: string) => {
     switch (severity?.toUpperCase()) {
       case 'CRITICAL': return 'bg-red-100 text-red-700 border-red-200'
-      case 'ERROR': return 'bg-orange-100 text-orange-700 border-orange-200'
-      case 'WARNING': return 'bg-yellow-100 text-yellow-700 border-yellow-200'
+      case 'ERROR': 
+      case 'HIGH': return 'bg-orange-100 text-orange-700 border-orange-200'
+      case 'WARNING': 
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-700 border-yellow-200'
+      case 'LOW':
       case 'INFO': return 'bg-blue-100 text-blue-700 border-blue-200'
       default: return 'bg-slate-100 text-slate-700 border-slate-200'
     }
@@ -134,8 +146,8 @@ export default function LogsExplorerPage() {
               type="text"
               placeholder="Search by file path or error text..."
               className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-shadow"
-              value={filters.file_path || ''}
-              onChange={(e) => setFilters(prev => ({ ...prev, file_path: e.target.value }))}
+              value={filters.search_query || ''}
+              onChange={(e) => setFilters(prev => ({ ...prev, search_query: e.target.value, file_path: undefined }))}
             />
           </div>
           <button 
@@ -146,58 +158,57 @@ export default function LogsExplorerPage() {
           </button>
         </form>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap md:flex-nowrap items-center gap-3 w-full">
           <div className="flex items-center gap-2 text-sm font-medium text-slate-700 shrink-0">
             <Filter className="h-4 w-4 text-slate-400" /> Filters:
           </div>
           
-          <select 
-            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 text-slate-700 outline-none focus:border-indigo-500 transition-colors"
+          <Select 
+            className="flex-1"
             value={filters.time_window || '7d'}
-            onChange={(e) => handleFilterChange('time_window', e.target.value)}
-          >
-            <option value="1h">Last 1 hour</option>
-            <option value="6h">Last 6 hours</option>
-            <option value="24h">Last 24 hours</option>
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-          </select>
+            onChange={(val) => handleFilterChange('time_window', val)}
+            options={TIME_OPTIONS}
+          />
 
-          <select 
-            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 text-slate-700 outline-none focus:border-indigo-500 transition-colors"
+          <Select 
+            className="flex-1"
             value={filters.severity || 'all'}
-            onChange={(e) => handleFilterChange('severity', e.target.value)}
-          >
-            <option value="all">All Severities</option>
-            {filterOptions?.severities.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+            onChange={(val) => handleFilterChange('severity', val)}
+            options={[
+              { value: 'all', label: 'All Severities' },
+              ...(filterOptions?.severities.map(s => ({ value: s, label: s })) || [])
+            ]}
+          />
 
-          <select 
-            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 text-slate-700 outline-none focus:border-indigo-500 transition-colors"
+          <Select 
+            className="flex-1"
             value={filters.service_name || 'all'}
-            onChange={(e) => handleFilterChange('service_name', e.target.value)}
-          >
-            <option value="all">All Services</option>
-            {filterOptions?.service_names.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+            onChange={(val) => handleFilterChange('service_name', val)}
+            options={[
+              { value: 'all', label: 'All Services' },
+              ...(filterOptions?.service_names.map(s => ({ value: s, label: s })) || [])
+            ]}
+          />
 
-          <select 
-            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 text-slate-700 outline-none focus:border-indigo-500 transition-colors"
+          <Select 
+            className="flex-1"
             value={filters.environment || 'all'}
-            onChange={(e) => handleFilterChange('environment', e.target.value)}
-          >
-            <option value="all">All Environments</option>
-            {filterOptions?.environments.map(e => <option key={e} value={e}>{e}</option>)}
-          </select>
+            onChange={(val) => handleFilterChange('environment', val)}
+            options={[
+              { value: 'all', label: 'All Environments' },
+              ...(filterOptions?.environments.map(e => ({ value: e, label: e })) || [])
+            ]}
+          />
 
-          <select 
-            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50 text-slate-700 outline-none focus:border-indigo-500 transition-colors"
+          <Select 
+            className="flex-1"
             value={filters.status || 'all'}
-            onChange={(e) => handleFilterChange('status', e.target.value)}
-          >
-            <option value="all">All Statuses</option>
-            {filterOptions?.statuses.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+            onChange={(val) => handleFilterChange('status', val)}
+            options={[
+              { value: 'all', label: 'All Statuses' },
+              ...(filterOptions?.statuses.map(s => ({ value: s, label: s })) || [])
+            ]}
+          />
         </div>
       </div>
 
@@ -241,13 +252,12 @@ export default function LogsExplorerPage() {
             </div>
           ) : (
             <div className="min-w-max w-full">
-              <div className="grid grid-cols-[160px_1fr_180px_160px_100px_100px] gap-4 px-6 py-3 border-b border-slate-100 bg-white text-xs font-semibold text-slate-500 uppercase tracking-wider sticky top-0 z-10">
+              <div className="grid grid-cols-[160px_1fr_180px_160px_100px] gap-4 px-6 py-3 border-b border-slate-100 bg-white text-xs font-semibold text-slate-500 uppercase tracking-wider sticky top-0 z-10">
                 <div>Timestamp</div>
                 <div>Error / Location</div>
                 <div>Service</div>
                 <div>Environment</div>
                 <div>Severity</div>
-                <div className="text-right">Action</div>
               </div>
               <div className="divide-y divide-slate-100">
                 <AnimatePresence>
@@ -256,7 +266,8 @@ export default function LogsExplorerPage() {
                       key={log.log_id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="grid grid-cols-[160px_1fr_180px_160px_100px_100px] gap-4 px-6 py-3.5 items-center hover:bg-slate-50/80 transition-colors group"
+                      onClick={() => navigate(`/dashboard/incidents/${log.incident_id}`)}
+                      className="grid grid-cols-[160px_1fr_180px_160px_100px] gap-4 px-6 py-3.5 items-center hover:bg-slate-50/80 transition-colors group cursor-pointer"
                     >
                       <div className="text-sm text-slate-600 font-medium font-mono">
                         <span className="flex items-center gap-1.5">
@@ -300,15 +311,6 @@ export default function LogsExplorerPage() {
                             : <AlertCircle className="h-3 w-3" />}
                           {log.severity?.toLowerCase()}
                         </span>
-                      </div>
-
-                      <div className="text-right">
-                        <button
-                          onClick={() => navigate(`/dashboard/incidents/${log.incident_id}`)}
-                          className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 hover:underline opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          View Incident &rarr;
-                        </button>
                       </div>
                     </motion.div>
                   ))}

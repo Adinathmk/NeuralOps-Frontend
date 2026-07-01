@@ -42,7 +42,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="max-w-2xl space-y-5">
+    <div className="w-full space-y-5">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-900">Notifications</h1>

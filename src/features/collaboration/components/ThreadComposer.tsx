@@ -6,6 +6,7 @@
 import { useRef, useEffect, useState, KeyboardEvent } from 'react'
 import { X, Send, CornerUpLeft, AtSign } from 'lucide-react'
 import { cn } from '@utils/cn'
+import { Avatar } from '@components/common/Avatar'
 import type { ThreadMessage, User } from '@/types'
 import { MentionPicker } from './MentionPicker'
 import { teamApi } from '@/features/team/api/teamApi'
@@ -19,8 +20,7 @@ interface Props {
   onChange: (value: string) => void
   onSend: (text?: string) => void
   onCancelReply: () => void
-  currentUserInitials?: string
-  currentUserColour?: string
+  currentUser?: User | null
 }
 
 export function ThreadComposer({
@@ -31,8 +31,7 @@ export function ThreadComposer({
   onChange,
   onSend,
   onCancelReply,
-  currentUserInitials = '?',
-  currentUserColour = '#6366F1',
+  currentUser,
 }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   
@@ -159,12 +158,7 @@ export function ThreadComposer({
       {/* Input row */}
       <div className="flex items-end gap-2 px-3 py-3 relative">
         {/* Current user avatar */}
-        <div
-          className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 mb-0.5"
-          style={{ backgroundColor: currentUserColour }}
-        >
-          {currentUserInitials}
-        </div>
+        <Avatar user={currentUser} className="!h-7 !w-7 !text-xs mb-0.5 shrink-0" />
 
         {/* Textarea */}
         <div className="flex-1 relative">

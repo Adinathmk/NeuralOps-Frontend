@@ -25,6 +25,14 @@ export function Sidebar() {
   const dispatch   = useAppDispatch()
   const navigate   = useNavigate()
   const collapsed  = useAppSelector(s => s.ui.sidebarCollapsed)
+  const user       = useAppSelector(s => s.auth.user)
+
+  const filteredNavItems = navItems.filter(item => {
+    if (item.label === 'Billing') {
+      return user && ['admin', 'engineer'].includes(user.role)
+    }
+    return true
+  })
 
   const handleLogout = async () => {
     await dispatch(logoutThunk())
@@ -81,7 +89,7 @@ export function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-6 px-3 flex flex-col gap-1">
         <div className="flex-1 space-y-1">
-          {navItems.map(({ to, icon: Icon, label }) => (
+          {filteredNavItems.map(({ to, icon: Icon, label }) => (
             <SidebarItem key={to} to={to} icon={Icon} label={label} collapsed={collapsed} />
           ))}
         </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState, forwardRef, useImperativeHandle } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, BookOpen, Trash2, Edit2, Code2 } from 'lucide-react'
+import { Plus, BookOpen, Trash2, Edit2, Code2, Zap } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -169,27 +169,32 @@ const PlaybooksTab = forwardRef<TabHandle>((props, ref) => {
         title={editItem ? 'Edit playbook' : 'Create playbook'}
         size="lg"
       >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-4">
           <Input
-            label="Error Pattern (Regex)"
+            label="Trigger pattern"
+            className="font-mono text-sm"
             placeholder="e.g. (NullPointerException|NoneType)"
-            hint="Matched against the error type to activate this playbook"
+            hint="Playbook activates when an incident's error matches this pattern"
             error={errors.error_pattern?.message}
+            leftIcon={<Code2 size={16} />}
             {...register('error_pattern')}
           />
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide">Instructions for AI Agent</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
+              <Zap size={14} className="text-amber-500" />
+              AI Instructions
+            </label>
             <textarea
               {...register('instructions')}
               rows={5}
               placeholder="Step-by-step instructions for the AI agent when this error type is detected…"
-              className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary resize-none transition-colors"
+              className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary focus:bg-white resize-none transition-all shadow-sm"
             />
             {errors.instructions && <p className="text-xs text-red-400">{errors.instructions.message}</p>}
           </div>
-          <div className="flex gap-2 pt-1">
-            <Button type="submit" className="flex-1" isLoading={submitting}>{editItem ? 'Save changes' : 'Create playbook'}</Button>
-            <Button type="button" variant="outline" className="flex-1" onClick={() => { setModalOpen(false); reset() }}>Cancel</Button>
+          <div className="flex justify-end gap-3 pt-2">
+            <Button type="button" variant="outline" onClick={() => { setModalOpen(false); reset() }}>Cancel</Button>
+            <Button type="submit" isLoading={submitting}>{editItem ? 'Save changes' : 'Create playbook'}</Button>
           </div>
         </form>
       </Modal>

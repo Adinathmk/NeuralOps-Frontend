@@ -12,6 +12,8 @@ import { updateGitHubIntegrationStatus } from '@store/slices/integrationsSlice'
 import { patchIncidentInStore } from '@store/slices/incidentsSlice'
 import { appendMessage, replaceMessage } from '@store/slices/collaborationSlice'
 
+import { fetchMeThunk } from '@store/slices/authSlice'
+
 export function DashboardLayout() {
   const isAuth = useRequireAuth()
   const { tenant, user } = useAuth()
@@ -19,6 +21,12 @@ export function DashboardLayout() {
 
   const { lastMessage: collabMessage } = useWebSocket(tenant ? `/ws/collaboration/${tenant.id}/` : null)
   const { lastMessage: notifMessage } = useWebSocket((tenant && user) ? `/ws/notifications/${user.id}/` : null)
+
+  useEffect(() => {
+    if (isAuth) {
+      dispatch(fetchMeThunk())
+    }
+  }, [isAuth, dispatch])
 
   const handleMessage = (msg: any) => {
     if (!msg) return

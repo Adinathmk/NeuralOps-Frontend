@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@components/common/Car
 import { Skeleton } from '@components/common/Skeleton'
 import { Input } from '@components/common/Input'
 import { formatDate, formatRelative, cn } from '@utils/cn'
+import { Avatar } from '@components/common/Avatar'
 import type { Incident } from '@/types'
 import { useAppSelector, useAppDispatch } from '@store/index'
 import { fetchIncidentThunk, updateIncidentThunk } from '@store/slices/incidentsSlice'
@@ -30,13 +31,6 @@ const getDisplayName = (u: any) => {
   return u.email
 }
 
-const getInitials = (u: any) => {
-  const name = getDisplayName(u)
-  if (name === u.email) return name.substring(0, 2).toUpperCase()
-  const parts = name.split(' ')
-  if (parts.length > 1) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase()
-  return name.substring(0, 2).toUpperCase()
-}
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function IncidentDetailPage() {
@@ -233,6 +227,9 @@ export default function IncidentDetailPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant={severityVariant} dot>{incident.severity}</Badge>
             <Badge variant={statusVariant}>{incident.status}</Badge>
+            <Badge variant="neutral" className="bg-slate-100 text-slate-600 font-medium">
+              {incident.occurrence_count} {incident.occurrence_count === 1 ? 'Event' : 'Events'}
+            </Badge>
             <span className="text-xs text-slate-500">{incident.environment}</span>
           </div>
           <h1 className="text-xl font-bold text-slate-900">{incident.error_type}</h1>
@@ -284,9 +281,7 @@ export default function IncidentDetailPage() {
               const isMe = u.id === user?.id;
               return (
                 <div key={u.id} className={cn("flex items-center gap-2 border rounded-full pl-1.5 pr-3 py-1.5 shadow-sm transition-colors", isMe ? "bg-indigo-50 border-indigo-200" : "bg-white border-slate-200 hover:bg-slate-50")}>
-                  <div className={cn("h-6 w-6 rounded-full text-white flex items-center justify-center text-[10px] font-bold shadow-sm", isMe ? "bg-indigo-600" : "bg-slate-700")}>
-                    {getInitials(u)}
-                  </div>
+                  <Avatar user={u} className={cn("!h-6 !w-6 !text-[10px]", isMe ? "ring-2 ring-indigo-200" : "")} />
                   <span className={cn("text-sm font-medium", isMe ? "text-indigo-900" : "text-slate-700")}>{getDisplayName(u)}</span>
                   {isMe && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded ml-1 font-semibold">(You)</span>}
                 </div>
@@ -361,12 +356,7 @@ export default function IncidentDetailPage() {
                             )}
                           >
                             <div className="flex items-center gap-3 truncate">
-                              <div className={cn(
-                                "h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors shadow-sm", 
-                                isSelected ? "bg-indigo-600 text-white ring-2 ring-indigo-100" : "bg-slate-100 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-700"
-                              )}>
-                                {getInitials(m)}
-                              </div>
+                              <Avatar user={m} className={cn("!h-8 !w-8 !text-xs shrink-0 transition-colors", isSelected ? "ring-2 ring-indigo-100" : "")} />
                               <div className="flex flex-col truncate">
                                 <span className={cn(
                                   "truncate transition-colors text-[13px]", 
@@ -704,12 +694,7 @@ export default function IncidentDetailPage() {
                   <div className="space-y-4">
                     {statusHistory.map(transition => (
                       <div key={transition.id} className="flex gap-3 text-sm">
-                        <div 
-                          className="h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-white font-medium text-xs mt-1"
-                          style={{ backgroundColor: transition.actor?.avatar_colour || '#94A3B8' }}
-                        >
-                          {transition.actor ? transition.actor.full_name.charAt(0).toUpperCase() : 'S'}
-                        </div>
+                        <Avatar user={transition.actor} className="!h-8 !w-8 !text-xs mt-1 shrink-0" />
                         <div className="flex-1 bg-slate-50 rounded-lg p-3 border border-slate-100">
                           <div className="flex items-center justify-between mb-1">
                             <span className="font-medium text-slate-700">

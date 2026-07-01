@@ -14,7 +14,8 @@ import { invitationsApi } from '@features/invitations/api/invitationsApi'
 import { teamApi } from '@features/team/api/teamApi'
 import { useToast } from '@hooks/useProtectedRoute'
 import { useRole } from '@hooks/useProtectedRoute'
-import { getInitials, formatDate, formatRelative, cn } from '@utils/cn'
+import { formatDate, formatRelative, cn } from '@utils/cn'
+import { Avatar } from '@components/common/Avatar'
 import type { Invitation, InvitationStatus, UserRole, User } from '@/types'
 
 const inviteSchema = z.object({
@@ -138,9 +139,7 @@ export default function TeamPage() {
                 transition={{ delay: i * 0.05 }}
                 className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-100 transition-colors"
               >
-                <div className="h-8 w-8 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center text-xs font-semibold text-primary shrink-0">
-                  {getInitials(member.full_name || member.email)}
-                </div>
+                <Avatar user={member} className="!h-8 !w-8 !text-xs" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-slate-900/85">{member.full_name || 'No Name'}</p>
                   <p className="text-xs text-slate-500">{member.email}</p>
@@ -220,21 +219,52 @@ export default function TeamPage() {
       )}
 
       {/* Invite modal */}
-      <Modal open={inviteOpen} onClose={() => { setInviteOpen(false); reset() }} title="Invite team member" description="They'll receive an email with a signup link." size="sm">
-        <form onSubmit={handleSubmit(onInvite)} className="space-y-4 mt-4">
+      <Modal open={inviteOpen} onClose={() => { setInviteOpen(false); reset() }} title="Invite team member" description="They'll receive an email with a magic link to join." size="sm">
+        <form onSubmit={handleSubmit(onInvite)} className="space-y-5 mt-4">
           <Input label="Email address" type="email" placeholder="colleague@company.com" error={errors.email?.message} {...register('email')} />
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide">Role</label>
-            <select
-              {...register('role')}
-              className="w-full h-9 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 focus:outline-none focus:border-primary transition-colors"
-            >
-              <option value="engineer">Engineer - Can view and interact with incidents</option>
-              <option value="admin">Admin - All permissions except billing</option>
-              <option value="viewer">Viewer - Read-only access</option>
-            </select>
+          
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-slate-700">Role</label>
+            <div className="space-y-2">
+              <label className="relative flex cursor-pointer rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:border-slate-300 has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-colors focus:outline-none">
+                <input type="radio" value="engineer" {...register('role')} className="sr-only" />
+                <span className="flex flex-1">
+                  <span className="flex flex-col">
+                    <span className="block text-sm font-medium text-slate-900">Engineer</span>
+                    <span className="mt-0.5 flex items-center text-xs text-slate-500">
+                      Can view and interact with all incidents and runbooks.
+                    </span>
+                  </span>
+                </span>
+              </label>
+
+              <label className="relative flex cursor-pointer rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:border-slate-300 has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-colors focus:outline-none">
+                <input type="radio" value="admin" {...register('role')} className="sr-only" />
+                <span className="flex flex-1">
+                  <span className="flex flex-col">
+                    <span className="block text-sm font-medium text-slate-900">Admin</span>
+                    <span className="mt-0.5 flex items-center text-xs text-slate-500">
+                      Full access to all settings, members, and billing.
+                    </span>
+                  </span>
+                </span>
+              </label>
+
+              <label className="relative flex cursor-pointer rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:border-slate-300 has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-colors focus:outline-none">
+                <input type="radio" value="viewer" {...register('role')} className="sr-only" />
+                <span className="flex flex-1">
+                  <span className="flex flex-col">
+                    <span className="block text-sm font-medium text-slate-900">Viewer</span>
+                    <span className="mt-0.5 flex items-center text-xs text-slate-500">
+                      Read-only access to dashboards and incident logs.
+                    </span>
+                  </span>
+                </span>
+              </label>
+            </div>
           </div>
-          <div className="flex gap-2 pt-1">
+
+          <div className="flex gap-2 pt-2">
             <Button type="submit" className="flex-1" isLoading={sending}>Send invitation</Button>
             <Button type="button" variant="outline" className="flex-1" onClick={() => { setInviteOpen(false); reset() }}>Cancel</Button>
           </div>
