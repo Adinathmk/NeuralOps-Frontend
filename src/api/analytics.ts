@@ -48,8 +48,10 @@ export interface AnalyticsSummary {
 
 export interface IncidentTrendPoint {
   date: string
-  created: number
+  open: number
+  investigating: number
   resolved: number
+  closed: number
 }
 
 export interface SeverityDistributionItem {

@@ -11,6 +11,7 @@ interface IncidentsState {
   filters: {
     status:   IncidentStatus | 'all'
     severity: string
+    category: string
     search:   string
     page:     number
     assignedToMe: boolean
@@ -26,6 +27,7 @@ const initialState: IncidentsState = {
   filters: {
     status:   'all',
     severity: 'all',
+    category: 'all',
     search:   '',
     page:     1,
     assignedToMe: false,
@@ -118,10 +120,19 @@ const incidentsSlice = createSlice({
       })
 
     builder
+      .addCase(fetchIncidentThunk.pending, (state) => {
+        state.isLoading = true
+        state.error     = null
+      })
       .addCase(fetchIncidentThunk.fulfilled, (state, { payload }) => {
+        state.isLoading = false
         state.selected = payload
         const idx = state.items.findIndex(i => i.id === payload.id)
         if (idx >= 0) state.items[idx] = payload
+      })
+      .addCase(fetchIncidentThunk.rejected, (state, { payload }) => {
+        state.isLoading = false
+        state.error     = payload as string
       })
       .addCase(updateIncidentThunk.fulfilled, (state, { payload }) => {
         if (state.selected && state.selected.id === payload.id) {

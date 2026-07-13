@@ -29,7 +29,7 @@ export function Sidebar() {
 
   const filteredNavItems = navItems.filter(item => {
     if (item.label === 'Billing') {
-      return user && ['admin', 'engineer'].includes(user.role)
+      return user && ['owner', 'admin'].includes(user.role)
     }
     return true
   })

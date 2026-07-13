@@ -203,7 +203,9 @@ export default function IncidentDetailPage() {
 
   const assignedUsers = teamMembers.filter(m => incident?.assigned_user_ids?.includes(m.id))
 
-  if (loading && !incident) return <DetailSkeleton />
+  const isDataStale = incident && incident.id !== id
+
+  if (loading || isDataStale) return <DetailSkeleton />
   if (!incident) return <div className="text-slate-500 text-sm p-6">Incident not found.</div>
 
   const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
@@ -227,6 +229,11 @@ export default function IncidentDetailPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant={severityVariant} dot>{incident.severity}</Badge>
             <Badge variant={statusVariant}>{incident.status}</Badge>
+            {incident.error_category && (
+              <Badge variant="neutral" className="bg-slate-100 text-slate-600 font-medium capitalize">
+                {incident.error_category.replace('_', ' ')}
+              </Badge>
+            )}
             <Badge variant="neutral" className="bg-slate-100 text-slate-600 font-medium">
               {incident.occurrence_count} {incident.occurrence_count === 1 ? 'Event' : 'Events'}
             </Badge>
@@ -482,51 +489,124 @@ export default function IncidentDetailPage() {
         {/* Left col — analysis */}
         <div className="xl:col-span-2 space-y-4">
 
-          {/* Pull Request Status Banner */}
-          {(incident.pr_status || incident.pr_url) && (
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}>
-              {incident.pr_status === 'open' || incident.pr_status === 'merged' ? (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                  <div className="flex items-start md:items-center gap-3">
-                    <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600 shrink-0">
-                      <GitPullRequest size={20} />
+          {/* Pull Request / Patch Banner */}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}>
+            {(() => {
+              const cat = incident.error_category;
+              const hasPatch = incident.pr_status || incident.pr_url;
+              
+              if (hasPatch) {
+                if (incident.pr_status === 'open' || incident.pr_status === 'merged') {
+                  return (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                      <div className="flex items-start md:items-center gap-3">
+                        <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600 shrink-0">
+                          <GitPullRequest size={20} />
+                        </div>
+                        <div>
+                          <h3 className="text-emerald-800 font-semibold text-sm">Automated Pull Request Created</h3>
+                          <p className="text-emerald-600/90 text-xs mt-0.5 max-w-xl">
+                            {incident.pr_title || `A patch has been generated and a PR (#${incident.pr_number}) was opened successfully.`}
+                          </p>
+                        </div>
+                      </div>
+                      {incident.pr_url && (
+                        <a 
+                          href={incident.pr_url} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="shrink-0 bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition-colors flex items-center gap-1.5"
+                        >
+                          View Pull Request <ExternalLink size={14} />
+                        </a>
+                      )}
                     </div>
-                    <div>
-                      <h3 className="text-emerald-800 font-semibold text-sm">Automated Pull Request Created</h3>
-                      <p className="text-emerald-600/90 text-xs mt-0.5 max-w-xl">
-                        {incident.pr_title || `A patch has been generated and a PR (#${incident.pr_number}) was opened successfully.`}
-                      </p>
+                  )
+                } else if (incident.pr_status === 'draft') {
+                  if (cat === 'security') {
+                    return (
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                        <div className="flex items-start md:items-center gap-3">
+                          <div className="bg-amber-100 p-2 rounded-lg text-amber-600 shrink-0">
+                            <AlertTriangle size={20} />
+                          </div>
+                          <div>
+                            <h3 className="text-amber-800 font-semibold text-sm">🔒 Held for manual review</h3>
+                            <p className="text-amber-600/90 text-xs mt-0.5 max-w-xl">
+                              Security-classified incidents are never auto-promoted, regardless of AI confidence. Please review the drafted patch manually.
+                            </p>
+                          </div>
+                        </div>
+                        {incident.pr_url && (
+                          <a href={incident.pr_url} target="_blank" rel="noreferrer" className="shrink-0 bg-white border border-amber-200 text-amber-700 hover:bg-amber-50 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm flex items-center gap-1.5">
+                            View Draft <ExternalLink size={14} />
+                          </a>
+                        )}
+                      </div>
+                    )
+                  } else {
+                    return (
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                        <div className="flex items-start md:items-center gap-3">
+                          <div className="bg-amber-100 p-2 rounded-lg text-amber-600 shrink-0">
+                            <AlertTriangle size={20} />
+                          </div>
+                          <div>
+                            <h3 className="text-amber-800 font-semibold text-sm">Draft PR Created</h3>
+                            <p className="text-amber-600/90 text-xs mt-0.5 max-w-xl">
+                              A patch was generated but kept as a draft due to low confidence or validation warnings.
+                            </p>
+                          </div>
+                        </div>
+                        {incident.pr_url && (
+                          <a href={incident.pr_url} target="_blank" rel="noreferrer" className="shrink-0 bg-white border border-amber-200 text-amber-700 hover:bg-amber-50 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm flex items-center gap-1.5">
+                            View Draft <ExternalLink size={14} />
+                          </a>
+                        )}
+                      </div>
+                    )
+                  }
+                } else if (incident.pr_status) {
+                  return (
+                    <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                      <div className="flex items-start md:items-center gap-3">
+                        <div className="bg-rose-100 p-2 rounded-lg text-rose-600 shrink-0">
+                          <XCircle size={20} />
+                        </div>
+                        <div>
+                          <h3 className="text-rose-800 font-semibold text-sm">Automated Patch Failed</h3>
+                          <p className="text-rose-600/90 text-xs mt-0.5 max-w-xl">
+                            {incident.pr_error || "NeuralOps agent encountered an issue while generating or creating the pull request."}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="critical" className="bg-white">Status: {incident.pr_status}</Badge>
                     </div>
-                  </div>
-                  {incident.pr_url && (
-                    <a 
-                      href={incident.pr_url} 
-                      target="_blank" 
-                      rel="noreferrer"
-                      className="shrink-0 bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition-colors flex items-center gap-1.5"
-                    >
-                      View Pull Request <ExternalLink size={14} />
-                    </a>
-                  )}
-                </div>
-              ) : incident.pr_status ? (
-                <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                  <div className="flex items-start md:items-center gap-3">
-                    <div className="bg-rose-100 p-2 rounded-lg text-rose-600 shrink-0">
-                      <XCircle size={20} />
+                  )
+                }
+              } else {
+                // NO PATCH
+                if (['infra_config', 'external_dependency', 'security', 'unknown'].includes(cat || '')) {
+                  return (
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center gap-4 mb-4">
+                      <div className="flex items-start md:items-center gap-3">
+                        <div className="bg-slate-200 p-2 rounded-lg text-slate-600 shrink-0">
+                          <AlertTriangle size={20} />
+                        </div>
+                        <div>
+                          <h3 className="text-slate-800 font-semibold text-sm">ℹ️ No automated fix generated</h3>
+                          <p className="text-slate-600 text-xs mt-0.5 max-w-xl">
+                            This incident is categorized as "{cat || 'unknown'}" — NeuralOps doesn't auto-generate code patches for this type, since the fix typically isn't in your codebase. Review the root cause and suggested fix below.
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-rose-800 font-semibold text-sm">Automated Patch Failed</h3>
-                      <p className="text-rose-600/90 text-xs mt-0.5 max-w-xl">
-                        {incident.pr_error || "NeuralOps agent encountered an issue while generating or creating the pull request."}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant="critical" className="bg-white">Status: {incident.pr_status}</Badge>
-                </div>
-              ) : null}
-            </motion.div>
-          )}
+                  )
+                }
+              }
+              return null;
+            })()}
+          </motion.div>
 
           {/* Root cause */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>

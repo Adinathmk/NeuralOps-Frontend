@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useAppSelector } from '@store/index'
 import { motion } from 'framer-motion'
-import { UserPlus, Mail, RefreshCw, X, Clock, CheckCircle, XCircle, Send } from 'lucide-react'
+import { UserPlus, Mail, RefreshCw, X, Clock, CheckCircle, XCircle, Send, Shield } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@components/common/Card'
 import { Button } from '@components/common/Button'
 import { Input } from '@components/common/Input'
 import { Badge } from '@components/common/Badge'
 import { Modal } from '@components/common/Modal'
 import { Skeleton } from '@components/common/Skeleton'
+import { Select } from '@components/common/Select'
 import { invitationsApi } from '@features/invitations/api/invitationsApi'
 import { teamApi } from '@features/team/api/teamApi'
 import { useToast } from '@hooks/useProtectedRoute'
@@ -38,8 +40,9 @@ const STATUS_COLOR: Record<InvitationStatus, string> = {
 }
 
 export default function TeamPage() {
-  const { canManage } = useRole()
+  const { canManage, isOwner } = useRole()
   const { toast } = useToast()
+  const currentUser = useAppSelector(s => s.auth.user)
   
   const [members, setMembers]         = useState<User[]>([])
   const [loadingMembers, setLoadingMembers] = useState(true)
@@ -49,6 +52,9 @@ export default function TeamPage() {
   const [inviteOpen, setInviteOpen]   = useState(false)
   const [sending, setSending]         = useState(false)
   const [actionId, setActionId]       = useState<string | null>(null)
+  const [updatingRoleId, setUpdatingRoleId] = useState<string | null>(null)
+  const [changeRoleMember, setChangeRoleMember] = useState<User | null>(null)
+  const [newRole, setNewRole] = useState<string>('')
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<InviteForm>({
     resolver: zodResolver(inviteSchema),
@@ -110,6 +116,28 @@ export default function TeamPage() {
   const roleVariant = (role: UserRole) =>
     role === 'owner' ? 'warning' : role === 'admin' ? 'info' : role === 'engineer' ? 'success' : 'neutral'
 
+  const onRoleChange = async (memberId: string, roleToSet: string) => {
+    setUpdatingRoleId(memberId)
+    try {
+      await teamApi.updateRole(memberId, roleToSet)
+      toast({ type: 'success', title: 'Role updated' })
+      loadMembers()
+      setChangeRoleMember(null)
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } }
+      toast({ type: 'error', title: e.response?.data?.message ?? 'Failed to update role' })
+    } finally {
+      setUpdatingRoleId(null)
+    }
+  }
+
+  const roleOptions = [
+    { value: 'engineer', label: 'Engineer' },
+    { value: 'admin', label: 'Admin' },
+    { value: 'viewer', label: 'Viewer' },
+    ...(isOwner ? [{ value: 'owner', label: 'Owner' }] : [])
+  ]
+
   return (
     <div className="w-full space-y-6">
       <div className="flex items-center justify-between">
@@ -117,7 +145,7 @@ export default function TeamPage() {
           <h1 className="text-xl font-bold text-slate-900">Team</h1>
           <p className="text-sm text-slate-500 mt-0.5">{members.length} member{members.length !== 1 && 's'} in this workspace</p>
         </div>
-        {canManage && (
+        {isOwner && (
           <Button size="sm" className="gap-2" onClick={() => setInviteOpen(true)}>
             <UserPlus size={13} /> Invite member
           </Button>
@@ -147,6 +175,17 @@ export default function TeamPage() {
                 <div className="flex items-center gap-2 shrink-0">
                   {!member.email_verified && !member.is_email_verified && <Badge variant="warning" dot>Unverified</Badge>}
                   <Badge variant={roleVariant(member.role) as 'warning' | 'info' | 'success' | 'neutral'}>{member.role}</Badge>
+                  {canManage && member.id !== currentUser?.id && member.role !== 'owner' && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7 text-slate-400 hover:text-indigo-600 ml-1"
+                      onClick={() => { setChangeRoleMember(member); setNewRole(member.role); }}
+                      title="Change role"
+                    >
+                      <Shield size={14} />
+                    </Button>
+                  )}
                 </div>
               </motion.div>
             ))
@@ -155,7 +194,7 @@ export default function TeamPage() {
       </Card>
 
       {/* Pending invitations */}
-      {canManage && (
+      {isOwner && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -269,6 +308,33 @@ export default function TeamPage() {
             <Button type="button" variant="outline" className="flex-1" onClick={() => { setInviteOpen(false); reset() }}>Cancel</Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Change Role Modal */}
+      <Modal open={!!changeRoleMember} onClose={() => setChangeRoleMember(null)} title="Change Role" description={`Update the role for ${changeRoleMember?.full_name || changeRoleMember?.email}.`} size="sm">
+        {changeRoleMember && (
+          <div className="space-y-5 mt-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Role</label>
+              <Select
+                value={newRole}
+                onChange={setNewRole}
+                options={roleOptions}
+              />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <Button 
+                onClick={() => onRoleChange(changeRoleMember.id, newRole)} 
+                isLoading={updatingRoleId === changeRoleMember.id} 
+                className="flex-1"
+                disabled={newRole === changeRoleMember.role}
+              >
+                Save changes
+              </Button>
+              <Button variant="outline" onClick={() => setChangeRoleMember(null)} className="flex-1">Cancel</Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   )

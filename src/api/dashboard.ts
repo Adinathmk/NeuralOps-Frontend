@@ -7,6 +7,10 @@ export type {
   CrashLocation,
   ActionableIncident,
   AIInsight,
+  ServiceBreakdownItem,
+  SeverityDistributionItem,
+  IncidentTrendPoint,
+  AnalyticsSummary,
 } from './analytics'
 
 export {
@@ -15,4 +19,8 @@ export {
   getActionableIncidents,
   getAIInsights,
   getLogVolume,
+  getServiceBreakdown,
+  getSeverityDistribution,
+  getIncidentTrend,
+  getAnalyticsSummary,
 } from './analytics'

@@ -127,6 +127,8 @@ export interface AnalysisDetail {
   created_at: string
 }
 
+export type IncidentCategory = 'code_bug' | 'database' | 'infra_config' | 'external_dependency' | 'security' | 'unknown'
+
 export interface Incident {
   id: string
   tenant_id: string
@@ -134,6 +136,7 @@ export interface Incident {
   status: IncidentStatus
   severity: IncidentSeverity
   error_type: string
+  error_category?: IncidentCategory
   error_message?: string
   service_name: string
   environment: string
@@ -312,10 +315,11 @@ export interface ChangePasswordFormData {
 // ─── GitHub Integration ───────────────────────────────────────────────────────
 
 export interface GitHubIntegrationStatus {
+  id: number
   repo_url: string
   repo_owner: string
   repo_name: string
-  indexing_status: 'pending' | 'indexing' | 'completed' | 'failed'
+  indexing_status: 'pending' | 'indexing' | 'completed' | 'failed' | 'indexed'
   last_indexed_commit?: string
   github_installation_id?: number
 }
@@ -324,5 +328,22 @@ export interface GitHubIntegrationFormData {
   repo_url: string
   repo_owner: string
   repo_name: string
+  default_branch: string
   github_installation_id: number
+}
+
+// ─── Code Mappings ───────────────────────────────────────────────────────────
+
+export interface ServiceRepoMapping {
+  id: string
+  service_name: string
+  github_integration_id: string
+  repo_name: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ServiceRepoMappingFormData {
+  service_name: string
+  github_integration_id: string
 }

@@ -18,6 +18,7 @@ import {
 import type { ThreadMessage } from '@/types'
 import { ThreadMessageItem } from './ThreadMessageItem'
 import { ThreadComposer } from './ThreadComposer'
+import { Skeleton } from '@components/common/Skeleton'
 
 interface Props {
   incidentId: string
@@ -158,8 +159,20 @@ export function ThreadPanel({ incidentId }: Props) {
       >
         {/* Loading state */}
         {isLoading && (
-          <div className="flex items-center justify-center h-full">
-            <Loader2 className="w-5 h-5 text-slate-300 animate-spin" />
+          <div className="flex flex-col gap-4 p-4 h-full">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="flex gap-3">
+                <Skeleton className="w-8 h-8 rounded-full shrink-0" />
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="w-24 h-3" />
+                    <Skeleton className="w-16 h-2" />
+                  </div>
+                  <Skeleton className="w-full h-4" />
+                  <Skeleton className="w-4/5 h-4" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 

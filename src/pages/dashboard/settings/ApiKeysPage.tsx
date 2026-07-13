@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Key, Plus, Trash2, ShieldAlert } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Key, Plus, Trash2, ShieldAlert, Clock } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import { Card, CardContent, CardHeader, CardTitle } from '@components/common/Card'
 import { Button } from '@components/common/Button'
 import { Badge } from '@components/common/Badge'
 import { Skeleton } from '@components/common/Skeleton'
@@ -48,98 +47,121 @@ export default function ApiKeysPage() {
   }
 
   const item = {
-    hidden: { opacity: 0, y: 10 },
-    show: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.3 } }
   }
 
+  const activeKeys = keys.filter(k => k.is_active)
+
   return (
-    <div className="w-full space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">API Keys</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Manage API keys used by the NeuralOps SDK to authenticate requests.</p>
+    <div className="w-full max-w-5xl mx-auto space-y-12 pb-24">
+      {/* ── Premium Page Header ── */}
+      <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 sm:p-10 shadow-xl">
+        <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%220%200%2040%2040%22%3E%3Cpath%20d%3D%22M20%200L40%2020L20%2040L0%2020L20%200Z%22%20fill%3D%22%23ffffff%22%2F%3E%3C%2Fsvg%3E')] bg-[length:30px_30px]" />
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="text-white">
+            <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10">
+                <Key size={24} className="text-indigo-300" />
+              </div>
+              API Keys
+            </h1>
+            <p className="text-slate-300 mt-3 max-w-xl text-sm leading-relaxed">
+              Manage the API keys used by your NeuralOps SDKs to authenticate requests securely. 
+              Keep these keys secret and never commit them to version control.
+            </p>
+          </div>
+          <Button 
+            onClick={() => setCreateOpen(true)} 
+            className="bg-white text-slate-900 hover:bg-slate-100 shadow-lg shadow-white/10 whitespace-nowrap gap-2 border-0"
+          >
+            <Plus size={18} /> Generate New Key
+          </Button>
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="gap-2">
-          <Plus size={16} />
-          Generate New Key
-        </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Key size={16} className="text-slate-500" />
-            Active Keys
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Active API Keys</h2>
+        
+        <div className="grid grid-cols-1 gap-5">
           {loading ? (
             <div className="space-y-4">
-              {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
+              {[1, 2, 3].map(i => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}
             </div>
-          ) : keys.filter(k => k.is_active).length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                <ShieldAlert className="text-slate-400" size={24} />
+          ) : activeKeys.length === 0 ? (
+            <div className="border-2 border-dashed border-slate-200 rounded-3xl p-12 flex flex-col items-center justify-center text-center bg-slate-50/50">
+              <div className="w-14 h-14 bg-white rounded-full shadow-sm border border-slate-100 flex items-center justify-center text-slate-300 mb-4">
+                <ShieldAlert size={28} />
               </div>
-              <h3 className="text-sm font-medium text-slate-900">No Active API Keys</h3>
-              <p className="text-sm text-slate-500 mt-1 max-w-sm">
-                Generate an API key to securely connect your SDKs to the NeuralOps backend.
+              <h3 className="text-base font-bold text-slate-800">No Active API Keys</h3>
+              <p className="text-sm text-slate-500 mt-1.5 mb-6 max-w-sm leading-relaxed">
+                Generate your first API key to start connecting your SDKs to the NeuralOps backend.
               </p>
+              <Button onClick={() => setCreateOpen(true)} className="gap-2 shadow-md rounded-xl h-11 px-6">
+                <Plus size={16} /> Generate Key
+              </Button>
             </div>
           ) : (
-            <motion.div variants={container} initial="hidden" animate="show" className="space-y-3">
-              {keys.filter(k => k.is_active).map(key => (
-                <motion.div
-                  key={key.id}
-                  variants={item}
-                  className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white hover:shadow-md transition-shadow duration-300 group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Key size={16} className="text-primary" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-slate-900">{key.name}</p>
-                        {key.is_active ? (
-                          <Badge variant="success" className="text-[10px] px-1.5 py-0">Active</Badge>
-                        ) : (
-                          <Badge variant="neutral" className="text-[10px] px-1.5 py-0">Revoked</Badge>
-                        )}
+            <motion.div variants={container} initial="hidden" animate="show" className="space-y-4">
+              <AnimatePresence>
+                {activeKeys.map(key => (
+                  <motion.div
+                    key={key.id}
+                    variants={item}
+                    layout
+                    initial="hidden"
+                    animate="show"
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="bg-white rounded-2xl p-5 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-200/60 flex flex-col md:flex-row gap-6 justify-between hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 relative group overflow-hidden"
+                  >
+                    <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500/20 group-hover:bg-indigo-500 transition-colors" />
+                    <div className="flex items-start gap-5">
+                      <div className="w-12 h-12 rounded-xl bg-indigo-50/50 flex items-center justify-center border border-indigo-100/50 shrink-0 text-indigo-600">
+                        <Key size={22} strokeWidth={2.5}/>
                       </div>
-                      <div className="flex items-center gap-3 mt-1">
-                        <code className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">
-                          {key.key_prefix}...
-                        </code>
-                        <span className="text-xs text-slate-400">
-                          Created {formatDistanceToNow(new Date(key.created_at), { addSuffix: true })}
-                        </span>
-                        {key.last_used_at && (
-                          <span className="text-xs text-slate-400 border-l border-slate-200 pl-3">
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-base font-bold text-slate-900">{key.name}</h3>
+                          <Badge variant="success" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] px-2 py-0.5 uppercase tracking-wider">Active</Badge>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3 mt-3">
+                          <code className="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg font-mono border border-slate-200/60 tracking-wider">
+                            {key.key_prefix}<span className="text-slate-400">.......................</span>
+                          </code>
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
+                            <Clock size={14}/> 
+                            Created: <span className="text-slate-600">{formatDistanceToNow(new Date(key.created_at), { addSuffix: true })}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-row md:flex-col items-center md:items-end justify-between border-t md:border-t-0 border-slate-100 pt-4 md:pt-0 mt-2 md:mt-0">
+                      {key.last_used_at ? (
+                         <div className="text-xs font-medium text-slate-400">
                             Last used {formatDistanceToNow(new Date(key.last_used_at), { addSuffix: true })}
-                          </span>
-                        )}
-                      </div>
+                         </div>
+                      ) : (
+                         <div className="text-xs font-medium text-slate-400">
+                            Never used
+                         </div>
+                      )}
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="text-rose-500 hover:bg-rose-50 hover:text-rose-600 h-9 px-3 rounded-lg opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity" 
+                        onClick={() => handleRevokeClick(key)}
+                      >
+                        <Trash2 size={14} className="mr-2" /> Revoke Key
+                      </Button>
                     </div>
-                  </div>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => handleRevokeClick(key)}
-                    >
-                      <Trash2 size={16} className="mr-2" />
-                      Revoke
-                    </Button>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </motion.div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </motion.div>
 
       <CreateApiKeyDialog
         open={createOpen}

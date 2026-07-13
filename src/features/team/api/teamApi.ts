@@ -9,4 +9,12 @@ export const teamApi = {
     const response = await apiClient.get<BackendResponse<User[]>>('/team/members')
     return response.data
   },
+  
+  /**
+   * Update a team member's role.
+   */
+  updateRole: async (memberId: string, role: string) => {
+    const response = await apiClient.patch<BackendResponse<User>>(`/team/members/${memberId}/role`, { role })
+    return response.data
+  },
 }

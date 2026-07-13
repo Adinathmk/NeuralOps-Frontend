@@ -2,24 +2,31 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   CheckCircle, Clock, Activity, 
-  Server, Zap, FileCode, Flame, Cpu, ShieldAlert 
+  Server, Zap, FileCode, Flame, Cpu, ShieldAlert,
+  AlertTriangle, Code
 } from 'lucide-react'
 import { useAppSelector } from '@store/index'
 import { Card, CardContent, CardHeader, CardTitle } from '@components/common/Card'
 import { Badge } from '@components/common/Badge'
+import { Skeleton, SkeletonCard } from '@components/common/Skeleton'
 import { formatRelative, cn } from '@utils/cn'
 import { Link } from 'react-router-dom'
 import {
-  getDashboardMetrics,
+  getAnalyticsSummary,
   getCrashLocations,
   getActionableIncidents,
-  getAIInsights,
   getLogVolume,
-  DashboardMetrics,
+  getServiceBreakdown,
+  getSeverityDistribution,
+  getIncidentTrend,
+  AnalyticsSummary,
   CrashLocation,
   ActionableIncident,
-  AIInsight
+  ServiceBreakdownItem,
+  SeverityDistributionItem,
+  IncidentTrendPoint
 } from '@api/dashboard'
+import { AreaChart, Area, ResponsiveContainer } from 'recharts'
 
 const container = {
   hidden: {},
@@ -40,28 +47,34 @@ function getTimeOfDay() {
 export default function DashboardPage() {
   const user = useAppSelector(s => s.auth.user)
 
-  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
+  const [summary, setSummary] = useState<AnalyticsSummary | null>(null)
   const [logVolume, setLogVolume] = useState<number | null>(null)
   const [crashLocations, setCrashLocations] = useState<CrashLocation[]>([])
   const [incidents, setIncidents] = useState<ActionableIncident[]>([])
-  const [insights, setInsights] = useState<AIInsight[]>([])
+  const [serviceBreakdown, setServiceBreakdown] = useState<ServiceBreakdownItem[]>([])
+  const [severityDist, setSeverityDist] = useState<SeverityDistributionItem[]>([])
+  const [incidentTrend, setIncidentTrend] = useState<IncidentTrendPoint[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [m, l, c, i, ins] = await Promise.all([
-          getDashboardMetrics(),
+        const [m, l, c, i, sb, sd, it] = await Promise.all([
+          getAnalyticsSummary(7),
           getLogVolume(),
           getCrashLocations(),
           getActionableIncidents(),
-          getAIInsights()
+          getServiceBreakdown(7),
+          getSeverityDistribution(7),
+          getIncidentTrend(7)
         ])
-        setMetrics(m)
+        setSummary(m)
         setLogVolume(l)
         setCrashLocations(c)
         setIncidents(i)
-        setInsights(ins)
+        setServiceBreakdown(sb)
+        setSeverityDist(sd)
+        setIncidentTrend(it)
       } catch (err) {
         console.error('Failed to load dashboard data:', err)
       } finally {
@@ -72,15 +85,81 @@ export default function DashboardPage() {
   }, [])
 
   const stats = [
-    { label: 'Active Criticals',  value: metrics?.active_criticals?.toString() || '0',     delta: '',    icon: Flame,         color: 'text-red-500',    bg: 'bg-red-500/10' },
-    { label: 'Error Volume (24h)',value: logVolume ? (logVolume > 1000 ? `${(logVolume/1000).toFixed(1)}k` : logVolume.toString()) : '0',  delta: '',  icon: Activity,      color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
-    { label: 'New Issues',        value: metrics?.new_issues?.toString() || '0',     delta: '',     icon: ShieldAlert,   color: 'text-amber-500',  bg: 'bg-amber-500/10' },
-    { label: 'Avg MTTR',          value: metrics?.avg_mttr || '0m',  delta: '',  icon: Clock,         color: 'text-emerald-500',bg: 'bg-emerald-500/10' },
+    { 
+      label: 'Active Criticals',  
+      value: summary?.critical_count?.toString() || '0', 
+      delta: summary?.previous_period?.critical_count !== undefined && summary.previous_period.critical_count !== summary.critical_count
+        ? `${summary.critical_count > summary.previous_period.critical_count ? '+' : ''}${summary.critical_count - summary.previous_period.critical_count} vs last week`
+        : '',
+      icon: Flame,         
+      color: 'text-red-500',    
+      bg: 'bg-red-500/10' 
+    },
+    { 
+      label: 'Total Issues (7d)', 
+      value: summary?.total_incidents?.toString() || '0',  
+      delta: summary?.previous_period?.total_incidents !== undefined && summary.previous_period.total_incidents !== summary.total_incidents
+        ? `${summary.total_incidents > summary.previous_period.total_incidents ? '+' : ''}${summary.total_incidents - summary.previous_period.total_incidents} vs last week`
+        : '',  
+      icon: Activity,      
+      color: 'text-indigo-500', 
+      bg: 'bg-indigo-500/10' 
+    },
+    { 
+      label: 'Resolution Rate (7d)',
+      value: summary ? `${summary.resolution_rate}%` : '0%',     
+      delta: '',     
+      icon: ShieldAlert,   
+      color: 'text-amber-500',  
+      bg: 'bg-amber-500/10' 
+    },
+    { 
+      label: 'Avg MTTR (7d)',          
+      value: summary ? `${summary.avg_mttr_minutes}m` : '0m',  
+      delta: summary?.previous_period?.avg_mttr_minutes !== undefined && summary.previous_period.avg_mttr_minutes !== summary.avg_mttr_minutes
+        ? `${summary.avg_mttr_minutes > summary.previous_period.avg_mttr_minutes ? '+' : ''}${summary.avg_mttr_minutes - summary.previous_period.avg_mttr_minutes}m vs last week`
+        : '',  
+      icon: Clock,         
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-500/10' 
+    },
   ]
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-500">Loading dashboard...</div>
+    return (
+      <div className="space-y-6 max-w-[1400px] w-full pb-10">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="xl:col-span-2 space-y-4">
+            <Skeleton className="h-[400px] w-full rounded-xl" />
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-[200px] w-full rounded-xl" />
+            <Skeleton className="h-[200px] w-full rounded-xl" />
+          </div>
+        </div>
+      </div>
+    )
   }
+
+  const maxCrashCount = Math.max(...crashLocations.map(l => l.count), 1)
+  const SEVERITY_COLORS: Record<string, string> = {
+    critical: 'bg-red-500',
+    high: 'bg-orange-500',
+    medium: 'bg-amber-400',
+    low: 'bg-blue-400'
+  }
+  const totalSeverity = severityDist.reduce((acc, curr) => acc + curr.count, 0) || 1
+  const trendData = incidentTrend.map(t => ({ val: t.open + t.investigating }))
+  const hasTrend = trendData.length > 1 && trendData.some(d => d.val > 0)
 
   return (
     <div className="space-y-6 max-w-[1400px] w-full pb-10">
@@ -101,32 +180,56 @@ export default function DashboardPage() {
         animate="show"
         className="grid grid-cols-2 xl:grid-cols-4 gap-4"
       >
-        {stats.map(stat => (
-          <motion.div key={stat.label} variants={item}>
-            <Card className="relative overflow-hidden border-slate-200/60 shadow-sm hover:shadow-md transition-shadow group">
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-[13px] font-medium text-slate-500 mb-1">{stat.label}</p>
-                    <p className="text-3xl font-bold text-slate-900 tracking-tight">{stat.value}</p>
-                    {stat.delta && (
-                      <p className={cn('text-xs mt-2 font-medium flex items-center gap-1', 
-                        stat.delta.startsWith('+') && stat.label === 'Active Criticals' ? 'text-red-500' :
-                        stat.delta.startsWith('-') && stat.label === 'Avg MTTR' ? 'text-emerald-500' :
-                        'text-slate-500'
-                      )}>
-                        {stat.delta} vs yesterday
-                      </p>
-                    )}
+        {stats.map(stat => {
+          const isVolume = stat.label === 'Total Issues (7d)'
+          return (
+            <motion.div key={stat.label} variants={item}>
+              <Card className="relative overflow-hidden border-slate-200/60 shadow-sm hover:shadow-md transition-shadow group flex flex-col h-full">
+                <CardContent className="p-5 flex flex-col flex-1">
+                  <div className="flex items-start justify-between relative z-10">
+                    <div>
+                      <p className="text-[13px] font-medium text-slate-500 mb-1">{stat.label}</p>
+                      <p className="text-3xl font-bold text-slate-900 tracking-tight">{stat.value}</p>
+                      {stat.delta && (
+                        <p className={cn('text-xs mt-2 font-medium flex items-center gap-1', 
+                          stat.delta.startsWith('+') ? 'text-red-500' : 'text-emerald-500'
+                        )}>
+                          {stat.delta}
+                        </p>
+                      )}
+                    </div>
+                    <div className={cn("p-2 rounded-lg", stat.bg)}>
+                      <stat.icon className={cn("w-5 h-5", stat.color)} />
+                    </div>
                   </div>
-                  <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110', stat.bg)}>
-                    <stat.icon size={20} className={stat.color} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+                  
+                  {isVolume && hasTrend && (
+                    <div className="h-[40px] mt-4 -mx-2 -mb-2 relative z-0">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={trendData}>
+                          <defs>
+                            <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
+                              <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <Area 
+                            type="monotone" 
+                            dataKey="val" 
+                            stroke="#6366f1" 
+                            strokeWidth={2}
+                            fillOpacity={1} 
+                            fill="url(#colorVal)" 
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          )
+        })}
       </motion.div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -137,7 +240,7 @@ export default function DashboardPage() {
           transition={{ delay: 0.2 }}
           className="xl:col-span-2 space-y-6"
         >
-          <Card className="shadow-sm border-slate-200/60 h-full">
+          <Card className="shadow-sm border-slate-200/60 overflow-hidden h-full">
             <CardHeader className="pb-4 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -153,29 +256,39 @@ export default function DashboardPage() {
               {incidents.length === 0 ? (
                 <div className="p-8 text-center text-slate-500 text-sm">No active incidents! 🎉</div>
               ) : (
-                <div className="divide-y divide-slate-100">
-                  {incidents.map(incident => (
-                    <Link key={incident.id} to={`/dashboard/incidents/${incident.id}`} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 hover:bg-slate-50 transition-colors group">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={cn(
-                            "inline-flex items-center justify-center h-5 w-5 rounded-md",
-                            incident.severity === 'critical' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'
-                          )}>
-                            <Flame size={12} strokeWidth={3} />
-                          </span>
-                          <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-indigo-600 transition-colors">{incident.error_type}</h4>
+                <div className="flex flex-col">
+                  {incidents.map(incident => {
+                    let cleanPath = incident.file_path?.replace(/\\/g, '/') || 'unknown'
+                    const parts = cleanPath.split('/')
+                    if (parts.length > 2) {
+                      cleanPath = parts.slice(-2).join('/')
+                    }
+                    return (
+                      <Link key={incident.id} to={`/dashboard/incidents/${incident.id}`} className="relative flex flex-col sm:flex-row sm:items-center gap-4 p-4 pl-6 hover:bg-slate-50 transition-colors group bg-white border-b border-slate-100 last:border-b-0">
+                        <div className={cn(
+                          "absolute left-0 top-0 bottom-0 w-[4px]",
+                          incident.severity === 'critical' ? 'bg-red-500' : 
+                          ['high', 'medium'].includes(incident.severity) ? 'bg-orange-500' : 'bg-blue-400'
+                        )} />
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-indigo-600 transition-colors">{incident.error_type}</h4>
+                            <Badge variant={incident.severity === 'critical' ? 'critical' : ['high', 'medium'].includes(incident.severity) ? 'warning' : 'info'} dot className="scale-90 origin-left">
+                              {incident.severity || 'unknown'}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-3 text-[12px] text-slate-500 font-medium">
+                            <span className="flex items-center gap-1 text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200/60"><Server size={12} className="text-indigo-500" /> {incident.service_name}</span>
+                            <span className="flex items-center gap-1 font-mono text-[11px] text-slate-500"><FileCode size={12} className="text-slate-400" /> {cleanPath}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-3 text-[12px] text-slate-500 font-medium">
-                          <span className="flex items-center gap-1"><Server size={12} className="text-slate-400" /> {incident.service_name}</span>
-                          <span className="flex items-center gap-1 font-mono text-[11px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-600"><FileCode size={12} /> {incident.file_path}</span>
+                        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 text-right">
+                          <span className="text-[11px] text-slate-400 flex items-center gap-1"><Clock size={10} /> {incident.created_at ? formatRelative(new Date(incident.created_at)) : ''}</span>
                         </div>
-                      </div>
-                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0">
-                        <span className="text-[11px] text-slate-400 flex items-center gap-1"><Clock size={10} /> {incident.created_at ? formatRelative(new Date(incident.created_at)) : ''}</span>
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    )
+                  })}
                 </div>
               )}
             </CardContent>
@@ -190,68 +303,137 @@ export default function DashboardPage() {
           className="space-y-6"
         >
           {/* Top Crash Locations */}
-          <Card className="shadow-sm border-slate-200/60">
+          <Card className="shadow-sm border-slate-200/60 h-full">
             <CardHeader className="pb-3 border-b border-slate-100">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Flame className="w-4 h-4 text-orange-500" />
                 Top Crash Locations
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-4 space-y-3">
               {crashLocations.length === 0 ? (
                 <div className="text-center text-slate-500 text-xs py-4">No crash locations found.</div>
               ) : (
-                crashLocations.map(loc => (
-                  <div key={loc.path} className="flex items-center justify-between">
-                    <div className="flex flex-col min-w-0 pr-4">
-                      <span className="text-[13px] font-semibold text-slate-900 truncate">{loc.type}</span>
-                      <span className="text-[11px] font-mono text-slate-500 truncate">{loc.path}</span>
+                crashLocations.map(loc => {
+                  const pct = (loc.count / maxCrashCount) * 100
+                  let cleanPath = loc.path.replace(/\\/g, '/')
+                  const parts = cleanPath.split('/')
+                  if (parts.length > 2) {
+                    cleanPath = parts.slice(-2).join('/')
+                  }
+                  return (
+                    <div key={loc.path} className="relative overflow-hidden rounded-lg border border-slate-100 bg-slate-50 p-3 group">
+                      <div 
+                        className="absolute left-0 top-0 bottom-0 bg-red-100/40 transition-all duration-500" 
+                        style={{ width: `${pct}%` }}
+                      />
+                      <div className="relative flex items-center justify-between">
+                        <div className="flex flex-col min-w-0 pr-4">
+                          <span className="text-[13px] font-bold text-slate-800 truncate flex items-center gap-1.5">
+                            {loc.type === 'MemoryError' ? <Cpu size={12} className="text-red-500"/> : 
+                             loc.type === 'OperationalError' ? <Server size={12} className="text-orange-500"/> : 
+                             <Code size={12} className="text-indigo-500"/>}
+                            {loc.type}
+                          </span>
+                          <span className="text-[11px] font-mono text-slate-500 truncate mt-0.5">{cleanPath}</span>
+                        </div>
+                        <span className="text-xs font-bold text-slate-700 bg-white px-2 py-0.5 rounded shadow-sm shrink-0 border border-slate-100">
+                          {loc.count}
+                        </span>
+                      </div>
                     </div>
-                    <span className={cn(
-                      "text-xs font-bold px-2 py-0.5 rounded-full shrink-0",
-                      loc.count > 100 ? 'bg-red-50 text-red-600' :
-                      loc.count > 50 ? 'bg-orange-50 text-orange-600' : 'bg-slate-100 text-slate-600'
-                    )}>
-                      {loc.count} err
-                    </span>
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
-
-          {/* AI Insights */}
-          <Card className="shadow-sm border-slate-200/60 bg-gradient-to-b from-indigo-50/50 to-white">
-            <CardHeader className="pb-3 border-b border-indigo-100/50">
-              <CardTitle className="text-sm flex items-center gap-2 text-indigo-900">
-                <Cpu className="w-4 h-4 text-indigo-500" />
-                AI Root Cause Insights
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-4">
-              {insights.length === 0 ? (
-                <div className="text-center text-slate-500 text-xs py-4">No recent AI insights available.</div>
-              ) : (
-                insights.map((insight, i) => (
-                  <div key={i} className="flex gap-3 items-start group">
-                    <div className="mt-0.5 shrink-0">
-                      <Zap size={14} className={cn(
-                        insight.type === 'performance' ? 'text-amber-500' : 'text-red-500'
-                      )} />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[13px] leading-snug text-slate-700 font-medium group-hover:text-indigo-700 transition-colors">
-                        {insight.description}
-                      </p>
-                      <p className="text-[10px] text-slate-400">{insight.title}</p>
-                    </div>
-                  </div>
-                ))
+                  )
+                })
               )}
             </CardContent>
           </Card>
         </motion.div>
       </div>
+
+      {/* Bottom Row: 2 Column Metrics */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        {/* Service Health */}
+        <Card className="shadow-sm border-slate-200/60">
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Activity className="w-4 h-4 text-indigo-500" />
+              Service Health (7d)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            {serviceBreakdown.length === 0 ? (
+              <div className="text-center text-slate-500 text-xs py-8">No services affected.</div>
+            ) : (
+              <div className="divide-y divide-slate-100">
+                {serviceBreakdown.slice(0, 4).map(svc => (
+                  <div key={svc.service_name} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-2.5">
+                      <div className={cn(
+                        "w-2 h-2 rounded-full", 
+                        svc.top_severity === 'critical' ? 'bg-red-500 animate-pulse' : 
+                        svc.top_severity === 'high' ? 'bg-orange-500' : 'bg-amber-400'
+                      )} />
+                      <div>
+                        <p className="text-[13px] font-bold text-slate-800">{svc.service_name}</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">{svc.count} open issues</p>
+                      </div>
+                    </div>
+                    {svc.avg_confidence !== undefined && svc.avg_confidence > 0 && (
+                      <Badge variant="neutral" className="text-[10px] bg-slate-100 text-slate-500">
+                        AI ~{Math.round(svc.avg_confidence * 100)}%
+                      </Badge>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Severity Breakdown */}
+        <Card className="shadow-sm border-slate-200/60">
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              Severity Distribution (7d)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-5">
+            {severityDist.length === 0 ? (
+              <div className="text-center text-slate-500 text-xs py-4">No active incidents.</div>
+            ) : (
+              <div className="space-y-4">
+                <div className="h-2.5 w-full bg-slate-100 rounded-full flex overflow-hidden">
+                  {severityDist.map(s => (
+                    <div 
+                      key={s.severity} 
+                      className={SEVERITY_COLORS[s.severity] || 'bg-slate-400'} 
+                      style={{ width: `${(s.count / totalSeverity) * 100}%` }}
+                      title={`${s.severity}: ${s.count}`}
+                    />
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-1">
+                  {severityDist.map(s => (
+                    <div key={s.severity} className="flex items-center justify-between text-xs bg-slate-50 px-2.5 py-1.5 rounded-md border border-slate-100">
+                      <div className="flex items-center gap-1.5 capitalize text-slate-600 font-medium">
+                        <span className={cn("w-1.5 h-1.5 rounded-full", SEVERITY_COLORS[s.severity] || 'bg-slate-400')} />
+                        {s.severity || 'Unknown'}
+                      </div>
+                      <span className="font-bold text-slate-900">{s.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   )
 }

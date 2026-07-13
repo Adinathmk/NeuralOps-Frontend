@@ -26,7 +26,19 @@ const STATUS_FILTERS: Array<{ label: string; value: string }> = [
   { label: 'Investigating', value: 'investigating' },
   { label: 'Resolved',      value: 'resolved' },
   { label: 'Closed',        value: 'closed' },
+  { label: 'Draft',         value: 'draft' },
 ]
+
+const CATEGORY_FILTERS: Array<{ label: string; value: string }> = [
+  { label: 'All', value: 'all' },
+  { label: 'Code Bug', value: 'code_bug' },
+  { label: 'Database', value: 'database' },
+  { label: 'Infra/Config', value: 'infra_config' },
+  { label: 'External Dependency', value: 'external_dependency' },
+  { label: 'Security', value: 'security' },
+  { label: 'Unknown', value: 'unknown' },
+]
+
 
 export default function IncidentsPage() {
   const dispatch = useAppDispatch()
@@ -38,11 +50,13 @@ export default function IncidentsPage() {
     dispatch(fetchIncidentsThunk({
       status: filters.status !== 'all' ? filters.status : undefined,
       severity: filters.severity !== 'all' ? filters.severity : undefined,
+      error_category: filters.category !== 'all' ? filters.category : undefined,
       assigned_user_id: filters.assignedToMe && user?.id ? user.id : undefined,
       search: filters.search || undefined,
       page: filters.page,
+      is_draft: true,
     }))
-  }, [dispatch, filters.status, filters.severity, filters.search, filters.page, filters.assignedToMe, user?.id])
+  }, [dispatch, filters.status, filters.severity, filters.category, filters.search, filters.page, filters.assignedToMe, user?.id])
 
   // Debounced search
   useEffect(() => {
@@ -60,9 +74,11 @@ export default function IncidentsPage() {
         <Button variant="outline" size="sm" className="gap-2" onClick={() => dispatch(fetchIncidentsThunk({
           status: filters.status !== 'all' ? filters.status : undefined,
           severity: filters.severity !== 'all' ? filters.severity : undefined,
+          error_category: filters.category !== 'all' ? filters.category : undefined,
           assigned_user_id: filters.assignedToMe && user?.id ? user.id : undefined,
           search: filters.search || undefined,
           page: filters.page,
+          is_draft: true,
         }))} isLoading={isLoading}>
           <RefreshCw size={13} /> Refresh
         </Button>
@@ -105,6 +121,12 @@ export default function IncidentsPage() {
             options={SEVERITY_FILTERS}
             active={filters.severity}
             onChange={v => dispatch(setFilter({ severity: v }))}
+          />
+          <FilterGroup
+            label="Category"
+            options={CATEGORY_FILTERS}
+            active={filters.category}
+            onChange={v => dispatch(setFilter({ category: v }))}
           />
           <FilterGroup
             label="Status"
@@ -154,8 +176,8 @@ export default function IncidentsPage() {
 }
 
 function IncidentCard({ incident }: { incident: Incident }) {
-  const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
-  const statusVariant = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
+  const severityVariant = { critical: 'critical', high: 'warning', medium: 'warning', low: 'info', unknown: 'neutral' }[incident.severity] as 'critical' | 'warning' | 'info' | 'neutral'
+  const statusVariant = { open: 'critical', investigating: 'warning', resolved: 'success', closed: 'neutral', draft: 'neutral' }[incident.status] as 'critical' | 'warning' | 'success' | 'neutral'
 
   return (
     <div className={cn(
@@ -177,6 +199,11 @@ function IncidentCard({ incident }: { incident: Incident }) {
           <p className="text-sm font-semibold text-slate-800 truncate">{incident.error_type}</p>
           <Badge variant={severityVariant} dot>{incident.severity}</Badge>
           <Badge variant={statusVariant}>{incident.status}</Badge>
+          {incident.error_category && (
+            <Badge variant="neutral" className="bg-slate-100 text-slate-600 font-medium">
+              {incident.error_category}
+            </Badge>
+          )}
         </div>
         <p className="text-xs text-slate-500 truncate font-mono">
           {incident.crash_file}:{incident.crash_line}

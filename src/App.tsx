@@ -128,7 +128,7 @@ export default function App() {
           <Route path="/dashboard/settings"                element={<SettingsPage />} />
           <Route path="/dashboard/settings/github"         element={<GitHubIntegrationPage />} />
           <Route path="/dashboard/settings/api-keys"       element={<ApiKeysPage />} />
-          <Route path="/dashboard/billing"                 element={<RequireRole allowedRoles={['admin', 'engineer']}><BillingPage /></RequireRole>} />
+          <Route path="/dashboard/billing"                 element={<RequireRole allowedRoles={['owner', 'admin']}><BillingPage /></RequireRole>} />
         </Route>
 
         {/* ── 404 ── */}
