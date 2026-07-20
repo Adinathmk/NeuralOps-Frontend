@@ -140,7 +140,7 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
           id: editRule.id,
           confidence_threshold: data.confidence_threshold,
           severity_filter: severities,
-          destinations: validDestinations,
+          destinations: validDestinations as any,
         })).unwrap()
 
         toast({ type: 'success', title: 'Rule updated' })
@@ -148,7 +148,7 @@ const AlertRulesTab = forwardRef<TabHandle>((props, ref) => {
         await dispatch(createAlertRule({
           confidence_threshold: data.confidence_threshold,
           severity_filter: severities,
-          destinations: validDestinations,
+          destinations: validDestinations as any,
           enabled: true,
         })).unwrap()
 

@@ -88,8 +88,8 @@ export default function DashboardPage() {
     { 
       label: 'Active Criticals',  
       value: summary?.critical_count?.toString() || '0', 
-      delta: summary?.previous_period?.critical_count !== undefined && summary.previous_period.critical_count !== summary.critical_count
-        ? `${summary.critical_count > summary.previous_period.critical_count ? '+' : ''}${summary.critical_count - summary.previous_period.critical_count} vs last week`
+      delta: summary?.critical_delta_pct != null && summary.critical_delta_pct !== 0
+        ? `${summary.critical_delta_pct > 0 ? '+' : ''}${summary.critical_delta_pct}% vs last period`
         : '',
       icon: Flame,         
       color: 'text-red-500',    
@@ -98,8 +98,8 @@ export default function DashboardPage() {
     { 
       label: 'Total Issues (7d)', 
       value: summary?.total_incidents?.toString() || '0',  
-      delta: summary?.previous_period?.total_incidents !== undefined && summary.previous_period.total_incidents !== summary.total_incidents
-        ? `${summary.total_incidents > summary.previous_period.total_incidents ? '+' : ''}${summary.total_incidents - summary.previous_period.total_incidents} vs last week`
+      delta: summary?.total_delta_pct != null && summary.total_delta_pct !== 0
+        ? `${summary.total_delta_pct > 0 ? '+' : ''}${summary.total_delta_pct}% vs last period`
         : '',  
       icon: Activity,      
       color: 'text-indigo-500', 
@@ -108,7 +108,9 @@ export default function DashboardPage() {
     { 
       label: 'Resolution Rate (7d)',
       value: summary ? `${summary.resolution_rate}%` : '0%',     
-      delta: '',     
+      delta: summary?.resolution_rate_delta_pct != null && summary.resolution_rate_delta_pct !== 0
+        ? `${summary.resolution_rate_delta_pct > 0 ? '+' : ''}${summary.resolution_rate_delta_pct}% vs last period`
+        : '',     
       icon: ShieldAlert,   
       color: 'text-amber-500',  
       bg: 'bg-amber-500/10' 
@@ -116,8 +118,8 @@ export default function DashboardPage() {
     { 
       label: 'Avg MTTR (7d)',          
       value: summary ? `${summary.avg_mttr_minutes}m` : '0m',  
-      delta: summary?.previous_period?.avg_mttr_minutes !== undefined && summary.previous_period.avg_mttr_minutes !== summary.avg_mttr_minutes
-        ? `${summary.avg_mttr_minutes > summary.previous_period.avg_mttr_minutes ? '+' : ''}${summary.avg_mttr_minutes - summary.previous_period.avg_mttr_minutes}m vs last week`
+      delta: summary?.mttr_delta_pct != null && summary.mttr_delta_pct !== 0
+        ? `${summary.mttr_delta_pct > 0 ? '+' : ''}${summary.mttr_delta_pct}% vs last period`
         : '',  
       icon: Clock,         
       color: 'text-emerald-500',
@@ -284,7 +286,7 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 text-right">
-                          <span className="text-[11px] text-slate-400 flex items-center gap-1"><Clock size={10} /> {incident.created_at ? formatRelative(new Date(incident.created_at)) : ''}</span>
+                          <span className="text-[11px] text-slate-400 flex items-center gap-1"><Clock size={10} /> {incident.created_at ? formatRelative(incident.created_at) : ''}</span>
                         </div>
                       </Link>
                     )

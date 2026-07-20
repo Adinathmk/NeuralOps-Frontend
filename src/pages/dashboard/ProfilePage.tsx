@@ -47,7 +47,7 @@ export default function ProfilePage() {
     setIsDeleting(true)
     try {
       const res = await authApi.deleteProfilePicture()
-      dispatch(updateUser(res.data))
+      dispatch(updateUser(res.data as any))
       toast({ type: 'success', title: 'Profile picture removed' })
     } catch (err) {
       console.error(err)
