@@ -33,9 +33,20 @@ export function useWebSocket(
       return
     }
 
+    const getWsHost = () => {
+      const apiUrl = import.meta.env.VITE_API_URL as string | undefined
+      if (apiUrl) {
+        try {
+          const url = new URL(apiUrl, window.location.origin)
+          return url.host
+        } catch (e) {}
+      }
+      return window.location.host
+    }
+
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    // Connect directly to Kong on port 80 instead of going through the Vite dev server proxy
-    const wsUrl = `${wsProtocol}//${window.location.hostname}${endpointPath}?jwt=${tokens.access_token}`
+    // Connect directly to the API host (e.g. localhost:8080) if specified, otherwise fallback to Vite proxy
+    const wsUrl = `${wsProtocol}//${getWsHost()}${endpointPath}?jwt=${tokens.access_token}`
 
     const ws = new WebSocket(wsUrl)
 

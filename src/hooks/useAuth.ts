@@ -25,7 +25,7 @@ export function useAuth() {
 
     // Registration requires email verification — redirect to confirm page
     if (registerThunk.fulfilled.match(result)) {
-      navigate('/register-success', { replace: true })
+      navigate('/register-success', { replace: true, state: { email: data.email } })
     }
 
     return result
