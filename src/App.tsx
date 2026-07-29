@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAppSelector } from '@store/index'
 import { setupWebPush } from '@lib/push'
 import apiClient from '@lib/axios'
+import { useTheme } from '@hooks/useTheme'
 
 // Layouts
 import { DashboardLayout } from '@components/layout/DashboardLayout'
@@ -42,6 +43,9 @@ import AcceptInvitePage   from '@pages/invitations/AcceptInvitePage'
 
 // Misc
 import NotFoundPage       from '@pages/NotFoundPage'
+import LandingPage        from '@pages/LandingPage'
+import ContactPage        from '@pages/ContactPage'
+import DocsPage           from '@pages/DocsPage'
 
 // ── Route guards ──────────────────────────────────────────────────────────────
 
@@ -80,11 +84,15 @@ function RequireRole({ children, allowedRoles }: { children: React.ReactNode, al
 }
 
 export default function App() {
+  useTheme()
+
   return (
     <BrowserRouter>
       <Routes>
-        {/* ── Root redirect ── */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* ── Public Pages ── */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/docs" element={<DocsPage />} />
 
         {/* ── Auth routes (guest only) ── */}
         <Route element={<RequireGuest><AuthLayout /></RequireGuest>}>

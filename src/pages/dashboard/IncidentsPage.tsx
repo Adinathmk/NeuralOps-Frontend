@@ -68,8 +68,8 @@ export default function IncidentsPage() {
     <div className="space-y-5 w-full">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Incidents</h1>
-          <p className="text-sm text-slate-500 mt-0.5">{items.length} incidents found</p>
+          <h1 className="text-xl font-bold text-foreground">Incidents</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{items.length} incidents found</p>
         </div>
         <Button variant="outline" size="sm" className="gap-2" onClick={() => dispatch(fetchIncidentsThunk({
           status: filters.status !== 'all' ? filters.status : undefined,
@@ -85,16 +85,16 @@ export default function IncidentsPage() {
       </div>
 
       {/* View Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 mt-2 mb-4">
+      <div className="flex items-center gap-2 border-b border-border mt-2 mb-4">
         <button 
           onClick={() => dispatch(setFilter({ assignedToMe: false }))}
-          className={cn("px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px", !filters.assignedToMe ? "border-primary text-primary" : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300")}
+          className={cn("px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px", !filters.assignedToMe ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:border-border")}
         >
           All Incidents
         </button>
         <button 
           onClick={() => dispatch(setFilter({ assignedToMe: true }))}
-          className={cn("px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px", filters.assignedToMe ? "border-primary text-primary" : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300")}
+          className={cn("px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px", filters.assignedToMe ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:border-border")}
         >
           My Incidents
         </button>
@@ -102,17 +102,17 @@ export default function IncidentsPage() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="py-5 flex flex-wrap gap-4 items-center bg-white rounded-2xl">
+        <CardContent className="py-5 flex flex-wrap gap-4 items-center bg-card rounded-2xl">
           {/* Search */}
           <div className="relative flex-1 min-w-[250px]">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-slate-400" />
+              <Search className="h-4 w-4 text-muted-foreground" />
             </div>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by error type or file…"
-              className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-shadow"
+              className="block w-full pl-10 pr-3 py-2.5 bg-background text-foreground border border-input rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-shadow"
             />
           </div>
 
@@ -166,8 +166,8 @@ export default function IncidentsPage() {
 
         {!isLoading && items.length === 0 && !error && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <AlertTriangle size={32} className="text-slate-400 mb-3" />
-            <p className="text-sm text-slate-500">No incidents match your filters</p>
+            <AlertTriangle size={32} className="text-muted-foreground/80 mb-3" />
+            <p className="text-sm text-muted-foreground">No incidents match your filters</p>
           </div>
         )}
       </div>
@@ -181,10 +181,10 @@ function IncidentCard({ incident }: { incident: Incident }) {
 
   return (
     <div className={cn(
-      'flex items-center gap-4 p-4 rounded-xl border bg-white hover:bg-slate-50 transition-all cursor-pointer group',
+      'flex items-center gap-4 p-4 rounded-xl border bg-card hover:bg-muted/50 transition-all cursor-pointer group',
       incident.severity === 'critical' ? 'border-red-500/15 hover:border-red-500/25' :
       ['high', 'medium'].includes(incident.severity) ? 'border-amber-500/15 hover:border-amber-500/25' :
-      'border-slate-200 hover:border-slate-300'
+      'border-border hover:border-border/80'
     )}>
       {/* Severity indicator */}
       <div className={cn(
@@ -196,38 +196,38 @@ function IncidentCard({ incident }: { incident: Incident }) {
       {/* Main content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <p className="text-sm font-semibold text-slate-800 truncate">{incident.error_type}</p>
+          <p className="text-sm font-semibold text-foreground truncate">{incident.error_type}</p>
           <Badge variant={severityVariant} dot>{incident.severity}</Badge>
           <Badge variant={statusVariant}>{incident.status}</Badge>
           {incident.error_category && (
-            <Badge variant="neutral" className="bg-slate-100 text-slate-600 font-medium">
+            <Badge variant="neutral" className="bg-muted text-muted-foreground font-medium">
               {incident.error_category}
             </Badge>
           )}
         </div>
-        <p className="text-xs text-slate-500 truncate font-mono">
+        <p className="text-xs text-muted-foreground truncate font-mono">
           {incident.crash_file}:{incident.crash_line}
         </p>
         {incident.root_cause && (
-          <p className="text-xs text-slate-600 truncate mt-1">{incident.root_cause}</p>
+          <p className="text-xs text-muted-foreground truncate mt-1">{incident.root_cause}</p>
         )}
       </div>
 
       {/* Meta */}
       <div className="text-right shrink-0 space-y-1">
-        <p className="text-xs text-slate-600 font-medium">{incident.service_name}</p>
+        <p className="text-xs text-muted-foreground font-medium">{incident.service_name}</p>
         {incident.confidence_score !== undefined && incident.confidence_score !== null && (
           <div className="flex items-center justify-end gap-1.5">
-            <div className="h-1 w-16 rounded-full bg-white/10 overflow-hidden">
+            <div className="h-1 w-16 rounded-full bg-card/10 overflow-hidden">
               <div
                 className="h-full rounded-full bg-primary"
                 style={{ width: `${incident.confidence_score * 100}%` }}
               />
             </div>
-            <span className="text-[10px] text-slate-500">{Math.round(incident.confidence_score * 100)}%</span>
+            <span className="text-[10px] text-muted-foreground">{Math.round(incident.confidence_score * 100)}%</span>
           </div>
         )}
-        <p className="text-[11px] text-slate-500">{formatRelative(incident.created_at)}</p>
+        <p className="text-[11px] text-muted-foreground">{formatRelative(incident.created_at)}</p>
       </div>
     </div>
   )
@@ -241,7 +241,7 @@ function FilterGroup({ label, options, active, onChange }: {
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm font-medium text-slate-700 shrink-0">{label}:</span>
+      <span className="text-sm font-medium text-foreground shrink-0">{label}:</span>
       <Select
         value={active}
         onChange={onChange}

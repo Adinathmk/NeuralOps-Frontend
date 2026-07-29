@@ -53,13 +53,13 @@ const fadeUp = {
 function PremiumTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-white/90 backdrop-blur-md border border-slate-100 rounded-xl px-4 py-3 shadow-xl">
-      {label && <p className="text-slate-500 mb-2 font-medium text-xs uppercase tracking-wider">{label}</p>}
+    <div className="bg-card/90 backdrop-blur-md border border-border rounded-xl px-4 py-3 shadow-xl">
+      {label && <p className="text-muted-foreground mb-2 font-medium text-xs uppercase tracking-wider">{label}</p>}
       {payload.map((entry: any, i: number) => (
         <div key={i} className="flex items-center gap-3 mb-1.5 last:mb-0">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
-          <span className="text-slate-600 text-sm font-medium">{entry.name}:</span>
-          <span className="font-bold text-slate-900 text-sm ml-auto">{entry.value}</span>
+          <span className="text-muted-foreground text-sm font-medium">{entry.name}:</span>
+          <span className="font-bold text-foreground text-sm ml-auto">{entry.value}</span>
         </div>
       ))}
     </div>
@@ -71,19 +71,19 @@ function KpiCard({ title, value, delta, inverse, icon: Icon, color }: any) {
   const neutral = delta === 0 || delta === null
 
   return (
-    <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100 flex justify-between group hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-shadow duration-300">
+    <div className="bg-card rounded-[20px] p-6 shadow-sm border border-border flex justify-between group hover:border-border/80 transition-colors duration-300">
       <div className="flex flex-col justify-between">
-        <h3 className="text-slate-500 font-medium text-sm mb-4">{title}</h3>
+        <h3 className="text-muted-foreground font-medium text-sm mb-4">{title}</h3>
         <div>
-          <div className="text-[32px] leading-none font-bold text-slate-800 mb-3">{value}</div>
+          <div className="text-[32px] leading-none font-bold text-foreground mb-3">{value}</div>
           <div className="flex items-center gap-2 text-xs">
             {neutral ? null : (
-              <span className={cn("flex items-center gap-0.5 font-bold px-1.5 py-0.5 rounded-md", positive ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600")}>
+              <span className={cn("flex items-center gap-0.5 font-bold px-1.5 py-0.5 rounded-md", positive ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500")}>
                 {positive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                 {Math.abs(delta)}%
               </span>
             )}
-            <span className="text-slate-400 font-medium">{neutral ? 'No change' : 'vs last period'}</span>
+            <span className="text-muted-foreground font-medium">{neutral ? 'No change' : 'vs last period'}</span>
           </div>
         </div>
       </div>
@@ -99,9 +99,9 @@ function KpiCard({ title, value, delta, inverse, icon: Icon, color }: any) {
 
 function SectionCard({ title, children, headerRight, className }: any) {
   return (
-    <div className={cn("bg-white rounded-[24px] shadow-[0_2px_16px_rgba(0,0,0,0.03)] border border-slate-100 overflow-hidden flex flex-col", className)}>
+    <div className={cn("bg-card rounded-[24px] shadow-[0_2px_16px_rgba(0,0,0,0.03)] border border-border overflow-hidden flex flex-col", className)}>
       <div className="flex items-center justify-between px-6 pt-6 pb-2">
-        <h3 className="text-[15px] font-bold text-slate-800">{title}</h3>
+        <h3 className="text-[15px] font-bold text-foreground">{title}</h3>
         {headerRight}
       </div>
       <div className="p-6 flex-1 flex flex-col">{children}</div>
@@ -111,8 +111,8 @@ function SectionCard({ title, children, headerRight, className }: any) {
 
 function Shimmer({ className }: { className?: string }) {
   return (
-    <div className={cn('relative overflow-hidden rounded-xl bg-slate-100', className)}>
-      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+    <div className={cn('relative overflow-hidden rounded-xl bg-muted', className)}>
+      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       <style>{`@keyframes shimmer { 100% { transform: translateX(200%); } }`}</style>
     </div>
   )
@@ -196,28 +196,28 @@ export default function AnalyticsPage() {
             <BarChart2 size={20} className="text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Dashboard Overview</h1>
-            <p className="text-slate-500 text-sm mt-0.5">Performance & Intelligence metrics</p>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard Overview</h1>
+            <p className="text-muted-foreground text-sm mt-0.5">Performance & Intelligence metrics</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 bg-white p-1 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-100 shrink-0 w-max">
+        <div className="flex items-center gap-2 bg-card p-1 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-border shrink-0 w-max">
           {[7, 14, 30].map(r => (
             <button
               key={r}
               onClick={() => setRange(r)}
               className={cn(
                 "px-4 py-1.5 rounded-lg text-sm font-medium transition-all",
-                range === r ? "bg-indigo-50 text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                range === r ? "bg-indigo-50 text-indigo-700 shadow-sm" : "text-muted-foreground hover:text-foreground/80 hover:bg-muted/50"
               )}
             >
               {r} Days
             </button>
           ))}
-          <div className="w-px h-6 bg-slate-200 mx-1" />
+          <div className="w-px h-6 bg-border mx-1" />
           <button
             onClick={() => fetchAll(range)}
-            className="p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-lg hover:bg-indigo-50 mr-1"
+            className="p-2 text-muted-foreground/80 hover:text-indigo-600 transition-colors rounded-lg hover:bg-indigo-50 mr-1"
           >
             <RefreshCw size={16} className={cn(refreshing && "animate-spin")} />
           </button>
@@ -284,19 +284,19 @@ export default function AnalyticsPage() {
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
-                  <span className="text-xs text-slate-500 font-medium">Open</span>
+                  <span className="text-xs text-muted-foreground font-medium">Open</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                  <span className="text-xs text-slate-500 font-medium">Investigating</span>
+                  <span className="text-xs text-muted-foreground font-medium">Investigating</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                  <span className="text-xs text-slate-500 font-medium">Resolved</span>
+                  <span className="text-xs text-muted-foreground font-medium">Resolved</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-500" />
-                  <span className="text-xs text-slate-500 font-medium">Closed</span>
+                  <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground" />
+                  <span className="text-xs text-muted-foreground font-medium">Closed</span>
                 </div>
               </div>
             }
@@ -338,10 +338,10 @@ export default function AnalyticsPage() {
                       tick={{ fill: '#94A3B8', fontSize: 12 }}
                     />
                     <Tooltip content={<PremiumTooltip />} />
-                    <Area type="natural" dataKey="open" name="Open" stroke="#6366F1" strokeWidth={3} fillOpacity={1} fill="url(#colorOpen)" activeDot={{ r: 6, strokeWidth: 0 }} />
-                    <Area type="natural" dataKey="investigating" name="Investigating" stroke="#F59E0B" strokeWidth={3} fillOpacity={1} fill="url(#colorInvestigating)" activeDot={{ r: 6, strokeWidth: 0 }} />
-                    <Area type="natural" dataKey="resolved" name="Resolved" stroke="#10B981" strokeWidth={3} fillOpacity={1} fill="url(#colorResolved)" activeDot={{ r: 6, strokeWidth: 0 }} />
-                    <Area type="natural" dataKey="closed" name="Closed" stroke="#64748B" strokeWidth={3} fillOpacity={1} fill="url(#colorClosed)" activeDot={{ r: 6, strokeWidth: 0 }} />
+                    <Area type="monotone" dataKey="open" name="Open" stroke="#6366F1" strokeWidth={3} fillOpacity={1} fill="url(#colorOpen)" activeDot={{ r: 6, strokeWidth: 0 }} />
+                    <Area type="monotone" dataKey="investigating" name="Investigating" stroke="#F59E0B" strokeWidth={3} fillOpacity={1} fill="url(#colorInvestigating)" activeDot={{ r: 6, strokeWidth: 0 }} />
+                    <Area type="monotone" dataKey="resolved" name="Resolved" stroke="#10B981" strokeWidth={3} fillOpacity={1} fill="url(#colorResolved)" activeDot={{ r: 6, strokeWidth: 0 }} />
+                    <Area type="monotone" dataKey="closed" name="Closed" stroke="#64748B" strokeWidth={3} fillOpacity={1} fill="url(#colorClosed)" activeDot={{ r: 6, strokeWidth: 0 }} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -377,18 +377,18 @@ export default function AnalyticsPage() {
                 </div>
                 {/* Center text */}
                 <div className="absolute top-[37%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-                  <div className="text-[28px] font-black text-slate-800 leading-none">
+                  <div className="text-[28px] font-black text-foreground leading-none">
                     {severity.reduce((a, b) => a + b.count, 0)}
                   </div>
-                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mt-1">Total</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground/80 font-bold mt-1">Total</div>
                 </div>
                 {/* Custom Legend */}
                 <div className="w-full grid grid-cols-2 gap-x-2 gap-y-3 mt-auto pt-2">
                   {severityData.slice(0,4).map((d) => (
                     <div key={d.name} className="flex items-center gap-2">
                       <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
-                      <span className="text-xs text-slate-600 font-medium flex-1 truncate">{d.name}</span>
-                      <span className="text-xs font-bold text-slate-900">{d.value}</span>
+                      <span className="text-xs text-muted-foreground font-medium flex-1 truncate">{d.name}</span>
+                      <span className="text-xs font-bold text-foreground">{d.value}</span>
                     </div>
                   ))}
                 </div>
@@ -404,7 +404,7 @@ export default function AnalyticsPage() {
               <div className="h-[260px] w-full mt-2">
                   <div className="h-[260px] w-full mt-2 overflow-y-auto pr-2 space-y-4 custom-scrollbar">
                     {services.length === 0 ? (
-                      <div className="flex h-full items-center justify-center text-sm text-slate-400">No service data available</div>
+                      <div className="flex h-full items-center justify-center text-sm text-muted-foreground/80">No service data available</div>
                     ) : (
                       services.slice(0, 6).map((svc, i) => {
                         const maxCount = Math.max(...services.map(s => s.count), 1)
@@ -414,13 +414,13 @@ export default function AnalyticsPage() {
                         return (
                           <div key={svc.service_name} className="flex flex-col gap-1.5 group">
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-semibold text-slate-700 truncate">{svc.service_name}</span>
+                              <span className="text-xs font-semibold text-foreground/80 truncate">{svc.service_name}</span>
                               <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded capitalize" style={{ backgroundColor: `${color}15`, color }}>{svc.top_severity}</span>
-                                <span className="text-xs font-black text-slate-800">{svc.count}</span>
+                                <span className="text-xs font-black text-foreground">{svc.count}</span>
                               </div>
                             </div>
-                            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                               <motion.div
                                 className="h-full rounded-full"
                                 style={{ backgroundColor: color }}
@@ -472,32 +472,32 @@ export default function AnalyticsPage() {
 
       {/* Table Section */}
       <motion.div variants={fadeUp} initial="hidden" animate="show">
-        <SectionCard title="Actionable Incidents" className="p-0" headerRight={<button className="text-xs text-indigo-600 font-medium hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg">View All</button>}>
+        <SectionCard title="Actionable Incidents" className="p-0" headerRight={<button className="text-xs text-blue-500 font-medium hover:text-blue-400 bg-blue-500/10 px-3 py-1.5 rounded-lg transition-colors">View All</button>}>
           {loading ? (
             <div className="p-6"><Shimmer className="h-40" /></div>
           ) : incidents.length === 0 ? (
-            <div className="p-8 text-center text-slate-500">No actionable incidents right now.</div>
+            <div className="p-8 text-center text-muted-foreground">No actionable incidents right now.</div>
           ) : (
             <div className="w-full overflow-x-auto pb-2">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-100">
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">ID</th>
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">Error Type</th>
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">Service</th>
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">Severity</th>
-                    <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50 text-right">Action</th>
+                  <tr className="border-b border-border">
+                    <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/30">ID</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/30">Error Type</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/30">Service</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/30">Severity</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest bg-muted/30 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {incidents.slice(0, 5).map((inc) => (
-                    <tr key={inc.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
-                      <td className="px-6 py-4 text-sm font-mono text-slate-500">#{inc.id.slice(0,6)}</td>
+                    <tr key={inc.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                      <td className="px-6 py-4 text-sm font-mono text-muted-foreground">#{inc.id.slice(0,6)}</td>
                       <td className="px-6 py-4">
-                        <div className="text-sm font-bold text-slate-800">{inc.error_type}</div>
-                        <div className="text-xs text-slate-500 truncate max-w-[250px]">{inc.error_message}</div>
+                        <div className="text-sm font-bold text-foreground">{inc.error_type}</div>
+                        <div className="text-xs text-muted-foreground truncate max-w-[250px]">{inc.error_message}</div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-medium text-slate-700">{inc.service_name}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-foreground/80">{inc.service_name}</td>
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold capitalize" style={{ backgroundColor: `${SEVERITY_COLORS[inc.severity] || '#94A3B8'}15`, color: SEVERITY_COLORS[inc.severity] || '#94A3B8' }}>
                           <div className="w-1.5 h-1.5 rounded-full mr-1.5" style={{ backgroundColor: SEVERITY_COLORS[inc.severity] || '#94A3B8' }} />
@@ -505,7 +505,7 @@ export default function AnalyticsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button className="p-2 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors">
+                        <button className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/50 transition-colors">
                           <MoreHorizontal size={16} />
                         </button>
                       </td>

@@ -43,25 +43,29 @@ export function Sidebar() {
     <motion.aside
       animate={{ width: collapsed ? 64 : 240 }}
       transition={{ duration: 0.25, ease: 'easeInOut' }}
-      className="relative flex flex-col h-screen bg-white border-r border-slate-200 shrink-0 overflow-hidden z-20"
+      className="relative flex flex-col h-screen bg-card border-r border-border shrink-0 overflow-hidden z-20"
     >
       {/* Logo / Interactive Toggle Header */}
       <div
         onClick={() => collapsed && dispatch(toggleSidebar())}
         className={cn(
           "flex items-center justify-between h-16 pl-6 pr-4 border-b border-transparent shrink-0 select-none",
-          collapsed && "cursor-pointer hover:bg-slate-100 justify-center px-0 relative group"
+          collapsed && "cursor-pointer hover:bg-muted justify-center px-0 relative group"
         )}
       >
         <div className="flex items-center gap-3">
           <div className={cn(
-            "h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0 shadow-md shadow-indigo-600/20 transition-all duration-300",
+            "h-8 w-8 rounded-full overflow-hidden shrink-0 transition-all duration-300 flex items-center justify-center bg-transparent",
             collapsed && "group-hover:scale-0 opacity-100 group-hover:opacity-0"
           )}>
-            <Zap size={16} className="text-white" />
+            <img 
+              src="/Logo.png" 
+              alt="Logo" 
+              className="h-full w-full object-cover scale-[1.15]" 
+            />
           </div>
           {!collapsed && (
-            <span className="text-base font-bold text-slate-900 tracking-tight whitespace-nowrap">
+            <span className="text-base font-bold text-foreground tracking-tight whitespace-nowrap">
               NeuralOps
             </span>
           )}
@@ -71,7 +75,7 @@ export function Sidebar() {
         {!collapsed && (
           <button
             onClick={(e) => { e.stopPropagation(); dispatch(toggleSidebar()) }}
-            className="h-7 w-7 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-500 hover:text-slate-700 transition-all shadow-sm"
+            className="h-7 w-7 rounded-lg bg-background border border-border hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-all shadow-sm"
             title="Collapse Sidebar"
           >
             <ChevronLeft size={14} />
@@ -99,7 +103,7 @@ export function Sidebar() {
             onClick={handleLogout}
             className={cn(
               'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-all duration-200 relative group overflow-hidden',
-              'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+              'text-muted-foreground hover:bg-muted hover:text-foreground',
               collapsed && 'justify-center px-2'
             )}
           >
@@ -138,8 +142,8 @@ function SidebarItem({ to, icon: Icon, label, collapsed, badge }: {
       className={({ isActive }) => cn(
         'flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-all duration-200 relative group overflow-hidden',
         isActive
-          ? 'bg-[#EEF0FF] text-[#4F46E5]'
-          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+          ? 'bg-primary/10 text-primary'
+          : 'text-muted-foreground hover:bg-muted hover:text-foreground',
         collapsed && 'justify-center px-2'
       )}
     >

@@ -4,13 +4,14 @@ import { useAppSelector } from '@store/index'
 
 import { cn } from '@utils/cn'
 import { Avatar } from '@components/common/Avatar'
+import { ThemeToggle } from '@components/ui/ThemeToggle'
 
 export function Topbar() {
   const user    = useAppSelector(s => s.auth.user)
   const unread  = useAppSelector(s => s.notifications.unreadCount)
 
   return (
-    <header className="h-14 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center gap-4 px-6 shrink-0">
+    <header className="h-14 border-b border-border bg-background/80 backdrop-blur-md flex items-center gap-4 px-6 shrink-0">
       <div className="ml-auto flex items-center gap-3">
         {/* Notifications */}
         <Link
@@ -26,6 +27,8 @@ export function Topbar() {
             </span>
           )}
         </Link>
+
+        <ThemeToggle />
 
         {/* Avatar */}
         <Link to="/dashboard/profile" className="flex items-center gap-2 group hover:opacity-80 transition-opacity">

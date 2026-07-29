@@ -18,20 +18,20 @@ export default function SettingsPage() {
   return (
     <div className="w-full space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-slate-900">Workspace Settings</h1>
-        <p className="text-sm text-slate-500 mt-0.5">Manage your workspace preferences and integrations.</p>
+        <h1 className="text-xl font-bold text-foreground">Workspace Settings</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Manage your workspace preferences and integrations.</p>
       </div>
 
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-        <Card className="overflow-hidden border-0 shadow-lg shadow-indigo-500/5 ring-1 ring-slate-200/50">
-          <div className="bg-gradient-to-r from-indigo-50 to-indigo-100/50 px-6 py-5 border-b border-indigo-100/50 flex items-center justify-between">
+        <Card className="overflow-hidden border-border shadow-sm">
+          <div className="bg-primary/5 px-6 py-5 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-xl bg-indigo-600 shadow-md shadow-indigo-600/20 flex items-center justify-center shrink-0">
-                <span className="text-xl font-bold text-white">{tenant?.name?.charAt(0).toUpperCase() || 'W'}</span>
+              <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shrink-0">
+                <span className="text-xl font-bold text-primary-foreground">{tenant?.name?.charAt(0).toUpperCase() || 'W'}</span>
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">{tenant?.name}</h2>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">Workspace details and active subscription</p>
+                <h2 className="text-lg font-bold text-foreground">{tenant?.name}</h2>
+                <p className="text-xs text-muted-foreground font-medium mt-0.5">Workspace details and active subscription</p>
               </div>
             </div>
             <Badge variant={tenant?.status === 'active' ? 'success' : 'warning'} className="capitalize px-3 py-1 text-xs">
@@ -41,20 +41,20 @@ export default function SettingsPage() {
           <CardContent className="p-6">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="space-y-1.5">
-                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Workspace ID</p>
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Workspace ID</p>
                 <div>
-                   <span className="text-xs font-mono font-medium text-slate-600 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">{tenant?.id || '—'}</span>
+                   <span className="text-xs font-mono font-medium text-foreground bg-muted px-2 py-1 rounded-md border border-border">{tenant?.id || '—'}</span>
                 </div>
               </div>
               <div className="space-y-1.5">
-                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Current Plan</p>
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Current Plan</p>
                 <div>
-                  <span className="text-xs font-bold text-indigo-700 uppercase tracking-wide bg-indigo-100/50 px-2.5 py-1 rounded-md">{tenant?.plan_tier || 'FREE'}</span>
+                  <span className="text-xs font-bold text-primary uppercase tracking-wide bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-md">{tenant?.plan_tier || 'FREE'}</span>
                 </div>
               </div>
               <div className="space-y-1.5">
-                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Created At</p>
-                <p className="text-sm text-slate-700 font-medium">{tenant?.created_at ? new Date(tenant.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '—'}</p>
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Created At</p>
+                <p className="text-sm text-foreground font-medium">{tenant?.created_at ? new Date(tenant.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '—'}</p>
               </div>
             </div>
           </CardContent>
@@ -75,16 +75,16 @@ export default function SettingsPage() {
               <Link
                 key={to}
                 to={to}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-100 transition-all group"
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-all group"
               >
-                <div className="h-8 w-8 rounded-md bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-slate-100 transition-colors">
-                  <Icon size={14} className="text-slate-600" />
+                <div className="h-8 w-8 rounded-md bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-background transition-colors">
+                  <Icon size={14} className="text-muted-foreground group-hover:text-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-700">{label}</p>
-                  <p className="text-xs text-slate-500">{desc}</p>
+                  <p className="text-sm font-medium text-foreground">{label}</p>
+                  <p className="text-xs text-muted-foreground">{desc}</p>
                 </div>
-                <ChevronRight size={14} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
+                <ChevronRight size={14} className="text-muted-foreground/50 group-hover:text-foreground transition-colors" />
               </Link>
             ))}
           </CardContent>

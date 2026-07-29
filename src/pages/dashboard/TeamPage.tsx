@@ -56,10 +56,12 @@ export default function TeamPage() {
   const [changeRoleMember, setChangeRoleMember] = useState<User | null>(null)
   const [newRole, setNewRole] = useState<string>('')
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<InviteForm>({
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<InviteForm>({
     resolver: zodResolver(inviteSchema),
     defaultValues: { role: 'engineer' },
   })
+
+  const selectedRole = watch('role')
 
   const loadInvitations = () => {
     setLoadingInv(true)
@@ -263,38 +265,38 @@ export default function TeamPage() {
           <Input label="Email address" type="email" placeholder="colleague@company.com" error={errors.email?.message} {...register('email')} />
           
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-slate-700">Role</label>
+            <label className="text-sm font-medium text-foreground">Role</label>
             <div className="space-y-2">
-              <label className="relative flex cursor-pointer rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:border-slate-300 has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-colors focus:outline-none">
+              <label className={cn("relative flex cursor-pointer rounded-lg border p-3 shadow-sm transition-colors focus:outline-none", selectedRole === 'engineer' ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-muted/50")}>
                 <input type="radio" value="engineer" {...register('role')} className="sr-only" />
                 <span className="flex flex-1">
                   <span className="flex flex-col">
-                    <span className="block text-sm font-medium text-slate-900">Engineer</span>
-                    <span className="mt-0.5 flex items-center text-xs text-slate-500">
+                    <span className="block text-sm font-medium text-foreground">Engineer</span>
+                    <span className="mt-0.5 flex items-center text-xs text-muted-foreground">
                       Can view and interact with all incidents and runbooks.
                     </span>
                   </span>
                 </span>
               </label>
 
-              <label className="relative flex cursor-pointer rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:border-slate-300 has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-colors focus:outline-none">
+              <label className={cn("relative flex cursor-pointer rounded-lg border p-3 shadow-sm transition-colors focus:outline-none", selectedRole === 'admin' ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-muted/50")}>
                 <input type="radio" value="admin" {...register('role')} className="sr-only" />
                 <span className="flex flex-1">
                   <span className="flex flex-col">
-                    <span className="block text-sm font-medium text-slate-900">Admin</span>
-                    <span className="mt-0.5 flex items-center text-xs text-slate-500">
+                    <span className="block text-sm font-medium text-foreground">Admin</span>
+                    <span className="mt-0.5 flex items-center text-xs text-muted-foreground">
                       Full access to all settings, members, and billing.
                     </span>
                   </span>
                 </span>
               </label>
 
-              <label className="relative flex cursor-pointer rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:border-slate-300 has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-colors focus:outline-none">
+              <label className={cn("relative flex cursor-pointer rounded-lg border p-3 shadow-sm transition-colors focus:outline-none", selectedRole === 'viewer' ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-muted/50")}>
                 <input type="radio" value="viewer" {...register('role')} className="sr-only" />
                 <span className="flex flex-1">
                   <span className="flex flex-col">
-                    <span className="block text-sm font-medium text-slate-900">Viewer</span>
-                    <span className="mt-0.5 flex items-center text-xs text-slate-500">
+                    <span className="block text-sm font-medium text-foreground">Viewer</span>
+                    <span className="mt-0.5 flex items-center text-xs text-muted-foreground">
                       Read-only access to dashboards and incident logs.
                     </span>
                   </span>

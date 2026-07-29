@@ -37,12 +37,12 @@ export function Select({ value, onChange, options, placeholder = 'Select...', cl
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full min-w-[150px] px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-700 hover:bg-slate-50"
+        className="flex items-center justify-between w-full min-w-[150px] px-3 py-2 text-sm bg-background border border-input rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-foreground hover:bg-muted/50"
       >
         <span className="truncate pr-2">
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronDown className={cn("h-4 w-4 text-slate-400 transition-transform duration-200", isOpen && "rotate-180")} />
+        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform duration-200", isOpen && "rotate-180")} />
       </button>
 
       <AnimatePresence>
@@ -52,7 +52,7 @@ export function Select({ value, onChange, options, placeholder = 'Select...', cl
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.98 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute z-50 left-0 min-w-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden py-1 whitespace-nowrap"
+            className="absolute z-50 left-0 min-w-full mt-1.5 bg-card border border-border rounded-xl shadow-lg overflow-hidden py-1 whitespace-nowrap"
           >
             <div className="max-h-60 overflow-y-auto">
               {options.map((option) => (
@@ -66,12 +66,12 @@ export function Select({ value, onChange, options, placeholder = 'Select...', cl
                   className={cn(
                     "w-full text-left flex items-center justify-between px-3 py-2 text-sm transition-colors",
                     value === option.value 
-                      ? "bg-indigo-50 text-indigo-700 font-medium" 
-                      : "text-slate-700 hover:bg-slate-50"
+                      ? "bg-primary/10 text-primary font-medium" 
+                      : "text-foreground hover:bg-muted"
                   )}
                 >
                   <span className="truncate pr-4">{option.label}</span>
-                  {value === option.value && <Check className="h-4 w-4 shrink-0 text-indigo-600" />}
+                  {value === option.value && <Check className="h-4 w-4 shrink-0 text-primary" />}
                 </button>
               ))}
             </div>

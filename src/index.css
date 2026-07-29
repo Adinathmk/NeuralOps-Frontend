@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -28,6 +28,20 @@
     --radius: 0.5rem;
   }
 
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 213 31% 91%;
+    --card: 222 47% 11%;
+    --card-foreground: 213 31% 91%;
+    --primary: 221 83% 60%;
+    --secondary: 217 32% 17%;
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 32% 17%;
+    --border: 217 32% 22%;
+    --input: 217 32% 22%;
+  }
+
  * {
   border-color: hsl(var(--border));
   box-sizing: border-box;
@@ -37,9 +51,13 @@
     @apply antialiased;
     color-scheme: light;
   }
+  
+  html.dark {
+    color-scheme: dark;
+  }
 
   body {
-    @apply bg-slate-50 text-foreground font-sans;
+    @apply bg-slate-50 text-foreground font-sans dark:bg-slate-950;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
@@ -48,6 +66,8 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+  .dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+  .dark ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
   /* Code blocks */
   code, pre { font-family: 'Geist Mono', 'Fira Code', monospace; }
@@ -59,6 +79,43 @@
   .bg-surface-2 { background-color: #F1F5F9; }
   .bg-surface-3 { background-color: #E2E8F0; }
   .bg-surface-4 { background-color: #CBD5E1; }
+  
+  .dark .bg-surface-0 { background-color: #0b1120; }
+  .dark .bg-surface-1 { background-color: #0f172a; }
+  .dark .bg-surface-2 { background-color: #1e293b; }
+  .dark .bg-surface-3 { background-color: #334155; }
+  .dark .bg-surface-4 { background-color: #475569; }
+
+  /* Fallback overrides for hardcoded light classes in dark mode */
+  .dark .bg-white { @apply !bg-card; }
+  .dark .bg-slate-50 { @apply !bg-background; }
+  .dark .bg-slate-100 { @apply !bg-muted; }
+  
+  .dark .hover\:bg-slate-50:hover { @apply !bg-muted; }
+  .dark .hover\:bg-slate-100:hover { @apply !bg-muted/80; }
+  
+  .dark .border-slate-100,
+  .dark .border-slate-200 { @apply !border-border; }
+  .dark .border-slate-200\/60 { @apply !border-border; }
+  
+  .dark .text-slate-900,
+  .dark .text-slate-800,
+  .dark .text-slate-700 { @apply !text-foreground; }
+  
+  .dark .text-slate-600,
+  .dark .text-slate-500,
+  .dark .text-slate-400 { @apply !text-muted-foreground; }
+  
+  .dark .bg-slate-50\/50 { @apply !bg-muted/50; }
+
+  /* 
+   * MAGIC TRICK: Force Razorpay Checkout into Dark Mode dynamically!
+   * Since Razorpay's iframe doesn't support dynamic themes via JS,
+   * we invert the iframe colors and hue-rotate back the brand colors.
+   */
+  html.dark .razorpay-container {
+    filter: invert(0.93) hue-rotate(180deg) !important;
+  }
 
   .border-white\/8 { border-color: rgba(0,0,0,0.08); }
 
